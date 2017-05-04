@@ -1,1 +1,10 @@
 julia 0.5
+ImageCore
+ImageTransformations
+CoordinateTransformations
+Rotations
+StaticArrays
+OffsetArrays
+Interpolations
+ColorTypes
+Compat 0.17
