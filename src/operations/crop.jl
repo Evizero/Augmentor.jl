@@ -8,11 +8,10 @@ end
 Crop{N}(indexes::NTuple{N,AbstractUnitRange}) = Crop{N}(indexes)
 Crop{N}(indexes::Vararg{AbstractUnitRange,N}) = Crop{N}(indexes)
 Crop(x, y, width, height) = Crop(y:y+height-1, x:x+width-1)
-Crop(; x = 1, y = 1, width = 64, height = 64) = Crop(x, y, width, height)
 
 islazy{T<:Crop}(::Type{T}) = true
-applyeager(tfm::Crop, img) = plain_array(img[tfm.indexes...])
-applylazy(tfm::Crop, img) = view(img, map(IdentityRange, tfm.indexes)...)
+applyeager(op::Crop, img) = plain_array(img[op.indexes...])
+applylazy(op::Crop, img) = view(img, map(IdentityRange, op.indexes)...)
 
 function Base.show{N}(io::IO, op::Crop{N})
     if get(io, :compact, false)

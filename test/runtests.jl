@@ -1,5 +1,12 @@
 using Augmentor
 using Base.Test
 
-# write your own tests here
-@test 1 == 2
+tests = [
+    "tst_show.jl",
+]
+
+for t in tests
+    @testset "$t" begin
+        include(t)
+    end
+end
