@@ -27,11 +27,13 @@ include("imagetransform.jl")
 include("compile.jl")
 include("augment.jl")
 
+include("transforms/noop.jl")
+include("transforms/either.jl")
 include("transforms/rotation.jl")
 include("transforms/crop.jl")
 
-_toarray(A::OffsetArray) = parent(A)
-_toarray(A::Array) = A
-_toarray(A::AbstractArray) = _toarray(copy(A))
+@inline plain_array(A::OffsetArray) = parent(A)
+@inline plain_array(A::Array) = A
+plain_array(A::AbstractArray) = plain_array(copy(A))
 
 end # module

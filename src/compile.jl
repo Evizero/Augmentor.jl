@@ -21,15 +21,15 @@ end
 
 # --------------------------------------------------------------------
 
-@inline function compile_pipeline(var_offset, tfm_offset, pipeline::Tuple)
+@inline function compile_pipeline(var_offset::Int, tfm_offset::Int, pipeline::Tuple)
     compile_pipeline(var_offset, tfm_offset, first(pipeline), Base.tail(pipeline))
 end
 
-@inline function compile_pipeline(var_offset, tfm_offset, pipeline::Tuple{})
+@inline function compile_pipeline(var_offset::Int, tfm_offset::Int, pipeline::Tuple{})
     :($(Symbol(:img_, var_offset)))
 end
 
-@inline function compile_pipeline(var_offset, tfm_offset, head, tail::Tuple)
+@inline function compile_pipeline(var_offset::Int, tfm_offset::Int, head, tail::Tuple)
     var_in  = Symbol(:img_, var_offset)
     var_out = Symbol(:img_, var_offset+1)
     expr = if islazy(head, tail)
@@ -48,7 +48,17 @@ end
 
 function compile_pipeline(varname, pipeline::Tuple)
     quote
+        $(Expr(:meta, :inline))
         img_1 = $varname
         $(compile_pipeline(1, 1, pipeline))
     end
 end
+
+# --------------------------------------------------------------------
+
+# just for user inspection to see how it works. not used internally
+function inspect_pipeline(pipeline::Pipeline)
+    compile_pipeline(:input_image, map(typeof, pipeline))
+end
+
+inspect_pipeline(tfm::ImageTransform) = inspect_pipeline((tfm,))

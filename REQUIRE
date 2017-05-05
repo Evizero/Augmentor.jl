@@ -7,4 +7,4 @@ StaticArrays
 OffsetArrays
 Interpolations
 ColorTypes
-Compat 0.17
+Compat 0.19

@@ -1,17 +1,13 @@
-function augment{T<:ImageTransform}(img, pipeline::AbstractVector{T})
-    augment(img, (pipeline...))
-end
-
 function augment{N}(img, pipeline::NTuple{N,ImageTransform})
-    _toarray(_augment(img, pipeline))
+    plain_array(_augment(img, pipeline))
 end
 
 function augment(img, tfm::ImageTransform)
-    _toarray(applyeager(tfm, img))
+    plain_array(applyeager(tfm, img))
 end
 
 function augment(img, pipeline::Tuple{ImageTransform})
-    _toarray(applyeager(first(pipeline), img))
+    plain_array(applyeager(first(pipeline), img))
 end
 
 # --------------------------------------------------------------------
