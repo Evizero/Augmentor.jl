@@ -23,14 +23,14 @@ export
     toaffine,
     augment
 
-include("imagetransform.jl")
+include("operation.jl")
 include("compile.jl")
 include("augment.jl")
 
-include("transforms/noop.jl")
-include("transforms/either.jl")
-include("transforms/rotation.jl")
-include("transforms/crop.jl")
+include("operations/noop.jl")
+include("operations/either.jl")
+include("operations/rotation.jl")
+include("operations/crop.jl")
 
 @inline plain_array(A::OffsetArray) = parent(A)
 @inline plain_array(A::Array) = A

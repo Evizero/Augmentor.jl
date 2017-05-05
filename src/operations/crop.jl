@@ -1,4 +1,4 @@
-immutable Crop{I<:Tuple} <: ImageTransform
+immutable Crop{I<:Tuple} <: Operation
     indexes::I
 
     function (::Type{Crop}){N}(indexes::NTuple{N,AbstractUnitRange})

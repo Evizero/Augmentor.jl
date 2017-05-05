@@ -21,44 +21,43 @@ end
 
 # --------------------------------------------------------------------
 
-@inline function compile_pipeline(var_offset::Int, tfm_offset::Int, pipeline::Tuple)
-    compile_pipeline(var_offset, tfm_offset, first(pipeline), Base.tail(pipeline))
+@inline function build_pipeline(var_offset::Int, op_offset::Int, pipeline::Tuple)
+    build_pipeline(var_offset, op_offset, first(pipeline), Base.tail(pipeline))
 end
 
-@inline function compile_pipeline(var_offset::Int, tfm_offset::Int, pipeline::Tuple{})
+@inline function build_pipeline(var_offset::Int, op_offset::Int, pipeline::Tuple{})
     :($(Symbol(:img_, var_offset)))
 end
 
-@inline function compile_pipeline(var_offset::Int, tfm_offset::Int, head, tail::Tuple)
+@inline function build_pipeline(var_offset::Int, op_offset::Int, head, tail::Tuple)
     var_in  = Symbol(:img_, var_offset)
     var_out = Symbol(:img_, var_offset+1)
     expr = if islazy(head, tail)
-        num_aff, rest = seek_connected_lazy(0, head, tail)
+        num_lazy, rest = seek_connected_lazy(0, head, tail)
         quote
-            $var_out = applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in tfm_offset:tfm_offset+num_aff-1)...)), $var_in)
-            $(compile_pipeline(var_offset+1, tfm_offset+num_aff, rest))
+            $var_out = applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
+            $(build_pipeline(var_offset+1, op_offset+num_lazy, rest))
         end
     else
         quote
-            $var_out = applyeager(pipeline[$tfm_offset], $var_in)
-            $(compile_pipeline(var_offset+1, tfm_offset+1, tail))
+            $var_out = applyeager(pipeline[$op_offset], $var_in)
+            $(build_pipeline(var_offset+1, op_offset+1, tail))
         end
     end
 end
 
-function compile_pipeline(varname, pipeline::Tuple)
+function build_pipeline(varname, pipeline::Tuple)
     quote
-        $(Expr(:meta, :inline))
         img_1 = $varname
-        $(compile_pipeline(1, 1, pipeline))
+        $(build_pipeline(1, 1, pipeline))
     end
 end
 
 # --------------------------------------------------------------------
 
 # just for user inspection to see how it works. not used internally
-function inspect_pipeline(pipeline::Pipeline)
-    compile_pipeline(:input_image, map(typeof, pipeline))
+function build_pipeline(pipeline::Pipeline)
+    build_pipeline(:input_image, map(typeof, pipeline))
 end
 
-inspect_pipeline(tfm::ImageTransform) = inspect_pipeline((tfm,))
+build_pipeline(op::Operation) = build_pipeline((op,))
