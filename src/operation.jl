@@ -49,18 +49,18 @@ Base.@pure supports_lazy(A) = supports_lazy(typeof(A))
 
 # --------------------------------------------------------------------
 
-function prepareaffine(op, img)
+function prepareaffine(img)
     ImageTransformations.box_extrapolation(img, Flat())
 end
 
-@inline prepareaffine{T,N,A<:InvWarpedView}(op, img::SubArray{T,N,A}) = img
-@inline prepareaffine(op, img::InvWarpedView) = img
-@inline prepareaffine(op, img::AbstractExtrapolation) = img
+@inline prepareaffine{T,N,A<:InvWarpedView}(img::SubArray{T,N,A}) = img
+@inline prepareaffine(img::InvWarpedView) = img
+@inline prepareaffine(img::AbstractExtrapolation) = img
 
-@inline prepareview(op, img) = img
-@inline preparestepview(op, img) = img
-@inline preparepermute(op, img) = img
-@inline preparelazy(op, img) = img
+@inline prepareview(img) = img
+@inline preparestepview(img) = img
+@inline preparepermute(img) = img
+@inline preparelazy(img) = img
 
 # --------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ for KIND in (:affine, :permute, :view, :stepview, :lazy)
     PRE = Symbol(:prepare, KIND)
     @eval begin
         function ($FUN){N}(pipeline::Pipeline{N}, img)
-            ($FUN)(first(pipeline), Base.tail(pipeline), ($PRE)(first(pipeline), img))
+            ($FUN)(first(pipeline), Base.tail(pipeline), ($PRE)(img))
         end
 
         @inline function ($FUN)(head::Operation, tail::Tuple, img)

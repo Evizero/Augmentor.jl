@@ -41,13 +41,13 @@ Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
 # choose lazy strategy based on shared qualities of elements
 @generated function applylazy(op::Either, img)
     if supports_view(op)
-        :(applyview(op, prepareview(op, img)))
+        :(applyview(op, prepareview(img)))
     elseif supports_stepview(op)
-        :(applystepview(op, preparestepview(op, img)))
+        :(applystepview(op, preparestepview(img)))
     elseif supports_permute(op)
-        :(applypermute(op, preparepermute(op, img)))
+        :(applypermute(op, preparepermute(img)))
     elseif supports_affine(op)
-        :(applyaffine(op, prepareaffine(op, img)))
+        :(applyaffine(op, prepareaffine(img)))
     else # should be unreachable
         error("applylazy(op::Either, img) should never be executed with op.operations = $(op.operations)")
     end

@@ -18,11 +18,11 @@ end
 
 function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,AbstractUnitRange})
     idx = map((i1,i2) -> UnitRange(i1)[i2], A.indexes, I)
-    view(A, map(IdentityRange, idx)...)
+    view(parent(A), map(IdentityRange, idx)...)
 end
 
-function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,OrdinalRange})
+function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,StepRange})
     idx = map((i1,i2) -> UnitRange(i1)[i2], A.indexes, I)
-    view(A, idx...)
+    view(parent(A), idx...)
 end
 

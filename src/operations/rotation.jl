@@ -10,7 +10,7 @@ applylazy(op::Rotate90, img) = applypermute(op, img)
 function applypermute{T}(::Rotate90, img::AbstractMatrix{T})
     idx = map(StepRange, indices(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
-    identity_view(perm_img, (reverse(idx[2]), idx[1]))
+    view(perm_img, reverse(idx[2]), idx[1])
 end
 
 # --------------------------------------------------------------------
@@ -25,7 +25,7 @@ applyeager(::Rotate180, img) = plain_array(rot180(img))
 applylazy(op::Rotate180, img) = applystepview(op, img)
 
 function applystepview(::Rotate180, img::AbstractMatrix)
-    idx = map(StepRange, indices(img))
+    idx = map(i->1:1:length(i), indices(img))
     identity_view(img, (reverse(idx[1]), reverse(idx[2])))
 end
 
@@ -43,7 +43,7 @@ applylazy(op::Rotate270, img) = applypermute(op, img)
 function applypermute{T}(::Rotate270, img::AbstractMatrix{T})
     idx = map(StepRange, indices(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
-    identity_view(perm_img, (idx[2], reverse(idx[1])))
+    view(perm_img, idx[2], reverse(idx[1]))
 end
 
 # --------------------------------------------------------------------
