@@ -11,7 +11,12 @@ isaffine(A) = isaffine(typeof(A))
 
 # --------------------------------------------------------------------
 
-function applylazy(op::AffineOperation, img)
+function applylazy(op::AffineOperation, img::AbstractArray)
+    etp = ImageTransformations.box_extrapolation(img, Flat())
+    applylazy(op, etp)
+end
+
+function applylazy(op::AffineOperation, img::AbstractExtrapolation)
     invwarpedview(img, toaffine(op, img))
 end
 

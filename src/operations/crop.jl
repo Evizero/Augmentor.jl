@@ -5,8 +5,9 @@ immutable Crop{N,I<:Tuple} <: Operation
         new{N,typeof(indexes)}(indexes)
     end
 end
+Crop(::Tuple{}) = throw(MethodError(Crop, ()))
 Crop{N}(indexes::NTuple{N,AbstractUnitRange}) = Crop{N}(indexes)
-Crop{N}(indexes::Vararg{AbstractUnitRange,N}) = Crop{N}(indexes)
+Crop{N}(indexes::Vararg{AbstractUnitRange,N}) = Crop(indexes)
 Crop(x, y, width, height) = Crop(y:y+height-1, x:x+width-1)
 
 islazy{T<:Crop}(::Type{T}) = true
