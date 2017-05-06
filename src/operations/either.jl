@@ -33,10 +33,39 @@ function Either(op::Operation, p::Real = .5)
 end
 
 # "Either" is only lazy if all its elements are affine
-Base.@pure islazy{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
+Base.@pure supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
+Base.@pure supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepview, T.types))
 Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
 
-for FUN in (:toaffine, :applylazy, :applyeager)
+# choose lazy strategy based on shared qualities of elements
+@generated function applylazy(op::Either, img)
+    if supports_stepview(op)
+        :(applystepview(op, preparestepview(op, img)))
+    elseif supports_permute(op)
+        :(applypermute(op, preparepermute(op, img)))
+    elseif supports_affine(op)
+        :(applyaffine(op, prepareaffine(op, img)))
+    else # should be unreachable
+        error("applylazy(op::Either, img) should never be executed with op.operations = $(op.operations)")
+    end
+end
+
+function toaffine(op::Either, img::AbstractMatrix)
+    p = rand()
+    for (i, p_i) in enumerate(op.cum_chances)
+        if p <= p_i
+            tfm = toaffine(op.operations[i], img)
+            return AffineMap(SMatrix(tfm.m), SVector(tfm.v))::AffineMap{SMatrix{2,2,Float64,4},SVector{2,Float64}}
+        end
+    end
+    error("unreachable code reached")
+end
+
+function applyaffine(op::Either, img)
+    invwarpedview(img, toaffine(op, img))
+end
+
+for FUN in (:applypermute, :applystepview, :applyeager)
     @eval function ($FUN)(op::Either, img)
         p = rand()
         for (i, p_i) in enumerate(op.cum_chances)
@@ -44,7 +73,7 @@ for FUN in (:toaffine, :applylazy, :applyeager)
                 return ($FUN)(op.operations[i], img)
             end
         end
-        ($FUN)(op.operations[end], img)
+        error("unreachable code reached")
     end
 end
 

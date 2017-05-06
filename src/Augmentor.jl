@@ -9,6 +9,7 @@ using StaticArrays
 using OffsetArrays
 using IdentityRanges
 using Compat
+using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
 
@@ -20,7 +21,6 @@ export
     Rotate270,
     Crop,
 
-    toaffine,
     augment
 
 include("operation.jl")

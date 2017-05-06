@@ -1,13 +1,13 @@
-@inline function seek_connected_lazy(N, head, tail::Tuple)
-    if islazy(head)
-        seek_connected_lazy(N+1, first(tail), Base.tail(tail))
+@inline function seek_connected(f, N, head, tail::Tuple)
+    if f(head)
+        seek_connected(f, N+1, first(tail), Base.tail(tail))
     else
         N, (head, tail...)
     end
 end
 
-@inline function seek_connected_lazy(N, head, tail::Tuple{})
-    if islazy(head)
+@inline function seek_connected(f, N, head, tail::Tuple{})
+    if f(head)
         N+1, ()
     else
         N, (head,)
@@ -16,8 +16,10 @@ end
 
 # --------------------------------------------------------------------
 
-@inline islazy(head, tail::Tuple) = islazy(head) && islazy(first(tail))
-@inline islazy(head, tail::Tuple{}) = false
+@inline supports_lazy(head, tail::Tuple) = supports_lazy(head) && supports_lazy(first(tail))
+@inline supports_lazy(head, tail::Tuple{}) = false
+@inline supports_affine(head, tail::Tuple) = supports_affine(head) && supports_affine(first(tail))
+@inline supports_affine(head, tail::Tuple{}) = false
 
 # --------------------------------------------------------------------
 
@@ -32,11 +34,19 @@ end
 @inline function build_pipeline(var_offset::Int, op_offset::Int, head, tail::Tuple)
     var_in  = Symbol(:img_, var_offset)
     var_out = Symbol(:img_, var_offset+1)
-    expr = if islazy(head, tail)
-        num_lazy, rest = seek_connected_lazy(0, head, tail)
-        quote
-            $var_out = applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
-            $(build_pipeline(var_offset+1, op_offset+num_lazy, rest))
+    if supports_lazy(head, tail)
+        num_affine, rest_affine = supports_affine(head, tail) ? seek_connected(supports_affine, 0, head, tail) : (0, nothing)
+        num_lazy, rest_lazy = seek_connected(x->(supports_permute(x)||supports_stepview(x)), 0, head, tail)
+        if num_lazy >= num_affine
+            quote
+                $var_out = applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
+                $(build_pipeline(var_offset+1, op_offset+num_lazy, rest_lazy))
+            end
+        else
+            quote
+                $var_out = applyaffine($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_affine-1)...)), $var_in)
+                $(build_pipeline(var_offset+1, op_offset+num_affine, rest_affine))
+            end
         end
     else
         quote
