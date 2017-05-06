@@ -23,6 +23,7 @@ export
 
     augment
 
+include("utils.jl")
 include("operation.jl")
 include("compile.jl")
 include("augment.jl")
@@ -31,9 +32,5 @@ include("operations/noop.jl")
 include("operations/either.jl")
 include("operations/rotation.jl")
 include("operations/crop.jl")
-
-@inline plain_array(A::OffsetArray) = parent(A)
-@inline plain_array(A::Array) = A
-plain_array(A::AbstractArray) = plain_array(copy(A))
 
 end # module

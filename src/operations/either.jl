@@ -34,12 +34,15 @@ end
 
 # "Either" is only lazy if all its elements are affine
 Base.@pure supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
+Base.@pure supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))
 Base.@pure supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepview, T.types))
 Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
 
 # choose lazy strategy based on shared qualities of elements
 @generated function applylazy(op::Either, img)
-    if supports_stepview(op)
+    if supports_view(op)
+        :(applyview(op, prepareview(op, img)))
+    elseif supports_stepview(op)
         :(applystepview(op, preparestepview(op, img)))
     elseif supports_permute(op)
         :(applypermute(op, preparepermute(op, img)))
@@ -65,7 +68,7 @@ function applyaffine(op::Either, img)
     invwarpedview(img, toaffine(op, img))
 end
 
-for FUN in (:applypermute, :applystepview, :applyeager)
+for FUN in (:applypermute, :applyview, :applystepview, :applyeager)
     @eval function ($FUN)(op::Either, img)
         p = rand()
         for (i, p_i) in enumerate(op.cum_chances)

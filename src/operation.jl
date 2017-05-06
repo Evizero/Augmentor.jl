@@ -36,12 +36,14 @@ Base.@pure isaffine(::Type) = false
 
 Base.@pure supports_affine{T}(::Type{T}) = isaffine(T)
 Base.@pure supports_permute(::Type) = false
+Base.@pure supports_view(::Type) = false
 Base.@pure supports_stepview(::Type) = false
-Base.@pure supports_lazy{T}(::Type{T}) = supports_affine(T) || supports_stepview(T) || supports_permute(T)
+Base.@pure supports_lazy{T}(::Type{T}) = supports_affine(T) || supports_stepview(T) || supports_view(T) || supports_permute(T)
 
 Base.@pure isaffine(A) = isaffine(typeof(A))
 Base.@pure supports_affine(A) = supports_affine(typeof(A))
 Base.@pure supports_permute(A) = supports_permute(typeof(A))
+Base.@pure supports_view(A) = supports_view(typeof(A))
 Base.@pure supports_stepview(A) = supports_stepview(typeof(A))
 Base.@pure supports_lazy(A) = supports_lazy(typeof(A))
 
@@ -55,6 +57,7 @@ end
 @inline prepareaffine(op, img::InvWarpedView) = img
 @inline prepareaffine(op, img::AbstractExtrapolation) = img
 
+@inline prepareview(op, img) = img
 @inline preparestepview(op, img) = img
 @inline preparepermute(op, img) = img
 @inline preparelazy(op, img) = img
@@ -71,12 +74,12 @@ end
 
 # --------------------------------------------------------------------
 
-for KIND in (:affine, :permute, :stepview, :lazy)
+for KIND in (:affine, :permute, :view, :stepview, :lazy)
     FUN = Symbol(:apply, KIND)
     PRE = Symbol(:prepare, KIND)
     @eval begin
         function ($FUN){N}(pipeline::Pipeline{N}, img)
-            ($FUN)(first(pipeline), Base.tail(pipeline), img)
+            ($FUN)(first(pipeline), Base.tail(pipeline), ($PRE)(first(pipeline), img))
         end
 
         @inline function ($FUN)(head::Operation, tail::Tuple, img)
@@ -84,7 +87,7 @@ for KIND in (:affine, :permute, :stepview, :lazy)
         end
 
         @inline function ($FUN)(head::Operation, tail::Tuple{}, img)
-            ($FUN)(head, ($PRE)(head, img))
+            ($FUN)(head, img)
         end
     end
 end

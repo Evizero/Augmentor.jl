@@ -36,8 +36,9 @@ end
     var_out = Symbol(:img_, var_offset+1)
     if supports_lazy(head, tail)
         num_affine, rest_affine = supports_affine(head, tail) ? seek_connected(supports_affine, 0, head, tail) : (0, nothing)
-        num_lazy, rest_lazy = seek_connected(x->(supports_permute(x)||supports_stepview(x)), 0, head, tail)
-        if num_lazy >= num_affine
+        num_special, _ = seek_connected(x->(supports_permute(x)||supports_view(x)||supports_stepview(x)), 0, head, tail)
+        num_lazy, rest_lazy = seek_connected(supports_lazy, 0, head, tail)
+        if num_special >= num_affine
             quote
                 $var_out = applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
                 $(build_pipeline(var_offset+1, op_offset+num_lazy, rest_lazy))
