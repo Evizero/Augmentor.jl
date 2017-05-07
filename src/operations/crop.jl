@@ -22,11 +22,7 @@ end
 applyaffine(op::Crop, img) = identity_view(img, op.indexes)
 applylazy(op::Crop, img) = identity_view(img, op.indexes)
 applyview(op::Crop, img) = identity_view(img, op.indexes)
-
-function applystepview(op::Crop, img::AbstractArray)
-    indexes = map(StepRange, op.indexes)
-    identity_view(img, indexes)
-end
+applystepview(op::Crop, img) = identity_view(img, map(StepRange, op.indexes))
 
 function Base.show{N}(io::IO, op::Crop{N})
     if get(io, :compact, false)

@@ -50,7 +50,8 @@ Base.@pure supports_lazy(A) = supports_lazy(typeof(A))
 # --------------------------------------------------------------------
 
 function prepareaffine(img)
-    ImageTransformations.box_extrapolation(img, Flat())
+    etp = ImageTransformations.box_extrapolation(img, Flat())
+    invwarpedview(etp, toaffine(NoOp(), img))
 end
 
 @inline prepareaffine{T,N,A<:InvWarpedView}(img::SubArray{T,N,A}) = img
@@ -63,31 +64,48 @@ end
 @inline preparelazy(img) = img
 
 # --------------------------------------------------------------------
+# AffineOperation fallbacks
 
 function applyaffine(op::AffineOperation, img)
     invwarpedview(img, toaffine(op, img))
 end
 
 function applylazy(op::AffineOperation, img)
-    applyaffine(op, prepareaffine(op, img))
+    _applylazy(op, img)
+end
+
+function _applylazy(op::AffineOperation, img::InvWarpedView)
+    applyaffine(op, img)
+end
+
+function _applylazy{T,N,IT<:InvWarpedView}(op::AffineOperation, img::SubArray{T,N,IT})
+    applyaffine(op, img)
+end
+
+function _applylazy(op::AffineOperation, img)
+    applylazy_fallback(op, img)
+end
+
+function applylazy_fallback(op::AffineOperation, img)
+    applyaffine(op, prepareaffine(img))
 end
 
 # --------------------------------------------------------------------
 
 for KIND in (:affine, :permute, :view, :stepview, :lazy)
-    FUN = Symbol(:apply, KIND)
+    APP = Symbol(:apply, KIND)
     PRE = Symbol(:prepare, KIND)
     @eval begin
-        function ($FUN){N}(pipeline::Pipeline{N}, img)
-            ($FUN)(first(pipeline), Base.tail(pipeline), ($PRE)(img))
+        function ($APP)(pipeline::Pipeline, img)
+            ($APP)(first(pipeline), Base.tail(pipeline), ($PRE)(img))
         end
 
-        @inline function ($FUN)(head::Operation, tail::Tuple, img)
-            ($FUN)(first(tail), Base.tail(tail), ($FUN)(head, img))
+        @inline function ($APP)(head::Operation, tail::Tuple, img)
+            ($APP)(first(tail), Base.tail(tail), ($APP)(head, img))
         end
 
-        @inline function ($FUN)(head::Operation, tail::Tuple{}, img)
-            ($FUN)(head, img)
+        @inline function ($APP)(head::Operation, tail::Tuple{}, img)
+            ($APP)(head, img)
         end
     end
 end
