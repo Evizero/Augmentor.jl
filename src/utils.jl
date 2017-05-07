@@ -1,6 +1,8 @@
+@inline _plain_array(A::OffsetArray) = parent(A)
+@inline _plain_array(A::Array) = A
 @inline plain_array(A::OffsetArray) = parent(A)
 @inline plain_array(A::Array) = A
-plain_array(A::AbstractArray) = plain_array(copy(A))
+plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recusion
 
 # --------------------------------------------------------------------
 
@@ -13,6 +15,10 @@ end
 end
 
 @inline function identity_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,IdentityRange})
+    view(A, I...)
+end
+
+@inline function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,IdentityRange})
     view(A, I...)
 end
 

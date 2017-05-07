@@ -12,18 +12,18 @@ end
 function Base.show{N}(io::IO, pipeline::Pipeline{N})
     n = length(pipeline)
     if get(io, :compact, false)
-        print(io, "(")
+        print(io, '(')
         for (i, op) in enumerate(pipeline)
             Base.showcompact(io, op)
             i < n && print(io, ", ")
         end
-        print(io, ")")
+        print(io, ')')
     else
         k = length("$(length(pipeline))")
         print(io, "$n-step Augmentor.Pipeline:")
         for (i, op) in enumerate(pipeline)
             println(io)
-            print(io, lpad("$i", k+1, " "), ".) ")
+            print(io, lpad(string(i), k+1, " "), ".) ")
             Base.showcompact(io, op)
         end
     end
@@ -49,15 +49,27 @@ Base.@pure supports_lazy(A) = supports_lazy(typeof(A))
 
 # --------------------------------------------------------------------
 
+"""
+    prepareaffine(img)
+
+Make sure `img` is either a `InvWarpedView` or a `SubArray` of
+one. If that is already the case, `img` will be returned as is.
+Otherwise `invwarpedview` will be called using a `Flat()`
+extrapolation scheme.
+
+Doing this will tell subsequent operations that they should also
+participate as affine operations (i.e. use `AffineMap` if they
+can).
+"""
 function prepareaffine(img)
-    etp = ImageTransformations.box_extrapolation(img, Flat())
-    invwarpedview(etp, toaffine(NoOp(), img))
+    invwarpedview(img, toaffine(NoOp(), img), Flat())
 end
 
 @inline prepareaffine{T,N,A<:InvWarpedView}(img::SubArray{T,N,A}) = img
 @inline prepareaffine(img::InvWarpedView) = img
 @inline prepareaffine(img::AbstractExtrapolation) = img
 
+# currently unused
 @inline prepareview(img) = img
 @inline preparestepview(img) = img
 @inline preparepermute(img) = img
