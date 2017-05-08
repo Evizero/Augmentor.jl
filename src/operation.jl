@@ -1,39 +1,7 @@
-@compat abstract type Operation end
-@compat abstract type AffineOperation <: Operation end
-
-# --------------------------------------------------------------------
-
-@compat const Pipeline{N} = NTuple{N,Operation}
-
-function Base.show(io::IO, pipeline::Pipeline{0})
-    print(io, "()")
-end
-
-function Base.show{N}(io::IO, pipeline::Pipeline{N})
-    n = length(pipeline)
-    if get(io, :compact, false)
-        print(io, '(')
-        for (i, op) in enumerate(pipeline)
-            Base.showcompact(io, op)
-            i < n && print(io, ", ")
-        end
-        print(io, ')')
-    else
-        k = length("$(length(pipeline))")
-        print(io, "$n-step Augmentor.Pipeline:")
-        for (i, op) in enumerate(pipeline)
-            println(io)
-            print(io, lpad(string(i), k+1, " "), ".) ")
-            Base.showcompact(io, op)
-        end
-    end
-end
-
-# --------------------------------------------------------------------
-
 Base.@pure isaffine{T<:AffineOperation}(::Type{T}) = true
 Base.@pure isaffine(::Type) = false
 
+Base.@pure supports_eager(::Type) = true
 Base.@pure supports_affine{T}(::Type{T}) = isaffine(T)
 Base.@pure supports_permute(::Type) = false
 Base.@pure supports_view(::Type) = false
@@ -41,11 +9,12 @@ Base.@pure supports_stepview(::Type) = false
 Base.@pure supports_lazy{T}(::Type{T}) = supports_affine(T) || supports_stepview(T) || supports_view(T) || supports_permute(T)
 
 Base.@pure isaffine(A) = isaffine(typeof(A))
-Base.@pure supports_affine(A) = supports_affine(typeof(A))
-Base.@pure supports_permute(A) = supports_permute(typeof(A))
-Base.@pure supports_view(A) = supports_view(typeof(A))
+Base.@pure supports_eager(A)    = supports_eager(typeof(A))
+Base.@pure supports_affine(A)   = supports_affine(typeof(A))
+Base.@pure supports_permute(A)  = supports_permute(typeof(A))
+Base.@pure supports_view(A)     = supports_view(typeof(A))
 Base.@pure supports_stepview(A) = supports_stepview(typeof(A))
-Base.@pure supports_lazy(A) = supports_lazy(typeof(A))
+Base.@pure supports_lazy(A)     = supports_lazy(typeof(A))
 
 # --------------------------------------------------------------------
 
@@ -67,7 +36,6 @@ end
 
 @inline prepareaffine{T,N,A<:InvWarpedView}(img::SubArray{T,N,A}) = img
 @inline prepareaffine(img::InvWarpedView) = img
-@inline prepareaffine(img::AbstractExtrapolation) = img
 
 # currently unused
 @inline prepareview(img) = img

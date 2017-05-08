@@ -13,9 +13,9 @@ using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
 
-    NoOp,
     Either,
 
+    NoOp,
     Rotate90,
     Rotate180,
     Rotate270,
@@ -24,7 +24,9 @@ export
     augment
 
 include("utils.jl")
+include("types.jl")
 include("operation.jl")
+include("pipeline.jl")
 include("compile.jl")
 include("augment.jl")
 

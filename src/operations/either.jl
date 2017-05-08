@@ -4,14 +4,17 @@ immutable Either{N,T<:Tuple} <: Operation
     cum_chances::SVector{N,Float64}
 
     function (::Type{Either}){N,T}(operations::Pipeline{N}, chances::SVector{N,T})
-        length(operations) > 0 || throw(ArgumentError("number of specified image operations need to be greater than 0"))
+        all(c->c>=0, chances) || throw(ArgumentError("All provided \"chances\" must be positive"))
+        length(operations) > 0 || throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
         sum_chances = sum(chances)
-        @assert sum_chances > 0.
+        sum_chances > 0 || throw(ArgumentError("The sum of all provided \"chances\" must be strictly positive"))
         norm_chances = map(x -> Float64(x/sum_chances), chances)
         cum_chances = SVector(cumsum(norm_chances))
         new{N,typeof(operations)}(operations, norm_chances, cum_chances)
     end
 end
+
+Either() = throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
 
 function Either{N}(operations::Pipeline{N}, chances::NTuple{N,Real} = map(op -> 1/length(operations), operations))
     Either(operations, SVector{N}(chances))
@@ -48,12 +51,13 @@ Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
         :(applypermute(op, preparepermute(img)))
     elseif supports_affine(op)
         :(applyaffine(op, prepareaffine(img)))
-    else # should be unreachable
-        error("applylazy(op::Either, img) should never be executed with op.operations = $(op.operations)")
+    else
+        :(throw(MethodError(applylazy, (op, img))))
     end
 end
 
 function toaffine(op::Either, img::AbstractMatrix)
+    supports_affine(typeof(op)) || throw(MethodError(toaffine, (op, img)))
     p = rand()
     for (i, p_i) in enumerate(op.cum_chances)
         if p <= p_i
@@ -68,12 +72,15 @@ function applyaffine(op::Either, img)
     invwarpedview(img, toaffine(op, img))
 end
 
-for FUN in (:applypermute, :applyview, :applystepview, :applyeager)
-    @eval function ($FUN)(op::Either, img)
+for KIND in (:eager, :permute, :view, :stepview)
+    APP = Symbol(:apply, KIND)
+    SUP = Symbol(:supports_, KIND)
+    @eval function ($APP)(op::Either, img)
+        ($SUP)(typeof(op)) || throw(MethodError($APP, (op, img)))
         p = rand()
         for (i, p_i) in enumerate(op.cum_chances)
             if p <= p_i
-                return ($FUN)(op.operations[i], img)
+                return ($APP)(op.operations[i], img)
             end
         end
         error("unreachable code reached")
@@ -90,9 +97,17 @@ function Base.show(io::IO, op::Either)
         end
     else
         print(io, "Augmentor.Either (1 out of ", length(op.operations), " operation(s)):")
-        for (op_i, p_i) in zip(op.operations, op.chances)
+        percent_int   = map(c->round(Int, c*100), op.chances)
+        percent_float = map(c->round(c*100, 1), op.chances)
+        percent = if any(i != f for (i,f) in zip(percent_int,percent_float))
+            percent_float
+        else
+            percent_int
+        end
+        k = maximum(length(string(c)) for c in percent)
+        for (op_i, p_i) in zip(op.operations, percent)
             println(io)
-            print(io, "  - ", round(p_i*100, 1), "% chance to: ")
+            print(io, "  - ", lpad(string(p_i), k, " "), "% chance to: ")
             Base.showcompact(io, op_i)
         end
     end

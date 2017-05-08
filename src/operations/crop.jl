@@ -15,6 +15,7 @@ Base.@pure supports_view{T<:Crop}(::Type{T}) = true
 Base.@pure supports_stepview{T<:Crop}(::Type{T}) = true
 
 applyeager(op::Crop, img) = plain_array(img[op.indexes...])
+applyeager(op::Crop, img::OffsetArray) = plain_array(parent(img)[op.indexes...])
 function applyeager{T,N,P}(op::Crop, img::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}})
     plain_array(identity_view(img, op.indexes))
 end
