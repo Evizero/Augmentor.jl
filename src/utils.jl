@@ -6,6 +6,10 @@ plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
 
 # --------------------------------------------------------------------
 
+function identity_view{T,N}(A::AbstractArray{T,N}, I::Tuple{})
+    throw(MethodError(identity_view, ()))
+end
+
 @inline function identity_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,AbstractUnitRange})
     view(A, map(IdentityRange, I)...)
 end

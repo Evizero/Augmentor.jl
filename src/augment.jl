@@ -3,7 +3,7 @@ function augment{N}(img, pipeline::Pipeline{N})
 end
 
 function augment(img, pipeline::Pipeline{1})
-    plain_array(applyeager(first(pipeline), img))
+    augment(img, first(pipeline))
 end
 
 function augment(img, op::Operation)

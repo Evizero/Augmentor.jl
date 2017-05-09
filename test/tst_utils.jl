@@ -24,6 +24,7 @@ end
     A = [1 2 3; 4 5 6; 7 8 9]
     Av = view(A, IdentityRange(2:3), IdentityRange(1:2))
     As = view(A, 3:-1:2, 1:1:2)
+    @test_throws MethodError Augmentor.identity_view(A, ())
     @test @inferred(Augmentor.identity_view(A, (2:3,1:2))) === Av
     @test @inferred(Augmentor.identity_view(A, (IdentityRange(2:3),IdentityRange(1:2)))) === Av
     @test @inferred(Augmentor.identity_view(A, (3:-1:2,1:1:2))) === As

@@ -1,4 +1,11 @@
-using Augmentor, ImageCore, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
+using ImageCore, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
+using ImageInTerminal
+
+# check for ambiguities
+refambs = detect_ambiguities(Base, Core)
+using Augmentor
+ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
+@test isempty(setdiff(ambs, refambs))
 
 function str_show(obj)
     io = IOBuffer()
@@ -26,6 +33,7 @@ tests = [
     "operations/tst_either.jl",
     "tst_operations.jl",
     "tst_pipeline.jl",
+    "tst_augment.jl",
 ]
 
 for t in tests

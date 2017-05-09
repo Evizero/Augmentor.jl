@@ -126,6 +126,24 @@ end
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
+    let op = @inferred Rotate90(1)
+        @test @inferred(Augmentor.isaffine(op)) === true
+        @test @inferred(Augmentor.supports_lazy(op)) === true
+        @test @inferred(Augmentor.supports_affine(op)) === true
+        @test @inferred(Augmentor.supports_view(op)) === false
+        @test @inferred(Augmentor.supports_stepview(op)) === false
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test_throws MethodError Augmentor.applyaffine(op, nothing)
+        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+        @test parent(wv).itp.coefs === square
+        @test wv == rotl90(square)
+        @test typeof(wv) <: InvWarpedView{eltype(square),2}
+        wv2 = @inferred Augmentor.applylazy(op, square)
+        @test parent(wv2).itp.coefs === square
+        @test wv2 == rotl90(square)
+        @test typeof(wv2) == typeof(wv)
+    end
     let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,1:2)))
         @test @inferred(Augmentor.isaffine(op)) === false
         @test @inferred(Augmentor.supports_lazy(op)) === false
