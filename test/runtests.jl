@@ -1,4 +1,4 @@
-using Augmentor, ImageCore, ImageTransformations, CoordinateTransformations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
+using Augmentor, ImageCore, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
 
 function str_show(obj)
     io = IOBuffer()

@@ -23,6 +23,13 @@ function applypermute{T,IT<:PermutedDimsArray}(::Rotate90, sub::SubArray{T,2,IT}
     view(img, reverse(idx[2]), idx[1])
 end
 
+function applypermute{T}(::Rotate90, sub::SubArray{T,2})
+    idx = map(StepRange, sub.indexes)
+    img = parent(sub)
+    perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
+    view(perm_img, reverse(idx[2]), idx[1])
+end
+
 # --------------------------------------------------------------------
 
 immutable Rotate180 <: AffineOperation end
@@ -62,6 +69,13 @@ function applypermute{T,IT<:PermutedDimsArray}(::Rotate270, sub::SubArray{T,2,IT
     idx = map(StepRange, sub.indexes)
     img = parent(parent(sub))
     view(img, idx[2], reverse(idx[1]))
+end
+
+function applypermute{T}(::Rotate270, sub::SubArray{T,2})
+    idx = map(StepRange, sub.indexes)
+    img = parent(sub)
+    perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
+    view(perm_img, idx[2], reverse(idx[1]))
 end
 
 # --------------------------------------------------------------------

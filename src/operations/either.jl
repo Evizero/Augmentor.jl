@@ -42,8 +42,12 @@ Base.@pure supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepvi
 Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
 
 # choose lazy strategy based on shared qualities of elements
+Base.@pure isaffine{T,N,P<:InvWarpedView,I,L}(::Type{SubArray{T,N,P,I,L}}) = true
+Base.@pure isaffine{T<:InvWarpedView}(::Type{T}) = true
 @generated function applylazy(op::Either, img)
-    if supports_view(op)
+    if isaffine(img) && supports_affine(op)
+        :(applyaffine(op, img))
+    elseif supports_view(op)
         :(applyview(op, prepareview(img)))
     elseif supports_stepview(op)
         :(applystepview(op, preparestepview(img)))
