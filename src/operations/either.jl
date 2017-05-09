@@ -56,6 +56,7 @@ Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
     end
 end
 
+# TODO: implement method for n-dim arrays
 function toaffine(op::Either, img::AbstractMatrix)
     supports_affine(typeof(op)) || throw(MethodError(toaffine, (op, img)))
     p = rand()

@@ -2,7 +2,7 @@
 @inline _plain_array(A::Array) = A
 @inline plain_array(A::OffsetArray) = parent(A)
 @inline plain_array(A::Array) = A
-plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recusion
+plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
 
 # --------------------------------------------------------------------
 

@@ -10,9 +10,10 @@ end
     @test @inferred(Augmentor.applyeager(NoOp(), OffsetArray(rect, (-1,-2)))) === rect
 end
 @testset "affine" begin
+    @test_throws MethodError Augmentor.toaffine(NoOp(), nothing)
     @test @inferred(Augmentor.isaffine(NoOp)) === true
     @test @inferred(Augmentor.supports_affine(NoOp)) === true
-    @test @inferred(Augmentor.toaffine(NoOp(), nothing)) == AffineMap(@SMatrix([1. 0; 0 1]), @SVector([0., 0.]))
+    @test @inferred(Augmentor.toaffine(NoOp(), rect)) == AffineMap(@SMatrix([1. 0; 0 1]), @SVector([0., 0.]))
     wv = @inferred Augmentor.applyaffine(NoOp(), rect)
     @test wv == rect
     @test typeof(wv) <: InvWarpedView{eltype(rect),2}
@@ -21,6 +22,8 @@ end
     @test @inferred(Augmentor.supports_lazy(NoOp)) === true
     @test @inferred(Augmentor.applylazy(NoOp(), nothing)) === nothing
     @test @inferred(Augmentor.applylazy(NoOp(), rect)) === rect
+    wv = Augmentor.prepareaffine(rect)
+    @test @inferred(Augmentor.applylazy(NoOp(), wv)) === wv
 end
 @testset "view" begin
     @test @inferred(Augmentor.supports_view(NoOp)) === true

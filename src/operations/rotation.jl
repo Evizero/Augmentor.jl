@@ -1,11 +1,13 @@
+# TODO: implement methods for n-dim arrays
+
 immutable Rotate90 <: AffineOperation end
 Rotate90(p) = Either(Rotate90(), p)
 
 Base.@pure supports_permute(::Type{Rotate90}) = true
 
-toaffine(::Rotate90, img) = recenter(RotMatrix(pi/2), center(img))
-applyeager(::Rotate90, img) = plain_array(rotl90(img))
-applylazy_fallback(op::Rotate90, img) = applypermute(op, img)
+toaffine(::Rotate90, img::AbstractMatrix) = recenter(RotMatrix(pi/2), center(img))
+applyeager(::Rotate90, img::AbstractMatrix) = plain_array(rotl90(img))
+applylazy_fallback(op::Rotate90, img::AbstractMatrix) = applypermute(op, img)
 
 function applypermute{T}(::Rotate90, img::AbstractMatrix{T})
     idx = map(StepRange, indices(img))
@@ -28,9 +30,9 @@ Rotate180(p) = Either(Rotate180(), p)
 
 Base.@pure supports_stepview(::Type{Rotate180}) = true
 
-toaffine(::Rotate180, img) = recenter(RotMatrix(pi), center(img))
-applyeager(::Rotate180, img) = plain_array(rot180(img))
-applylazy_fallback(op::Rotate180, img) = applystepview(op, img)
+toaffine(::Rotate180, img::AbstractMatrix) = recenter(RotMatrix(pi), center(img))
+applyeager(::Rotate180, img::AbstractMatrix) = plain_array(rot180(img))
+applylazy_fallback(op::Rotate180, img::AbstractMatrix) = applystepview(op, img)
 
 function applystepview(::Rotate180, img::AbstractMatrix)
     idx = map(i->1:1:length(i), indices(img))
@@ -44,9 +46,9 @@ Rotate270(p) = Either(Rotate270(), p)
 
 Base.@pure supports_permute(::Type{Rotate270}) = true
 
-toaffine(::Rotate270, img) = recenter(RotMatrix(-pi/2), center(img))
-applyeager(::Rotate270, img) = plain_array(rotr90(img))
-applylazy_fallback(op::Rotate270, img) = applypermute(op, img)
+toaffine(::Rotate270, img::AbstractMatrix) = recenter(RotMatrix(-pi/2), center(img))
+applyeager(::Rotate270, img::AbstractMatrix) = plain_array(rotr90(img))
+applylazy_fallback(op::Rotate270, img::AbstractMatrix) = applypermute(op, img)
 
 function applypermute{T}(::Rotate270, img::AbstractMatrix{T})
     idx = map(StepRange, indices(img))

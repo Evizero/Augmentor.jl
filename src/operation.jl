@@ -30,10 +30,8 @@ Doing this will tell subsequent operations that they should also
 participate as affine operations (i.e. use `AffineMap` if they
 can).
 """
-function prepareaffine(img)
-    invwarpedview(img, toaffine(NoOp(), img), Flat())
-end
-
+prepareaffine(img) = invwarpedview(img, toaffine(NoOp(), img), Flat())
+prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffine(NoOp(), img))
 @inline prepareaffine{T,N,A<:InvWarpedView}(img::SubArray{T,N,A}) = img
 @inline prepareaffine(img::InvWarpedView) = img
 
@@ -72,7 +70,7 @@ end
 
 # --------------------------------------------------------------------
 
-for KIND in (:affine, :permute, :view, :stepview, :lazy)
+for KIND in (:affine, :lazy) # :permute, :view, :stepview)
     APP = Symbol(:apply, KIND)
     PRE = Symbol(:prepare, KIND)
     @eval begin

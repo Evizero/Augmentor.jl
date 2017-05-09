@@ -28,6 +28,10 @@
         @test v === view(permuteddimsview(rect, (2,1)), 3:-1:1, 1:1:2)
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
+        wv = @inferred Augmentor.applylazy(Rotate90(), Augmentor.prepareaffine(square))
+        @test parent(wv).itp.coefs === square
+        @test wv == rotl90(square)
+        @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
         @test @inferred(Augmentor.supports_view(Rotate90)) === false
@@ -79,6 +83,10 @@ end
         @test v === view(rect, 2:-1:1, 3:-1:1)
         @test v == rot180(rect)
         @test typeof(v) <: SubArray
+        wv = @inferred Augmentor.applylazy(Rotate180(), Augmentor.prepareaffine(square))
+        @test parent(wv).itp.coefs === square
+        @test wv[1:3,1:3] == rot180(square)
+        @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
         @test @inferred(Augmentor.supports_view(Rotate180)) === false
@@ -127,6 +135,10 @@ end
         @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
+        wv = @inferred Augmentor.applylazy(Rotate270(), Augmentor.prepareaffine(square))
+        @test parent(wv).itp.coefs === square
+        @test wv == rotr90(square)
+        @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
         @test @inferred(Augmentor.supports_view(Rotate270)) === false
