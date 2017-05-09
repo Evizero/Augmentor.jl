@@ -14,6 +14,7 @@ end
 
 SPACE = VERSION < v"0.6.0-dev.2505" ? "" : " " # julia PR #20288
 
+camera = testimage("cameraman")
 square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]
 rect = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6]
 
