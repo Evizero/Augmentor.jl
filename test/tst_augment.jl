@@ -135,5 +135,18 @@ ops = (Rotate(45),Crop(1:512,1:512))
     @test_reference "rot45_crop" img
 end
 
+ops = (Scale(.1,.2),NoOp())
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: InvWarpedView
+    @test parent(wv).itp.coefs === camera
+    @test_reference "scale_crop" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "scale_crop" img
+end
+
 # just for code coverage
 @test typeof(@inferred(Augmentor.build_pipeline(Rotate90()))) <: Expr

@@ -35,10 +35,10 @@ function Either(op::Operation, p::Real = .5)
     Either((op, NoOp()), (p1, p2))
 end
 
-# "Either" is only lazy if all its elements are affine
 Base.@pure supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
 Base.@pure supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))
 Base.@pure supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepview, T.types))
+# "Either" only supports affine if all its elements are affine
 Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
 
 # choose lazy strategy based on shared qualities of elements

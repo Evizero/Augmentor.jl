@@ -100,6 +100,7 @@ end
 
 immutable Rotate{T<:AbstractVector} <: AffineOperation
     degree::T
+
     function (::Type{Rotate}){T<:Real}(degree::AbstractVector{T})
         length(degree) > 0 || throw(ArgumentError("The number of different angles passed to \"Rotate(...)\" must be non-zero"))
         new{typeof(degree)}(degree)

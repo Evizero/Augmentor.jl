@@ -1,5 +1,6 @@
 immutable Resize{N} <: Operation
     size::NTuple{N,Int}
+
     function (::Type{Resize{N}}){N}(size::NTuple{N,Int})
         all(s->s>0, size) || throw(ArgumentError("Specified sizes must be strictly greater than 0. Actual: $size"))
         new{N}(size)
