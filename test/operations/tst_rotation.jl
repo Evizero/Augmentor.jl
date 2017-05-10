@@ -8,7 +8,7 @@
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate90(), nothing)
         @test @inferred(Augmentor.supports_eager(Rotate90)) === true
-        for img in (rect, OffsetArray(rect, -2, -1))
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate90(), img)) == rotl90(rect)
             @test typeof(Augmentor.applyeager(Rotate90(), img)) <: Array
         end
@@ -68,7 +68,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate180(), nothing)
         @test @inferred(Augmentor.supports_eager(Rotate180)) === true
-        for img in (rect, OffsetArray(rect, -2, -1))
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate180(), img)) == rot180(rect)
             @test typeof(Augmentor.applyeager(Rotate180(), img)) <: Array
         end
@@ -126,7 +126,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate270(), nothing)
         @test @inferred(Augmentor.supports_eager(Rotate270)) === true
-        for img in (rect, OffsetArray(rect, -2, -1))
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate270(), img)) == rotr90(rect)
             @test typeof(Augmentor.applyeager(Rotate270(), img)) <: Array
         end
@@ -201,7 +201,7 @@ end
         @test_throws MethodError Augmentor.applyeager(Rotate(10), nothing)
         @test @inferred(Augmentor.supports_eager(Rotate)) === false
         # TODO: more tests
-        for img in (square, OffsetArray(square, 0, 0))
+        for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate(90), img)) == rotl90(square)
             @test typeof(Augmentor.applyeager(Rotate(90), img)) <: Array
             @test @inferred(Augmentor.applyeager(Rotate(-90), img)) == rotr90(square)

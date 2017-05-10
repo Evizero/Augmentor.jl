@@ -8,7 +8,7 @@
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(FlipX(), nothing)
         @test @inferred(Augmentor.supports_eager(FlipX)) === true
-        for img in (rect, OffsetArray(rect, -2, -1))
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(FlipX(), img)) == flipdim(rect,2)
             @test typeof(Augmentor.applyeager(FlipX(), img)) <: Array
         end
@@ -61,7 +61,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(FlipY(), nothing)
         @test @inferred(Augmentor.supports_eager(FlipY)) === true
-        for img in (rect, OffsetArray(rect, -2, -1))
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(FlipY(), img)) == flipdim(rect,1)
             @test typeof(Augmentor.applyeager(FlipY(), img)) <: Array
         end

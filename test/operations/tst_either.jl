@@ -106,6 +106,14 @@ end
         @test @inferred(Augmentor.supports_eager(op)) === true
         @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,1)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
+        op = @inferred Either((Rotate90(),Resize(5,5)), (0,1))
+        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
+        @test typeof(Augmentor.applyeager(op, img)) <: Array
+        op = @inferred Either((Crop(1:2,1:2),Resize(5,5)), (0,1))
+        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
+        @test typeof(Augmentor.applyeager(op, img)) <: Array
     end
 end
 
@@ -199,6 +207,28 @@ end
         @test typeof(wv2) == typeof(wv)
     end
     let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,1:2)))
+        @test @inferred(Augmentor.isaffine(op)) === false
+        @test @inferred(Augmentor.supports_lazy(op)) === false
+        @test @inferred(Augmentor.supports_affine(op)) === false
+        @test @inferred(Augmentor.supports_view(op)) === false
+        @test @inferred(Augmentor.supports_stepview(op)) === false
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test_throws MethodError Augmentor.toaffine(op, nothing)
+        @test_throws MethodError Augmentor.toaffine(op, rect)
+        @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+    end
+    let op = @inferred Either((Rotate90(),Resize(2,3)))
+        @test @inferred(Augmentor.isaffine(op)) === false
+        @test @inferred(Augmentor.supports_lazy(op)) === false
+        @test @inferred(Augmentor.supports_affine(op)) === false
+        @test @inferred(Augmentor.supports_view(op)) === false
+        @test @inferred(Augmentor.supports_stepview(op)) === false
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test_throws MethodError Augmentor.toaffine(op, nothing)
+        @test_throws MethodError Augmentor.toaffine(op, rect)
+        @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+    end
+    let op = @inferred Either((Crop(1:2,1:2),Resize(2,3)))
         @test @inferred(Augmentor.isaffine(op)) === false
         @test @inferred(Augmentor.supports_lazy(op)) === false
         @test @inferred(Augmentor.supports_affine(op)) === false

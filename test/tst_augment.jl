@@ -77,6 +77,13 @@ ops = (Rotate(90),Rotate(-90)) # forces affine
     @test wv == camera
 end
 
+ops = (Resize(2,2),Rotate90()) # forces affine
+@testset "$(str_showcompact(ops))" begin
+    img = @inferred Augmentor._augment(rect, ops)
+    @test typeof(img) === Array{Gray{N0f8},2}
+    @test img == rotl90(imresize(rect,2,2))
+end
+
 ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
@@ -103,6 +110,14 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(1:250, 1:150))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "rot_crop_rot_crop" img
+end
+
+ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(1:250, 1:150),Resize(25,15))
+@testset "$(str_showcompact(ops))" begin
+    img = @inferred Augmentor._augment(camera, ops)
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "rot_crop_rot_crop_resize" img
 end
 
 ops = (Rotate(45),Crop(1:512,1:512))

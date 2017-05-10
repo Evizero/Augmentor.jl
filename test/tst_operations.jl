@@ -40,9 +40,19 @@ ops = (Rotate90(), Rotate270())
     wv = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(rect))
     @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
     @test wv == rect
+    img = @inferred Augmentor.applyeager(Resize(4,4), wv)
+    @test img == imresize(rect, (4,4))
     v = @inferred Augmentor.applylazy(ops, rect)
     @test v === view(rect, 1:1:2, 1:1:3)
     @test v == rect
+    img = @inferred Augmentor.applyeager(Resize(4,4), v)
+    @test img == imresize(rect, (4,4))
+end
+
+ops = (Rotate90(), Resize(2,2))
+@testset "$(str_showcompact(ops))" begin
+    @test_throws MethodError Augmentor.applylazy(ops, rect)
+    @test_throws MethodError Augmentor.applyaffine(ops, rect)
 end
 
 ops = (Rotate(-90), Rotate90())

@@ -7,8 +7,11 @@
         @test typeof(@inferred(Crop(1:10,3:5))) <: Crop{2} <: Crop <: Augmentor.Operation
         @test @inferred(Crop(1,4,10,5)) === @inferred(Crop((4:8,1:10)))
         @test str_show(Crop(3:4)) == "Augmentor.Crop{1}((3:4,))"
+        @test str_showcompact(Crop(3:4)) == "Crop region (3:4,)"
         @test str_show(Crop(1:2,2:3)) == "Augmentor.Crop{2}((1:2,$(SPACE)2:3))"
-        @test str_showcompact(Crop(1:2,2:3)) == "Crop region (1:2,$(SPACE)2:3)"
+        @test str_showcompact(Crop(1:2,2:3)) == "Crop region 1:2×2:3"
+        @test str_show(Crop(1:2,2:3,3:4)) == "Augmentor.Crop{3}((1:2,$(SPACE)2:3,$(SPACE)3:4))"
+        @test str_showcompact(Crop(1:2,2:3,3:4)) == "Crop region (1:2,$(SPACE)2:3,$(SPACE)3:4)"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Crop(1:10), nothing)

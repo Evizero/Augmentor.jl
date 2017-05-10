@@ -31,6 +31,7 @@ tests = [
     "operations/tst_rotation.jl",
     "operations/tst_flip.jl",
     "operations/tst_crop.jl",
+    "operations/tst_resize.jl",
     "operations/tst_either.jl",
     "tst_operations.jl",
     "tst_pipeline.jl",

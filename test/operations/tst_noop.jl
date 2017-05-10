@@ -8,6 +8,7 @@ end
     @test_throws MethodError Augmentor.applyeager(NoOp(), nothing)
     @test @inferred(Augmentor.supports_eager(NoOp)) === false
     @test @inferred(Augmentor.applyeager(NoOp(), rect)) === rect
+    @test @inferred(Augmentor.applyeager(NoOp(), view(rect,:,:))) == rect
     @test @inferred(Augmentor.applyeager(NoOp(), OffsetArray(rect, (-1,-2)))) === rect
 end
 @testset "affine" begin

@@ -5,7 +5,7 @@ immutable Crop{N,I<:Tuple} <: Operation
         new{N,typeof(indexes)}(indexes)
     end
 end
-Crop(::Tuple{}) = throw(MethodError(Crop, ()))
+Crop(::Tuple{}) = throw(MethodError(Crop, ((),)))
 Crop{N}(indexes::NTuple{N,UnitRange}) = Crop{N}(indexes)
 Crop{N}(indexes::Vararg{UnitRange,N}) = Crop(indexes)
 Crop(x, y, width, height) = Crop(y:y+height-1, x:x+width-1)
@@ -28,7 +28,11 @@ applystepview(op::Crop, img) = identity_view(img, map(StepRange, op.indexes))
 
 function Base.show{N}(io::IO, op::Crop{N})
     if get(io, :compact, false)
-        print(io, "Crop region $(op.indexes)")
+        if N == 2
+            print(io, "Crop region $(op.indexes[1])×$(op.indexes[2])")
+        else
+            print(io, "Crop region $(op.indexes)")
+        end
     else
         print(io, "Augmentor.Crop{$N}($(op.indexes))")
     end
