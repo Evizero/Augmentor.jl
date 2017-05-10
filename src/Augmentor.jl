@@ -13,13 +13,18 @@ using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
 
+    NoOp,
+
     Either,
 
-    NoOp,
     Rotate90,
     Rotate180,
     Rotate270,
     Rotate,
+
+    FlipX,
+    FlipY,
+
     Crop,
 
     augment
@@ -34,6 +39,7 @@ include("augment.jl")
 include("operations/noop.jl")
 include("operations/either.jl")
 include("operations/rotation.jl")
+include("operations/flip.jl")
 include("operations/crop.jl")
 
 end # module

@@ -103,6 +103,11 @@ end
         @test v === view(rect, 2:-1:1, 3:-1:1)
         @test v == rot180(rect)
         @test typeof(v) <: SubArray
+        img = OffsetArray(rect,-2,1)
+        v = @inferred Augmentor.applylazy(Rotate180(), img)
+        @test v === view(img, 0:-1:-1, 4:-1:2)
+        @test v == rot180(rect)
+        @test typeof(v) <: SubArray
     end
     @testset "permute" begin
         @test @inferred(Augmentor.supports_permute(Rotate180)) === false

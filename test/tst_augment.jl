@@ -58,10 +58,16 @@ end
 # --------------------------------------------------------------------
 
 @testset "single op" begin
-    img = @inferred Augmentor.augment(rect, (Rotate90(),))
+    img = @inferred Augmentor._augment(rect, (Rotate90(),))
     @test typeof(img) <: Array
+    @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
     @test eltype(img) <: eltype(rect)
     @test img == rotl90(rect)
+    img = @inferred Augmentor._augment(square, (Rotate(90),))
+    @test typeof(img) <: Array
+    @test typeof(img) == typeof(@inferred(augment(square, (Rotate(90),))))
+    @test eltype(img) <: eltype(square)
+    @test img == rotl90(square)
 end
 
 ops = (Rotate(90),Rotate(-90)) # forces affine

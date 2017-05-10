@@ -46,6 +46,11 @@ function applystepview(::Rotate180, img::AbstractMatrix)
     identity_view(img, (reverse(idx[1]), reverse(idx[2])))
 end
 
+function applystepview{T}(::Rotate180, img::OffsetArray{T,2})
+    idx = map(StepRange, indices(img))
+    identity_view(img, (reverse(idx[1]), reverse(idx[2])))
+end
+
 # --------------------------------------------------------------------
 
 immutable Rotate270 <: AffineOperation end

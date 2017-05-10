@@ -19,6 +19,19 @@
     @test @inferred(Augmentor.prepareaffine(v)) === v
 end
 
+ops = (FlipX(), FlipY())
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor.applyaffine(ops, rect)
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test wv == rot180(rect)
+    wv = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(rect))
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test wv == rot180(rect)
+    v = @inferred Augmentor.applylazy(ops, rect)
+    @test v === view(rect, 2:-1:1, 3:-1:1)
+    @test v == rot180(rect)
+end
+
 ops = (Rotate90(), Rotate270())
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.applyaffine(ops, rect)
@@ -32,14 +45,14 @@ ops = (Rotate90(), Rotate270())
     @test v == rect
 end
 
-ops = (Rotate90(), Rotate(-90))
+ops = (Rotate(-90), Rotate90())
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.applyaffine(ops, rect)
     @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
     @test wv == rect
-    wv = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(rect))
-    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
-    @test wv == rect
+    wv2 = @inferred Augmentor.applylazy(ops, rect)
+    @test typeof(wv2) == typeof(wv)
+    @test wv2 == rect
 end
 
 ops = (Rotate90(), Rotate270(), Rotate180())
