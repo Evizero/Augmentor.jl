@@ -2,7 +2,7 @@ using ImageCore, ImageTransformations, CoordinateTransformations, Interpolations
 using ImageInTerminal
 
 # check for ambiguities
-refambs = detect_ambiguities(Base, Core)
+refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
 @test isempty(setdiff(ambs, refambs))

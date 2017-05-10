@@ -64,32 +64,54 @@ end
     @test img == rotl90(rect)
 end
 
-op = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
+ops = (Rotate(90),Rotate(-90)) # forces affine
 @testset "$(str_showcompact(ops))" begin
-    wv = @inferred Augmentor._augment(camera, op)
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test wv == camera
+end
+
+ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
     @test_reference "rot_crop_either_crop" wv
-    img = @inferred augment(camera, op)
+    img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "rot_crop_either_crop" img
 end
 
-op = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(1:250, 1:150))
+ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(1:250, 1:150))
 @testset "$(str_showcompact(ops))" begin
-    wv = @inferred Augmentor._augment(camera, op)
+    wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test typeof(parent(wv)) <: Base.PermutedDimsArrays.PermutedDimsArray
     @test_reference "rot_crop_rot_crop" wv
-    img = @inferred augment(camera, op)
+    img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "rot_crop_rot_crop" img
+end
+
+ops = (Rotate(45),Crop(1:512,1:512))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "rot45_crop" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "rot45_crop" img
 end
 
 # just for code coverage

@@ -90,3 +90,36 @@ for deg in (90, 180, 270)
         end
     end
 end
+
+# --------------------------------------------------------------------
+
+immutable Rotate{T<:AbstractVector} <: AffineOperation
+    degree::T
+    function (::Type{Rotate}){T<:Real}(degree::AbstractVector{T})
+        length(degree) > 0 || throw(ArgumentError("The number of different angles passed to \"Rotate(...)\" must be non-zero"))
+        new{typeof(degree)}(degree)
+    end
+end
+Rotate(degree::Real) = Rotate(degree:degree)
+
+Base.@pure supports_eager{T<:Rotate}(::Type{T}) = false
+
+function toaffine(op::Rotate, img::AbstractMatrix)
+    recenter(RotMatrix(deg2rad(Float64(rand(op.degree)))), center(img))
+end
+
+function Base.show(io::IO, op::Rotate)
+    if get(io, :compact, false)
+        if length(op.degree) == 1
+            print(io, "Rotate ", first(op.degree), " degree")
+        else
+            print(io, "Rotate α ∈ ", op.degree, " degree")
+        end
+    else
+        if length(op.degree) == 1
+            print(io, "Augmentor.Rotate($(first(op.degree)))")
+        else
+            print(io, "Augmentor.Rotate($(op.degree))")
+        end
+    end
+end

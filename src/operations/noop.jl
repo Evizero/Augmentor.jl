@@ -1,5 +1,6 @@
 immutable NoOp <: AffineOperation end
 
+Base.@pure supports_eager(::Type{NoOp}) = false
 Base.@pure supports_stepview(::Type{NoOp}) = true
 Base.@pure supports_view(::Type{NoOp}) = true
 

@@ -10,6 +10,7 @@ Crop{N}(indexes::NTuple{N,UnitRange}) = Crop{N}(indexes)
 Crop{N}(indexes::Vararg{UnitRange,N}) = Crop(indexes)
 Crop(x, y, width, height) = Crop(y:y+height-1, x:x+width-1)
 
+Base.@pure supports_eager{T<:Crop}(::Type{T}) = false
 Base.@pure supports_affine{T<:Crop}(::Type{T}) = true
 Base.@pure supports_view{T<:Crop}(::Type{T}) = true
 Base.@pure supports_stepview{T<:Crop}(::Type{T}) = true

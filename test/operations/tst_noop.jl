@@ -6,6 +6,7 @@
 end
 @testset "eager" begin
     @test_throws MethodError Augmentor.applyeager(NoOp(), nothing)
+    @test @inferred(Augmentor.supports_eager(NoOp)) === false
     @test @inferred(Augmentor.applyeager(NoOp(), rect)) === rect
     @test @inferred(Augmentor.applyeager(NoOp(), OffsetArray(rect, (-1,-2)))) === rect
 end

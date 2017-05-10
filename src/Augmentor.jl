@@ -19,6 +19,7 @@ export
     Rotate90,
     Rotate180,
     Rotate270,
+    Rotate,
     Crop,
 
     augment

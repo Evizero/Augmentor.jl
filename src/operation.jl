@@ -44,6 +44,10 @@ prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffine(NoOp(), 
 # --------------------------------------------------------------------
 # AffineOperation fallbacks
 
+function applyeager(op::AffineOperation, img)
+    plain_array(applylazy(op, img))
+end
+
 function applyaffine(op::AffineOperation, img)
     invwarpedview(img, toaffine(op, img))
 end

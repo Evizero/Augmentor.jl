@@ -50,9 +50,16 @@ end
             end
         end
     else
-        quote
-            $var_out = applyeager(pipeline[$op_offset], $var_in)
-            $(build_pipeline(var_offset+1, op_offset+1, tail))
+        if length(tail) == 0 || supports_eager(head) || !supports_lazy(head)
+            quote
+                $var_out = applyeager(pipeline[$op_offset], $var_in)
+                $(build_pipeline(var_offset+1, op_offset+1, tail))
+            end
+        else # use lazy because there is no special eager implementation
+            quote
+                $var_out = applylazy(pipeline[$op_offset], $var_in)
+                $(build_pipeline(var_offset+1, op_offset+1, tail))
+            end
         end
     end
 end
