@@ -9,10 +9,6 @@ immutable Scale{N,T<:AbstractVector} <: AffineOperation
         new{N,T}(factors)
     end
 end
-
-_vectorize(A::AbstractVector) = A
-_vectorize(A::Real) = A:A
-
 Scale() = throw(MethodError(Scale, ()))
 Scale(::Tuple{}) = throw(MethodError(Scale, ((),)))
 Scale(factors...) = Scale(factors)

@@ -35,3 +35,16 @@ function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I
     idx = map((i1,i2) -> UnitRange(i1)[i2], A.indexes, I)
     identity_view(parent(A), idx)
 end
+
+# --------------------------------------------------------------------
+
+_vectorize(A::AbstractVector) = A
+_vectorize(A::Real) = A:A
+
+_round(num::Integer, d) = num
+_round(num::AbstractFloat, d) = round(num,d)
+_round(nums::Tuple, d) = map(num->_round(num,d), nums)
+
+function unionrange(i1::AbstractUnitRange, i2::AbstractUnitRange)
+    map(min, first(i1), first(i2)):map(max, last(i1), last(i2))
+end

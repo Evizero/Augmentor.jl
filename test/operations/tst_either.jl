@@ -94,6 +94,10 @@ end
         @test_throws MethodError Augmentor.applyview(op, rect)
         @test_throws MethodError Augmentor.applystepview(op, rect)
         @test_throws MethodError Augmentor.applypermute(op, rect)
+        op = @inferred Either((Rotate90(),Zoom(.8)), (1,0))
+        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
+        @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),FlipX()), (1,0))
         @test @inferred(Augmentor.supports_eager(op)) === true
         @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
@@ -188,7 +192,7 @@ end
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
-    let op = @inferred Rotate90(1)
+    for op = (@inferred(Rotate90(1)), @inferred(Either((Rotate90(),Scale(0.8)),(1,0))))
         @test @inferred(Augmentor.isaffine(op)) === true
         @test @inferred(Augmentor.supports_lazy(op)) === true
         @test @inferred(Augmentor.supports_affine(op)) === true
@@ -207,6 +211,17 @@ end
         @test typeof(wv2) == typeof(wv)
     end
     let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,1:2)))
+        @test @inferred(Augmentor.isaffine(op)) === false
+        @test @inferred(Augmentor.supports_lazy(op)) === false
+        @test @inferred(Augmentor.supports_affine(op)) === false
+        @test @inferred(Augmentor.supports_view(op)) === false
+        @test @inferred(Augmentor.supports_stepview(op)) === false
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test_throws MethodError Augmentor.toaffine(op, nothing)
+        @test_throws MethodError Augmentor.toaffine(op, rect)
+        @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+    end
+    let op = @inferred Either((Rotate90(),Zoom(.8)))
         @test @inferred(Augmentor.isaffine(op)) === false
         @test @inferred(Augmentor.supports_lazy(op)) === false
         @test @inferred(Augmentor.supports_affine(op)) === false

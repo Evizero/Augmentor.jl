@@ -140,12 +140,55 @@ ops = (Scale(.1,.2),NoOp())
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: InvWarpedView
     @test parent(wv).itp.coefs === camera
-    @test_reference "scale_crop" wv
+    @test_reference "scale_noop" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "scale_crop" img
+    @test_reference "scale_noop" img
+end
+
+ops = (Crop(101:200,201:350),Scale(.2,.4))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "crop_scale" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "crop_scale" img
+end
+
+ops = (Crop(101:200,201:350),Zoom(1.3))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "crop_zoom" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "crop_zoom" img
+end
+
+ops = (Rotate(45),Zoom(2))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: InvWarpedView
+    @test parent(wv).itp.coefs === camera
+    @test_reference "rot45_zoom" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "rot45_zoom" img
 end
 
 # just for code coverage

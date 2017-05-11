@@ -28,7 +28,9 @@ export
     Crop,
 
     Resize,
+
     Scale,
+    Zoom,
 
     augment
 
@@ -46,5 +48,6 @@ include("operations/flip.jl")
 include("operations/crop.jl")
 include("operations/resize.jl")
 include("operations/scale.jl")
+include("operations/zoom.jl")
 
 end # module
