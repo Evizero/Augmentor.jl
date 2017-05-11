@@ -29,6 +29,7 @@ tests = [
     "tst_utils.jl",
     "operations/tst_noop.jl",
     "operations/tst_rotation.jl",
+    "operations/tst_shear.jl",
     "operations/tst_flip.jl",
     "operations/tst_crop.jl",
     "operations/tst_resize.jl",

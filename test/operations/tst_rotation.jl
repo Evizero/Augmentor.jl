@@ -191,11 +191,11 @@ end
         @test str_showcompact(Rotate(10)) == "Rotate 10 degree"
         op = @inferred(Rotate(-1:1))
         @test str_show(op) == "Augmentor.Rotate(-1:1)"
-        @test str_showcompact(op) == "Rotate α ∈ -1:1 degree"
+        @test str_showcompact(op) == "Rotate θ ∈ -1:1 degree"
         op = @inferred(Rotate([2,30]))
         @test op.degree == [2,30]
         @test str_show(op) == "Augmentor.Rotate([2,$(SPACE)30])"
-        @test str_showcompact(op) == "Rotate α ∈ [2,$(SPACE)30] degree"
+        @test str_showcompact(op) == "Rotate θ ∈ [2,$(SPACE)30] degree"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate(10), nothing)

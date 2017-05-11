@@ -22,6 +22,9 @@ export
     Rotate270,
     Rotate,
 
+    ShearX,
+    ShearY,
+
     FlipX,
     FlipY,
 
@@ -44,6 +47,7 @@ include("augment.jl")
 include("operations/noop.jl")
 include("operations/either.jl")
 include("operations/rotation.jl")
+include("operations/shear.jl")
 include("operations/flip.jl")
 include("operations/crop.jl")
 include("operations/resize.jl")

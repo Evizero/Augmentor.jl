@@ -77,6 +77,20 @@ ops = (Rotate(90),Rotate(-90)) # forces affine
     @test wv == camera
 end
 
+ops = (ShearX(45),ShearX(-45)) # forces affine
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test view(wv,1:512,1:512) == camera
+end
+
+ops = (ShearY(45),ShearY(-45)) # forces affine
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test view(wv,1:512,1:512) == camera
+end
+
 ops = (Resize(2,2),Rotate90()) # forces affine
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(rect, ops)
@@ -146,6 +160,34 @@ ops = (Scale(.1,.2),NoOp())
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "scale_noop" img
+end
+
+ops = (ShearX(45),NoOp())
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: InvWarpedView
+    @test parent(wv).itp.coefs === camera
+    @test_reference "shearx_noop" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "shearx_noop" img
+end
+
+ops = (ShearY(45),Crop(1:512,1:512))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "sheary_crop" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "sheary_crop" img
 end
 
 ops = (Crop(101:200,201:350),Scale(.2,.4))
