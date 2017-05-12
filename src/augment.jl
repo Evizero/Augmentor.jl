@@ -10,6 +10,10 @@ function augment(img, op::Operation)
     plain_array(applyeager(op, img))
 end
 
+function augment(op::Union{Pipeline,Operation})
+    augment(use_testpattern(), op)
+end
+
 # --------------------------------------------------------------------
 
 @inline function _augment{N}(img, pipeline::Pipeline{N})

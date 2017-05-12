@@ -8,4 +8,5 @@ StaticArrays
 OffsetArrays
 IdentityRanges
 ColorTypes 0.4
+FileIO
 Compat 0.19

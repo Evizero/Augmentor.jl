@@ -8,6 +8,7 @@ using Interpolations
 using StaticArrays
 using OffsetArrays
 using IdentityRanges
+using FileIO
 using Compat
 using Base.PermutedDimsArrays: PermutedDimsArray
 
@@ -36,7 +37,15 @@ export
     Scale,
     Zoom,
 
-    augment
+    augment,
+
+    testpattern
+
+testpattern() = load(joinpath(dirname(@__FILE__()), "testpattern.png"))
+function use_testpattern()
+    info("No custom image specifed. Using \"testpattern()\" for demonstration.")
+    testpattern()
+end
 
 include("utils.jl")
 include("types.jl")
