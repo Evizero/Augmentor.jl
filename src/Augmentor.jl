@@ -29,6 +29,7 @@ export
     FlipY,
 
     Crop,
+    CropSize,
 
     Resize,
 

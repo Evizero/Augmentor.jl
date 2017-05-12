@@ -123,6 +123,22 @@ ops = (Rotate180(), Crop(1:2,2:3))
     @test v == view(rot180(square), 1:2, 2:3)
 end
 
+ops = (Rotate180(), CropSize(2,2))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor.applyaffine(ops, square)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === square
+    @test wv == view(rot180(square), IdentityRange(1:2), IdentityRange(2:3))
+    wv2 = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(square))
+    @test wv2 == wv
+    @test typeof(wv2) == typeof(wv)
+    v = @inferred Augmentor.applylazy(ops, square)
+    @test v === view(square, 3:-1:2, 3:-1:2)
+    @test v == view(rot180(square), 1:2, 1:2)
+end
+
 ops = (Either((Rotate90(),Rotate270()),(1,0)), Crop(20:30,100:150), Either((Rotate90(),Rotate270()),(0,1)))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.applyaffine(ops, camera)

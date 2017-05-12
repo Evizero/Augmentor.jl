@@ -21,7 +21,7 @@ function Base.show(io::IO, op::ShearX)
         if length(op.degree) == 1
             print(io, "ShearX ", first(op.degree), " degree")
         else
-            print(io, "ShearX ϕ ∈ ", op.degree, " degree")
+            print(io, "ShearX by ϕ ∈ ", op.degree, " degree")
         end
     else
         if length(op.degree) == 1
@@ -57,7 +57,7 @@ function Base.show(io::IO, op::ShearY)
         if length(op.degree) == 1
             print(io, "ShearY ", first(op.degree), " degree")
         else
-            print(io, "ShearY ψ ∈ ", op.degree, " degree")
+            print(io, "ShearY by ψ ∈ ", op.degree, " degree")
         end
     else
         if length(op.degree) == 1

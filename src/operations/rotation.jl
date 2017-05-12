@@ -119,7 +119,7 @@ function Base.show(io::IO, op::Rotate)
         if length(op.degree) == 1
             print(io, "Rotate ", first(op.degree), " degree")
         else
-            print(io, "Rotate θ ∈ ", op.degree, " degree")
+            print(io, "Rotate by θ ∈ ", op.degree, " degree")
         end
     else
         if length(op.degree) == 1

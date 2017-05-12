@@ -37,3 +37,52 @@ function Base.show{N}(io::IO, op::Crop{N})
         print(io, "Augmentor.Crop{$N}($(op.indexes))")
     end
 end
+
+# --------------------------------------------------------------------
+
+immutable CropSize{N} <: Operation
+    size::NTuple{N,Int}
+
+    function (::Type{CropSize{N}}){N}(size::NTuple{N,Int})
+        all(s->s>0, size) || throw(ArgumentError("Specified sizes must be strictly greater than 0. Actual: $size"))
+        new{N}(size)
+    end
+end
+CropSize(::Tuple{}) = throw(MethodError(CropSize, ((),)))
+CropSize(; width=64, height=64) = CropSize((height,width))
+CropSize(size::Vararg{Int}) = CropSize(size)
+CropSize{N}(size::NTuple{N,Int}) = CropSize{N}(size)
+
+Base.@pure supports_eager{T<:CropSize}(::Type{T}) = false
+Base.@pure supports_affine{T<:CropSize}(::Type{T}) = true
+Base.@pure supports_view{T<:CropSize}(::Type{T}) = true
+Base.@pure supports_stepview{T<:CropSize}(::Type{T}) = true
+
+function cropsize_indices(op::CropSize, img::AbstractArray)
+    cntr = convert(Tuple, center(img))
+    sze = op.size
+    corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
+    map((b,s)->b:(b+s-1), corner, sze)
+end
+
+applyeager(op::CropSize, img) = plain_array(applyview(op, img))
+applylazy(op::CropSize, img) = applyview(op, img)
+applyaffine(op::CropSize, img) = applyview(op, img)
+function applyview(op::CropSize, img)
+    identity_view(img, cropsize_indices(op, img))
+end
+function applystepview(op::CropSize, img)
+    identity_view(img, map(StepRange, cropsize_indices(op, img)))
+end
+
+function Base.show{N}(io::IO, op::CropSize{N})
+    if get(io, :compact, false)
+        if N == 1
+            print(io, "Crop a $(first(op.size))-length window at the center")
+        else
+            print(io, "Crop a $(join(op.size,"×")) window around the center")
+        end
+    else
+        print(io, "$(typeof(op))($(op.size))")
+    end
+end

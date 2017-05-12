@@ -19,11 +19,11 @@
         @test str_showcompact(ShearX(10)) == "ShearX 10 degree"
         op = @inferred(ShearX(-1:1))
         @test str_show(op) == "Augmentor.ShearX(-1:1)"
-        @test str_showcompact(op) == "ShearX ϕ ∈ -1:1 degree"
+        @test str_showcompact(op) == "ShearX by ϕ ∈ -1:1 degree"
         op = @inferred(ShearX([2,30]))
         @test op.degree == [2,30]
         @test str_show(op) == "Augmentor.ShearX([2,$(SPACE)30])"
-        @test str_showcompact(op) == "ShearX ϕ ∈ [2,$(SPACE)30] degree"
+        @test str_showcompact(op) == "ShearX by ϕ ∈ [2,$(SPACE)30] degree"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(ShearX(10), nothing)
@@ -98,11 +98,11 @@ end
         @test str_showcompact(ShearY(10)) == "ShearY 10 degree"
         op = @inferred(ShearY(-1:1))
         @test str_show(op) == "Augmentor.ShearY(-1:1)"
-        @test str_showcompact(op) == "ShearY ψ ∈ -1:1 degree"
+        @test str_showcompact(op) == "ShearY by ψ ∈ -1:1 degree"
         op = @inferred(ShearY([2,30]))
         @test op.degree == [2,30]
         @test str_show(op) == "Augmentor.ShearY([2,$(SPACE)30])"
-        @test str_showcompact(op) == "ShearY ψ ∈ [2,$(SPACE)30] degree"
+        @test str_showcompact(op) == "ShearY by ψ ∈ [2,$(SPACE)30] degree"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(ShearY(10), nothing)

@@ -9,7 +9,7 @@ end
 Resize(::Tuple{}) = throw(MethodError(Resize, ((),)))
 Resize(; width=64, height=64) = Resize((height,width))
 Resize(size::Vararg{Int}) = Resize(size)
-Resize{N}(size::NTuple{N}) = Resize{N}(size)
+Resize{N}(size::NTuple{N,Int}) = Resize{N}(size)
 
 applyeager(op::Resize, img) = plain_array(imresize(img, op.size))
 

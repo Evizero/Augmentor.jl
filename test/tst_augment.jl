@@ -149,6 +149,36 @@ ops = (Rotate(45),Crop(1:512,1:512))
     @test_reference "rot45_crop" img
 end
 
+ops = (Rotate(45),CropSize(512,512))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "rot45_crop" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "rot45_crop" img
+end
+
+ops = (Rotate(-45),CropSize(256,256))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "rotr45_cropsize" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "rotr45_cropsize" img
+end
+
 ops = (Scale(.1,.2),NoOp())
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)

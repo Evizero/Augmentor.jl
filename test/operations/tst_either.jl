@@ -221,6 +221,17 @@ end
         @test_throws MethodError Augmentor.toaffine(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
     end
+    let op = @inferred Either((Rotate90(),Rotate270(),CropSize(2,2)))
+        @test @inferred(Augmentor.isaffine(op)) === false
+        @test @inferred(Augmentor.supports_lazy(op)) === false
+        @test @inferred(Augmentor.supports_affine(op)) === false
+        @test @inferred(Augmentor.supports_view(op)) === false
+        @test @inferred(Augmentor.supports_stepview(op)) === false
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test_throws MethodError Augmentor.toaffine(op, nothing)
+        @test_throws MethodError Augmentor.toaffine(op, rect)
+        @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+    end
     let op = @inferred Either((Rotate90(),Zoom(.8)))
         @test @inferred(Augmentor.isaffine(op)) === false
         @test @inferred(Augmentor.supports_lazy(op)) === false
@@ -276,6 +287,16 @@ end
         @test @inferred(Augmentor.supports_permute(op)) === false
         @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+    end
+    let op = @inferred Either((Crop(1:2,2:4),CropSize(2,3)), (0,1))
+        @test @inferred(Augmentor.isaffine(op)) === false
+        @test @inferred(Augmentor.supports_lazy(op)) === true
+        @test @inferred(Augmentor.supports_affine(op)) === false
+        @test @inferred(Augmentor.supports_view(op)) === true
+        @test @inferred(Augmentor.supports_stepview(op)) === true
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
     end
 end
 
@@ -367,6 +388,20 @@ end
         v = @inferred Augmentor.applylazy(op, rect)
         @test v === @inferred(Augmentor.applystepview(op, rect))
         @test v === view(rect,1:1:2,2:1:3)
+        @test typeof(v) <: SubArray
+    end
+    let op = @inferred Either((Rotate180(),CropSize(2,3)),(0,1))
+        @test @inferred(Augmentor.isaffine(op)) === false
+        @test @inferred(Augmentor.supports_lazy(op)) === true
+        @test @inferred(Augmentor.supports_affine(op)) === false
+        @test @inferred(Augmentor.supports_view(op)) === false
+        @test @inferred(Augmentor.supports_stepview(op)) === true
+        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test_throws MethodError Augmentor.applylazy(op, nothing)
+        @test_throws MethodError Augmentor.applystepview(op, nothing)
+        v = @inferred Augmentor.applylazy(op, square)
+        @test v === @inferred(Augmentor.applystepview(op, square))
+        @test v === view(square,1:1:2,1:1:3)
         @test typeof(v) <: SubArray
     end
 end
