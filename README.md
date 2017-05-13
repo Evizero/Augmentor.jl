@@ -1,26 +1,47 @@
-![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/header.png)
+[![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/header.png)](http://augmentorjl.readthedocs.io/)
 
 **Augmentor.jl** is the [Julia](http://julialang.org)
-implementation for *Augmentor*. You can find the Python version
-[here](https://github.com/mdbloice/Augmentor).
+implementation for Augmentor. The Python version of the same name
+is available [here](https://github.com/mdbloice/Augmentor).
 
 | **Package Status** | **Package Evaluator** | **Build Status**  |
 |:------------------:|:---------------------:|:-----------------:|
 | [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md) [![Documentation Status](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](http://augmentorjl.readthedocs.io/en/latest/?badge=latest) | [![Julia Pkg 0.5](http://pkg.julialang.org/badges/Augmentor_0.5.svg)](http://pkg.julialang.org/?pkg=Augmentor) [![Julia Pkg 0.6](http://pkg.julialang.org/badges/Augmentor_0.6.svg)](http://pkg.julialang.org/?pkg=Augmentor) | [![Travis Status](https://travis-ci.org/Evizero/Augmentor.jl.svg?branch=master)](https://travis-ci.org/Evizero/Augmentor.jl) [![AppVeyor status](https://ci.appveyor.com/api/projects/status/stfgx2856r8ckskw?svg=true)](https://ci.appveyor.com/project/Evizero/augmentor-jl) [![Coverage Status](https://coveralls.io/repos/github/Evizero/Augmentor.jl/badge.svg?branch=master)](https://coveralls.io/github/Evizero/Augmentor.jl?branch=master) |
 
-Augmentor is an image-augmentation library designed to render
-the process of artificial dataset enlargement more convenient,
-less error prone, and easier to reproduce. This is achieved using
-probabilistic transformation pipelines.
+Augmentor is a real-time image-augmentation library designed to
+render the process of artificial dataset enlargement more
+convenient, less error prone, and easier to reproduce. It offers
+the user the ability to build a stochastic augmentation pipeline
+using simple building blocks. In other words, a stochastic
+augmentation pipeline is simply a sequence of operations for
+which the parameters can (but need not) be random variables.
+
+```julia
+julia> pipeline = (Rotate([-5, -3, 0, 3, 5]), CropSize(64,64), Zoom(1:0.1:1.2))
+# 3-step Augmentor.Pipeline:
+#  1.) Rotate by θ ∈ [-5,-3,0,3,5] degree
+#  2.) Crop a 64×64 window around the center
+#  3.) Zoom by I ∈ {1.0×1.0, 1.1×1.1, 1.2×1.2}
+```
+
+The Julia version of Augmentor is engineered specifically for
+high performance applications. It makes use of multiple
+heuristics to generate efficient tailor-made code for the
+concrete user-specified augmentation pipeline. In particular
+Augmentor tries to avoid the need for any intermediate images,
+but instead aims to compute the output image directly from the
+input in one single pass.
 
 ## Hello World
 
-The following code snipped shows how a stochastic augmentation
-pipeline can be specified using simple building blocks. To show
-the effect we compiled a few resulting output images into a gif.
-In order to give the example some meaning, we will use a real
-medical image from the publicly available [ISIC
-archive](https://isic-archive.com/) as input.
+The following code snippet shows how a stochastic augmentation
+pipeline can be specified using simple building blocks that we
+call "operations". In order to give the example some meaning, we
+will use a real medical image from the publicly available
+[ISIC archive](https://isic-archive.com/) as input. The concrete
+image can be downloaded
+[here](https://isic-archive.com/api/v1/image/5592ac599fc3c13155a57a85/thumbnail)
+using their [Web API](https://isic-archive.com/api/v1).
 
 ```julia
 julia> using Augmentor, ISICArchive
@@ -50,10 +71,109 @@ julia> img_new = augment(img, pipeline)
 # [...]
 ```
 
+The function `augment` will generate a single augmented image
+from the given input image and pipeline. To visualize the effect
+we compiled a few resulting output images into a GIF using the
+plotting library
+[Plots.jl](https://github.com/JuliaPlots/Plots.jl) with the
+[PyPlot.jl](https://github.com/JuliaPy/PyPlot.jl) back-end. The
+code that generated the two figures below can be found
+[here](https://github.com/JuliaML/FileStorage/blob/master/Augmentor/readme_isic.jl).
+
 Input (`img`)                       |   | Output (`img_new`)
 :----------------------------------:|:-:|:------------------------------:
 ![input](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme_1_in.png) | → | ![output](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme_1_out.gif)
 
+While this is just a small preview image (note the term
+"thumbnail" in the code above), it is already possible to observe
+Augmentor's behaviour when looking at the memory footprint of
+`augment` compared to a simple `copy`.
+
+```julia
+julia> @allocated(augment(img, pipeline)) / 1024
+96.515625 # KiB
+
+julia> @allocated(copy(img)) / 1024
+126.828125 # KiB
+```
+
+Note how the *whole* process for producing an augmented version
+of `img` allocates less memory than a simple unaltered `copy` of
+the original. The reason for this is that the output image
+`img_new` is smaller than the input image `img`. Augmentor tries
+to compose all operations of the pipeline into one single
+function, which it then queries for each individual pixel in the
+*output* image. In general this means that the memory footprint
+and the runtime depends on the size of the output image.
+
+To take the output-dependent behaviour to its extreme, consider
+the full sized version of the above thumbnail, which is about 14
+mb in size. We will modify our pipeline slightly and insert a
+`Scale` operation as the *fourth* operation. Doing this will
+result in a similar output as our original example.
+
+```julia
+julia> img_big = get(ImageDownloadRequest(id = "5592ac599fc3c13155a57a85"))
+# 4399×6628 Array{RGB{N0f8},2}:
+# [...]
+
+julia> pipeline_big = (
+           Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()),
+           Rotate(0:360),
+           Either(ShearX(-5:5), ShearY(-5:5)),
+           Scale(0.05), # NEW
+           CropSize(165, 165),
+           Zoom(1:0.05:1.2),
+           Resize(64, 64)
+       );
+
+julia> img_new = augment(img_big, pipeline_big)
+# 64×64 Array{RGB{N0f8},2}:
+# [...]
+
+julia> @allocated(augment(img_big, pipeline_big)) / 1024
+96.6875 # KiB
+````
+
+As we can see the allocated memory did not change notably.
+Furthermore, it is worth pointing out explicitly how we added the
+`Scale` operation as the fourth step in the pipeline and not the
+first. This highlights how the operations aren't just applied
+naively one after the other, but instead combined intelligently
+before ever computing a single pixel.
+
+Aside from the memory requirement we can also measure how the
+execution time remains approximately constant, even though the
+image is significantly larger and we added an additional
+operation to the pipeline.
+
+```julia
+julia> using BenchmarkTools
+
+julia> @benchmark augment($img, $pipeline) # small image
+BenchmarkTools.Trial:
+  memory estimate:  96.44 KiB
+  allocs estimate:  117
+  minimum time:     2.381 ms (0.00% GC)
+
+julia> @benchmark augment($img_big, $pipeline_big) # big image
+BenchmarkTools.Trial:
+  memory estimate:  96.61 KiB
+  allocs estimate:  119
+  minimum time:     2.459 ms (0.00% GC)
+
+julia> @benchmark copy($img_big) # simple memory copy
+BenchmarkTools.Trial:
+  memory estimate:  83.42 MiB
+  allocs estimate:  2
+  minimum time:     16.122 ms (1.23% GC)
+```
+
+To be fair, the way we aggressively downscaled the large image
+in this example was rather untypical, because doing it this way
+would cause aliasing effects that may not be tolerable. The point
+of this exercise was to convey an intuition of how Augmentor
+works.
 
 ## Documentation
 
@@ -77,6 +197,7 @@ imported just as any other Julia package.
 
 ```julia
 Pkg.clone("https://github.com/Evizero/Augmentor.jl.git")
+Pkg.checkout("ImageTransformations")
 using Augmentor
 ```
 
