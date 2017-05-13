@@ -1,3 +1,6 @@
 FixedPointNumbers 0.3
 ImageInTerminal
 TestImages
+@windows ImageMagick
+@linux ImageMagick
+@osx QuartzImageIO
