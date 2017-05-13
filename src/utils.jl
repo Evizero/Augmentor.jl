@@ -5,10 +5,25 @@
 plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
 
 # --------------------------------------------------------------------
+# AVOID AMBIGUOUS METHODS WITH TUPLES ON 0.5 AND 0.6
+
+function identity_view{T}(A::AbstractArray{T,0}, I::Tuple{})
+    throw(MethodError(identity_view, ((),)))
+end
 
 function identity_view{T,N}(A::AbstractArray{T,N}, I::Tuple{})
-    throw(MethodError(identity_view, ()))
+    throw(MethodError(identity_view, ((),)))
 end
+
+function identity_view{T,P}(A::SubArray{T,0,P,NTuple{0,IdentityRange{Int}}}, I::Tuple{})
+    throw(MethodError(identity_view, ((),)))
+end
+
+function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::Tuple{})
+    throw(MethodError(identity_view, ((),)))
+end
+
+# --------------------------------------------------------------------
 
 @inline function identity_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,AbstractUnitRange})
     view(A, map(IdentityRange, I)...)
