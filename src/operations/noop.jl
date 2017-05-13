@@ -11,12 +11,12 @@ applylazy(::NoOp, img) = img
 
 function applyview(::NoOp, img)
     idx = map(i->1:length(i), indices(img))
-    identity_view(img, idx)
+    indirect_view(img, idx)
 end
 
 function applystepview(::NoOp, img)
     idx = map(i->1:1:length(i), indices(img))
-    identity_view(img, idx)
+    indirect_view(img, idx)
 end
 
 function Base.show(io::IO, op::NoOp)

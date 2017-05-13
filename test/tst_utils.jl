@@ -20,16 +20,21 @@
     @test @inferred(Augmentor.plain_array(p)) == A'[2:3, 1:2]
 end
 
-@testset "identity_view" begin
+@testset "direct_view" begin
     A = [1 2 3; 4 5 6; 7 8 9]
     Av = view(A, IdentityRange(2:3), IdentityRange(1:2))
     As = view(A, 3:-1:2, 1:1:2)
-    @test_throws MethodError Augmentor.identity_view(A, ())
-    @test @inferred(Augmentor.identity_view(A, (2:3,1:2))) === Av
-    @test @inferred(Augmentor.identity_view(A, (IdentityRange(2:3),IdentityRange(1:2)))) === Av
-    @test @inferred(Augmentor.identity_view(A, (3:-1:2,1:1:2))) === As
-
-    @test @inferred(Augmentor.identity_view(Av, (2:2,1:2))) === view(Av,3:3,1:2)
-    @test @inferred(Augmentor.identity_view(Av, (IdentityRange(3:3),IdentityRange(1:2)))) === view(Av,3:3,1:2)
-    @test @inferred(Augmentor.identity_view(Av, (2:-1:1,2:-1:1))) === view(A,3:-1:2,2:-1:1)
+    @test_throws MethodError Augmentor.direct_view(A, ())
+    @test @inferred(Augmentor.direct_view(A, (2:3,1:2))) === Av
+    @test @inferred(Augmentor.indirect_view(A, (2:3,1:2))) === Av
+    @test @inferred(Augmentor.direct_view(A, (IdentityRange(2:3),IdentityRange(1:2)))) === Av
+    @test @inferred(Augmentor.indirect_view(A, (IdentityRange(2:3),IdentityRange(1:2)))) === Av
+    @test @inferred(Augmentor.direct_view(A, (3:-1:2,1:1:2))) === As
+    @test @inferred(Augmentor.indirect_view(A, (3:-1:2,1:1:2))) === As
+    @test @inferred(Augmentor.direct_view(Av, (3:3,1:2))) === view(Av,3:3,1:2)
+    @test @inferred(Augmentor.indirect_view(Av, (2:2,1:2))) === view(Av,3:3,1:2)
+    @test @inferred(Augmentor.direct_view(Av, (IdentityRange(3:3),IdentityRange(1:2)))) === view(Av,3:3,1:2)
+    @test @inferred(Augmentor.indirect_view(Av, (IdentityRange(2:2),IdentityRange(1:2)))) === view(Av,3:3,1:2)
+    @test_throws MethodError Augmentor.direct_view(Av, (3:-1:2,2:-1:1))
+    @test @inferred(Augmentor.indirect_view(Av, (2:-1:1,2:-1:1))) === view(A,3:-1:2,2:-1:1)
 end

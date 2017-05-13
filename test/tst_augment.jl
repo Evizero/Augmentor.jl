@@ -134,7 +134,7 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(1:250, 1:150),Resize(25,1
     @test_reference "rot_crop_rot_crop_resize" img
 end
 
-ops = (Rotate(45),Crop(1:512,1:512))
+ops = (Rotate(45),CropDirect(1:512,1:512))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
@@ -205,7 +205,7 @@ ops = (ShearX(45),NoOp())
     @test_reference "shearx_noop" img
 end
 
-ops = (ShearY(45),Crop(1:512,1:512))
+ops = (ShearY(45),CropDirect(1:512,1:512))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray

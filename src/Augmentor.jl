@@ -16,8 +16,6 @@ export
 
     NoOp,
 
-    Either,
-
     Rotate90,
     Rotate180,
     Rotate270,
@@ -30,12 +28,15 @@ export
     FlipY,
 
     Crop,
+    CropDirect,
     CropSize,
 
     Resize,
 
     Scale,
     Zoom,
+
+    Either,
 
     augment,
 

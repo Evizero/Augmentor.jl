@@ -43,12 +43,7 @@ applylazy_fallback(op::Rotate180, img::AbstractMatrix) = applystepview(op, img)
 
 function applystepview(::Rotate180, img::AbstractMatrix)
     idx = map(i->1:1:length(i), indices(img))
-    identity_view(img, (reverse(idx[1]), reverse(idx[2])))
-end
-
-function applystepview{T}(::Rotate180, img::OffsetArray{T,2})
-    idx = map(StepRange, indices(img))
-    identity_view(img, (reverse(idx[1]), reverse(idx[2])))
+    indirect_view(img, (reverse(idx[1]), reverse(idx[2])))
 end
 
 # --------------------------------------------------------------------

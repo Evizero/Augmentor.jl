@@ -5,50 +5,67 @@
 plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
 
 # --------------------------------------------------------------------
-# AVOID AMBIGUOUS METHODS WITH TUPLES ON 0.5 AND 0.6
 
-function identity_view{T}(A::AbstractArray{T,0}, I::Tuple{})
-    throw(MethodError(identity_view, ((),)))
+function indirect_indices(::Tuple{}, ::Tuple{})
+    throw(MethodError(indirect_indices, ((),())))
 end
 
-function identity_view{T,N}(A::AbstractArray{T,N}, I::Tuple{})
-    throw(MethodError(identity_view, ((),)))
+@inline function indirect_indices{N}(O::NTuple{N,Base.OneTo}, I::NTuple{N,AbstractUnitRange})
+    map(IdentityRange, I)
 end
 
-function identity_view{T,P}(A::SubArray{T,0,P,NTuple{0,IdentityRange{Int}}}, I::Tuple{})
-    throw(MethodError(identity_view, ((),)))
+@inline function indirect_indices{N}(O::NTuple{N,Base.OneTo}, I::NTuple{N,StepRange})
+    I
 end
 
-function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::Tuple{})
-    throw(MethodError(identity_view, ((),)))
+@inline function indirect_indices{N}(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange})
+    map((i1,i2) -> IdentityRange(UnitRange(i1)[i2]), O, I)
+end
+
+@inline function indirect_indices{N}(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange})
+    map((i1,i2) -> UnitRange(i1)[i2], O, I)
+end
+
+@inline function indirect_indices{N}(O::NTuple{N,StepRange}, I::NTuple{N,Range})
+    map((i1,i2) -> i1[i2], O, I)
 end
 
 # --------------------------------------------------------------------
 
-@inline function identity_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,AbstractUnitRange})
-    view(A, map(IdentityRange, I)...)
+@inline function indirect_view(A::AbstractArray, I::Tuple)
+    view(A, indirect_indices(indices(A), I)...)
 end
 
-@inline function identity_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,StepRange})
-    view(A, I...)
+@inline function indirect_view(A::SubArray, I::Tuple)
+    view(parent(A), indirect_indices(A.indexes, I)...)
 end
 
-@inline function identity_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,IdentityRange})
-    view(A, I...)
+# --------------------------------------------------------------------
+
+function direct_indices(::Tuple{}, ::Tuple{})
+    throw(MethodError(direct_indices, ((),())))
 end
 
-@inline function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,IdentityRange})
-    view(A, I...)
+function direct_indices{N}(O::NTuple{N,IdentityRange}, I::NTuple{N,StepRange})
+    throw(MethodError(direct_indices, (O, I)))
 end
 
-function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,AbstractUnitRange})
-    idx = map((i1,i2) -> UnitRange(i1)[i2], A.indexes, I)
-    identity_view(parent(A), map(IdentityRange, idx))
+@inline function direct_indices{N}(O::NTuple{N,Range}, I::NTuple{N,AbstractUnitRange})
+    map(IdentityRange, I)
 end
 
-function identity_view{T,N,P}(A::SubArray{T,N,P,NTuple{N,IdentityRange{Int}}}, I::NTuple{N,StepRange})
-    idx = map((i1,i2) -> UnitRange(i1)[i2], A.indexes, I)
-    identity_view(parent(A), idx)
+@inline function direct_indices{N}(O::NTuple{N,Range}, I::NTuple{N,StepRange})
+    I
+end
+
+# --------------------------------------------------------------------
+
+@inline function direct_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,Range})
+    view(A, direct_indices(indices(A), I)...)
+end
+
+@inline function direct_view{T,N}(A::SubArray{T,N}, I::NTuple{N,Range})
+    view(A, direct_indices(A.indexes, I)...)
 end
 
 # --------------------------------------------------------------------

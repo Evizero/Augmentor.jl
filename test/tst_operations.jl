@@ -107,7 +107,7 @@ ops = (Crop(1:2,2:3), Either((Rotate90(), Rotate270()), (1,0)))
     @test v == rotl90(view(square, 1:2, 2:3))
 end
 
-ops = (Rotate180(), Crop(1:2,2:3))
+ops = (Rotate180(), CropDirect(1:2,2:3))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.applyaffine(ops, square)
     @test typeof(wv) <: SubArray
