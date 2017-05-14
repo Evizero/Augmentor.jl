@@ -26,7 +26,7 @@ Base.@pure supports_eager{T<:Scale}(::Type{T}) = false
 
 function toaffine(op::Scale{2}, img::AbstractMatrix)
     idx = rand(1:length(op.factors[1]))
-    @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), @SVector([1.,1.]))
+    @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
     tfm
 end
 

@@ -61,8 +61,8 @@
         @test @inferred(Augmentor.isaffine(Scale)) === true
         @test @inferred(Augmentor.supports_affine(Scale)) === true
         @test_throws MethodError Augmentor.applyaffine(Scale(90), nothing)
-        @test @inferred(Augmentor.toaffine(Scale(2,3), rect)) ≈ AffineMap([2. 0.; 0. 3.], [-1,-2.0])
-        @test @inferred(Augmentor.toaffine(Scale([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.1,0.2])
+        @test @inferred(Augmentor.toaffine(Scale(2,3), rect)) ≈ AffineMap([2. 0.; 0. 3.], [-1.5,-4.0])
+        @test @inferred(Augmentor.toaffine(Scale([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.15,0.4])
         wv = @inferred Augmentor.applyaffine(Scale(2,3), Augmentor.prepareaffine(square))
         # TODO: better tests
         @test parent(wv).itp.coefs === square
