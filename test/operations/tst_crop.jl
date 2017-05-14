@@ -46,52 +46,52 @@ end
 
 # --------------------------------------------------------------------
 
-@testset "CropDirect" begin
-    @test (CropDirect <: Augmentor.AffineOperation) == false
+@testset "CropNative" begin
+    @test (CropNative <: Augmentor.AffineOperation) == false
     @testset "constructor" begin
-        @test_throws MethodError CropDirect()
-        @test_throws MethodError CropDirect(())
-        @test typeof(@inferred(CropDirect(1:10))) <: CropDirect{1} <: CropDirect <: Augmentor.Operation
-        @test typeof(@inferred(CropDirect(1:10,3:5))) <: CropDirect{2} <: CropDirect <: Augmentor.Operation
-        @test @inferred(CropDirect(1,4,10,5)) === @inferred(CropDirect((4:8,1:10)))
-        @test str_show(CropDirect(3:4)) == "Augmentor.CropDirect{1}((3:4,))"
-        @test str_showcompact(CropDirect(3:4)) == "Crop (directly) region (3:4,)"
-        @test str_show(CropDirect(1:2,2:3)) == "Augmentor.CropDirect{2}((1:2,$(SPACE)2:3))"
-        @test str_showcompact(CropDirect(1:2,2:3)) == "Crop (directly) region 1:2×2:3"
-        @test str_show(CropDirect(1:2,2:3,3:4)) == "Augmentor.CropDirect{3}((1:2,$(SPACE)2:3,$(SPACE)3:4))"
-        @test str_showcompact(CropDirect(1:2,2:3,3:4)) == "Crop (directly) region (1:2,$(SPACE)2:3,$(SPACE)3:4)"
+        @test_throws MethodError CropNative()
+        @test_throws MethodError CropNative(())
+        @test typeof(@inferred(CropNative(1:10))) <: CropNative{1} <: CropNative <: Augmentor.Operation
+        @test typeof(@inferred(CropNative(1:10,3:5))) <: CropNative{2} <: CropNative <: Augmentor.Operation
+        @test @inferred(CropNative(1,4,10,5)) === @inferred(CropNative((4:8,1:10)))
+        @test str_show(CropNative(3:4)) == "Augmentor.CropNative{1}((3:4,))"
+        @test str_showcompact(CropNative(3:4)) == "Crop native region (3:4,)"
+        @test str_show(CropNative(1:2,2:3)) == "Augmentor.CropNative{2}((1:2,$(SPACE)2:3))"
+        @test str_showcompact(CropNative(1:2,2:3)) == "Crop native region 1:2×2:3"
+        @test str_show(CropNative(1:2,2:3,3:4)) == "Augmentor.CropNative{3}((1:2,$(SPACE)2:3,$(SPACE)3:4))"
+        @test str_showcompact(CropNative(1:2,2:3,3:4)) == "Crop native region (1:2,$(SPACE)2:3,$(SPACE)3:4)"
     end
     @testset "eager" begin
-        @test_throws MethodError Augmentor.applyeager(CropDirect(1:10), nothing)
-        @test_throws MethodError Augmentor.applyeager(CropDirect(1:2,2:3), nothing)
+        @test_throws MethodError Augmentor.applyeager(CropNative(1:10), nothing)
+        @test_throws MethodError Augmentor.applyeager(CropNative(1:2,2:3), nothing)
         for img in (Augmentor.prepareaffine(rect), rect, view(rect, IdentityRange(1:2), IdentityRange(1:3)))
-            @test @inferred(Augmentor.applyeager(CropDirect(1:2,2:3), img)) == rect[1:2, 2:3]
-            @test typeof(Augmentor.applyeager(CropDirect(1:2,2:3), img)) <: Array
+            @test @inferred(Augmentor.applyeager(CropNative(1:2,2:3), img)) == rect[1:2, 2:3]
+            @test typeof(Augmentor.applyeager(CropNative(1:2,2:3), img)) <: Array
         end
         img = OffsetArray(rect, -2, -1)
-        @test @inferred(Augmentor.applyeager(CropDirect(-1:0,1:2), img)) == rect[1:2, 2:3]
-        @test typeof(Augmentor.applyeager(CropDirect(-1:0,1:2), img)) <: Array
+        @test @inferred(Augmentor.applyeager(CropNative(-1:0,1:2), img)) == rect[1:2, 2:3]
+        @test typeof(Augmentor.applyeager(CropNative(-1:0,1:2), img)) <: Array
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(CropDirect)) === false
-        @test @inferred(Augmentor.supports_affine(CropDirect)) === true
-        @test_throws MethodError Augmentor.applyaffine(CropDirect(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffine(CropDirect(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.isaffine(CropNative)) === false
+        @test @inferred(Augmentor.supports_affine(CropNative)) === true
+        @test_throws MethodError Augmentor.applyaffine(CropNative(1:2,2:3), nothing)
+        @test @inferred(Augmentor.applyaffine(CropNative(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(CropDirect)) === true
-        @test @inferred(Augmentor.applylazy(CropDirect(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.supports_lazy(CropNative)) === true
+        @test @inferred(Augmentor.applylazy(CropNative(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(CropDirect)) === true
-        @test @inferred(Augmentor.applyview(CropDirect(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.supports_view(CropNative)) === true
+        @test @inferred(Augmentor.applyview(CropNative(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(CropDirect)) === true
-        @test @inferred(Augmentor.applystepview(CropDirect(1:2,2:3), rect)) === view(rect, 1:1:2, 2:1:3)
+        @test @inferred(Augmentor.supports_stepview(CropNative)) === true
+        @test @inferred(Augmentor.applystepview(CropNative(1:2,2:3), rect)) === view(rect, 1:1:2, 2:1:3)
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(CropDirect)) === false
+        @test @inferred(Augmentor.supports_permute(CropNative)) === false
     end
 end
 

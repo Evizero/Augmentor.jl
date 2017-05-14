@@ -36,38 +36,38 @@ end
 
 # --------------------------------------------------------------------
 
-immutable CropDirect{N,I<:Tuple} <: Operation
+immutable CropNative{N,I<:Tuple} <: Operation
     indexes::I
 
-    function (::Type{CropDirect{N}}){N}(indexes::NTuple{N,UnitRange})
+    function (::Type{CropNative{N}}){N}(indexes::NTuple{N,UnitRange})
         new{N,typeof(indexes)}(indexes)
     end
 end
-CropDirect(::Tuple{}) = throw(MethodError(CropDirect, ((),)))
-CropDirect{N}(indexes::NTuple{N,UnitRange}) = CropDirect{N}(indexes)
-CropDirect{N}(indexes::Vararg{UnitRange,N}) = CropDirect(indexes)
-CropDirect(x, y, width, height) = CropDirect(y:y+height-1, x:x+width-1)
+CropNative(::Tuple{}) = throw(MethodError(CropNative, ((),)))
+CropNative{N}(indexes::NTuple{N,UnitRange}) = CropNative{N}(indexes)
+CropNative{N}(indexes::Vararg{UnitRange,N}) = CropNative(indexes)
+CropNative(x, y, width, height) = CropNative(y:y+height-1, x:x+width-1)
 
-Base.@pure supports_eager{T<:CropDirect}(::Type{T})    = false
-Base.@pure supports_affine{T<:CropDirect}(::Type{T})   = true
-Base.@pure supports_view{T<:CropDirect}(::Type{T})     = true
-Base.@pure supports_stepview{T<:CropDirect}(::Type{T}) = true
+Base.@pure supports_eager{T<:CropNative}(::Type{T})    = false
+Base.@pure supports_affine{T<:CropNative}(::Type{T})   = true
+Base.@pure supports_view{T<:CropNative}(::Type{T})     = true
+Base.@pure supports_stepview{T<:CropNative}(::Type{T}) = true
 
-applyeager(op::CropDirect, img)    = plain_array(img[op.indexes...])
-applyaffine(op::CropDirect, img)   = direct_view(img, op.indexes)
-applylazy(op::CropDirect, img)     = direct_view(img, op.indexes)
-applyview(op::CropDirect, img)     = direct_view(img, op.indexes)
-applystepview(op::CropDirect, img) = direct_view(img, map(StepRange, op.indexes))
+applyeager(op::CropNative, img)    = plain_array(img[op.indexes...])
+applyaffine(op::CropNative, img)   = direct_view(img, op.indexes)
+applylazy(op::CropNative, img)     = direct_view(img, op.indexes)
+applyview(op::CropNative, img)     = direct_view(img, op.indexes)
+applystepview(op::CropNative, img) = direct_view(img, map(StepRange, op.indexes))
 
-function Base.show{N}(io::IO, op::CropDirect{N})
+function Base.show{N}(io::IO, op::CropNative{N})
     if get(io, :compact, false)
         if N == 2
-            print(io, "Crop (directly) region $(op.indexes[1])×$(op.indexes[2])")
+            print(io, "Crop native region $(op.indexes[1])×$(op.indexes[2])")
         else
-            print(io, "Crop (directly) region $(op.indexes)")
+            print(io, "Crop native region $(op.indexes)")
         end
     else
-        print(io, "Augmentor.CropDirect{$N}($(op.indexes))")
+        print(io, "Augmentor.CropNative{$N}($(op.indexes))")
     end
 end
 

@@ -1,4 +1,4 @@
-[![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/header.png)](http://augmentorjl.readthedocs.io/)
+[![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/header.png)](http://augmentorjl.readthedocs.io/)
 
 **Augmentor.jl** is the [Julia](http://julialang.org)
 implementation for Augmentor. The Python version of the same name
@@ -17,11 +17,12 @@ augmentation pipeline is simply a sequence of operations for
 which the parameters can (but need not) be random variables.
 
 ```julia
-julia> pipeline = (Rotate([-5, -3, 0, 3, 5]), CropSize(64,64), Zoom(1:0.1:1.2))
-# 3-step Augmentor.Pipeline:
-#  1.) Rotate by θ ∈ [-5,-3,0,3,5] degree
-#  2.) Crop a 64×64 window around the center
-#  3.) Zoom by I ∈ {1.0×1.0, 1.1×1.1, 1.2×1.2}
+julia> pipeline = (FlipX(0.5), Rotate([-5, -3, 0, 3, 5]), CropSize(64, 64), Zoom(1:0.1:1.2))
+# 4-step Augmentor.Pipeline:
+#  1.) Either: (50%) Flip the X axis. (50%) No operation.
+#  2.) Rotate by θ ∈ [-5,-3,0,3,5] degree
+#  3.) Crop a 64×64 window around the center
+#  4.) Zoom by I ∈ {1.0×1.0, 1.1×1.1, 1.2×1.2}
 ```
 
 The Julia version of Augmentor is engineered specifically for
@@ -82,7 +83,7 @@ code that generated the two figures below can be found
 
 Input (`img`)                       |   | Output (`img_new`)
 :----------------------------------:|:-:|:------------------------------:
-![input](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme_1_in.png) | → | ![output](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme_1_out.gif)
+![input](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/isic_in.png) | → | ![output](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/isic_out.gif)
 
 While we just used a small preview image in the above example
 (note the term "thumbnail" in the code), it is already possible

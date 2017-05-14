@@ -28,7 +28,7 @@ export
     FlipY,
 
     Crop,
-    CropDirect,
+    CropNative,
     CropSize,
 
     Resize,
