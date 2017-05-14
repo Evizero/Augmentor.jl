@@ -32,7 +32,7 @@ Augmentor tries to avoid the need for any intermediate images,
 but instead aims to compute the output image directly from the
 input in one single pass.
 
-## Hello World
+## Introduction
 
 The following code snippet shows how a stochastic augmentation
 pipeline can be specified using simple building blocks that we
@@ -84,14 +84,14 @@ Input (`img`)                       |   | Output (`img_new`)
 :----------------------------------:|:-:|:------------------------------:
 ![input](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme_1_in.png) | → | ![output](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme_1_out.gif)
 
-While this is just a small preview image (note the term
-"thumbnail" in the code above), it is already possible to observe
-Augmentor's behaviour when looking at the memory footprint of
-`augment` compared to a simple `copy`.
+While we just used a small preview image in the above example
+(note the term "thumbnail" in the code), it is already possible
+to observe Augmentor's behaviour when comparing the memory
+footprint of `augment` to a simple `copy` of the original.
 
 ```julia
 julia> @allocated(augment(img, pipeline)) / 1024
-96.515625 # KiB
+15.578125 # KiB
 
 julia> @allocated(copy(img)) / 1024
 126.828125 # KiB
@@ -107,10 +107,11 @@ function, which it then queries for each individual pixel in the
 and the runtime depends on the size of the output image.
 
 To take the output-dependent behaviour to its extreme, consider
-the full sized version of the above thumbnail, which is about 14
-mb in size. We will modify our pipeline slightly and insert a
-`Scale` operation as the *fourth* operation. Doing this will
-result in a similar output as our original example.
+the full sized version of the above thumbnail, which is about 80
+mb in uncompressed size. We will modify our pipeline slightly and
+insert a `Scale` operation as the *fourth* step. Doing this will
+cause `augment` to produce a similar looking output as in our
+original example.
 
 ```julia
 julia> img_big = get(ImageDownloadRequest(id = "5592ac599fc3c13155a57a85"))
@@ -132,7 +133,7 @@ julia> img_new = augment(img_big, pipeline_big)
 # [...]
 
 julia> @allocated(augment(img_big, pipeline_big)) / 1024
-96.6875 # KiB
+15.671875 # KiB
 ````
 
 As we can see the allocated memory did not change notably.
@@ -152,15 +153,15 @@ julia> using BenchmarkTools
 
 julia> @benchmark augment($img, $pipeline) # small image
 BenchmarkTools.Trial:
-  memory estimate:  96.44 KiB
-  allocs estimate:  117
-  minimum time:     2.381 ms (0.00% GC)
+  memory estimate:  15.50 KiB
+  allocs estimate:  57
+  minimum time:     338.520 μs (0.00% GC)
 
 julia> @benchmark augment($img_big, $pipeline_big) # big image
 BenchmarkTools.Trial:
-  memory estimate:  96.61 KiB
-  allocs estimate:  119
-  minimum time:     2.459 ms (0.00% GC)
+  memory estimate:  15.67 KiB
+  allocs estimate:  59
+  minimum time:     356.819 μs (0.00% GC)
 
 julia> @benchmark copy($img_big) # simple memory copy
 BenchmarkTools.Trial:
@@ -169,11 +170,25 @@ BenchmarkTools.Trial:
   minimum time:     16.122 ms (1.23% GC)
 ```
 
-To be fair, the way we aggressively downscaled the large image
-in this example was rather untypical, because doing it this way
-would cause aliasing effects that may not be tolerable. The point
-of this exercise was to convey an intuition of how Augmentor
-works.
+To be fair, the way we aggressively downscaled the large image in
+this example was rather untypical, because doing it this way
+would cause aliasing effects that may not be tolerable (although
+for this particular image these weren't that bad). The point of
+this exercise was to convey an intuition of how Augmentor works.
+
+```
+julia> versioninfo()
+Julia Version 0.5.0
+Commit 3c9d753 (2016-09-19 18:14 UTC)
+Platform Info:
+  System: Linux (x86_64-linux-gnu)
+  CPU: Intel(R) Xeon(R) CPU E5-1650 v3 @ 3.50GHz
+  WORD_SIZE: 64
+  BLAS: libopenblas (NO_LAPACK NO_LAPACKE DYNAMIC_ARCH NO_AFFINITY Haswell)
+  LAPACK: liblapack.so.3
+  LIBM: libopenlibm
+  LLVM: libLLVM-3.7.1 (ORCJIT, haswell)
+```
 
 ## Documentation
 

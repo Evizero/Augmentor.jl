@@ -49,10 +49,34 @@ ops = (Rotate90(), Rotate270())
     @test img == imresize(rect, (4,4))
 end
 
+ops = (Rotate90(), Resize(3,3))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor.applyaffine(ops, square)
+    @test typeof(wv) === typeof(view(invwarpedview(square, Augmentor.toaffine(NoOp(),square), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    @test wv == rotl90(square)
+    wv = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(square))
+    @test typeof(wv) === typeof(view(invwarpedview(square, Augmentor.toaffine(NoOp(),square), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    @test wv == rotl90(square)
+end
+
 ops = (Rotate90(), Resize(2,2))
 @testset "$(str_showcompact(ops))" begin
-    @test_throws MethodError Augmentor.applylazy(ops, rect)
-    @test_throws MethodError Augmentor.applyaffine(ops, rect)
+    wv = @inferred Augmentor.applyaffine(ops, square)
+    @test typeof(wv) === typeof(view(invwarpedview(square, Augmentor.toaffine(NoOp(),square), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    @test wv == imresize(rotl90(square), 2, 2)
+    wv = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(square))
+    @test typeof(wv) === typeof(view(invwarpedview(square, Augmentor.toaffine(NoOp(),square), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    @test wv == imresize(rotl90(square), 2, 2)
+end
+
+ops = (Rotate90(), Resize(5,9))
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor.applyaffine(ops, square)
+    @test typeof(wv) === typeof(view(invwarpedview(square, Augmentor.toaffine(NoOp(),square), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    @test wv == imresize(rotl90(square), 5, 9)
+    wv = @inferred Augmentor.applylazy(ops, Augmentor.prepareaffine(square))
+    @test typeof(wv) === typeof(view(invwarpedview(square, Augmentor.toaffine(NoOp(),square), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    @test wv == imresize(rotl90(square), 5, 9)
 end
 
 ops = (Rotate(-90), Rotate90())

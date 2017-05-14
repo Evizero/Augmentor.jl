@@ -31,7 +31,7 @@ end
     :($(Symbol(:img_, var_offset)))
 end
 
-@inline function build_pipeline(var_offset::Int, op_offset::Int, head, tail::Tuple)
+function build_pipeline(var_offset::Int, op_offset::Int, head, tail::Tuple)
     var_in  = Symbol(:img_, var_offset)
     var_out = Symbol(:img_, var_offset+1)
     if supports_lazy(head, tail)

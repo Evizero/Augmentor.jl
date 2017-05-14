@@ -5,7 +5,11 @@ using ImageInTerminal
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
-@test length(setdiff(ambs, refambs)) <= 10
+if VERSION < v"0.6.0-" # good enough. the 10 on 0.5 are spurious
+    @test length(setdiff(ambs, refambs)) <= 10
+else
+    @test length(setdiff(ambs, refambs)) == 0
+end
 
 function str_show(obj)
     io = IOBuffer()
@@ -25,6 +29,7 @@ camera = testimage("cameraman")
 square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]
 square2 = rand(Gray{N0f8}, 4, 4)
 rect = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6]
+checkers = Gray{N0f8}[1 0 1 0 1; 0 1 0 1 0; 1 0 1 0 1]
 
 tests = [
     "tst_utils.jl",
