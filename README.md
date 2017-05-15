@@ -8,19 +8,20 @@ is available [here](https://github.com/mdbloice/Augmentor).
 |:------------------:|:---------------------:|:-----------------:|
 | [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md) [![Documentation Status](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](http://augmentorjl.readthedocs.io/en/latest/?badge=latest) | [![Julia Pkg 0.5](http://pkg.julialang.org/badges/Augmentor_0.5.svg)](http://pkg.julialang.org/?pkg=Augmentor) [![Julia Pkg 0.6](http://pkg.julialang.org/badges/Augmentor_0.6.svg)](http://pkg.julialang.org/?pkg=Augmentor) | [![Travis Status](https://travis-ci.org/Evizero/Augmentor.jl.svg?branch=master)](https://travis-ci.org/Evizero/Augmentor.jl) [![AppVeyor status](https://ci.appveyor.com/api/projects/status/stfgx2856r8ckskw?svg=true)](https://ci.appveyor.com/project/Evizero/augmentor-jl) [![Coverage Status](https://coveralls.io/repos/github/Evizero/Augmentor.jl/badge.svg?branch=master)](https://coveralls.io/github/Evizero/Augmentor.jl?branch=master) |
 
-Augmentor is a real-time image-augmentation library designed to
+Augmentor is a real-time image augmentation library designed to
 render the process of artificial dataset enlargement more
 convenient, less error prone, and easier to reproduce. It offers
 the user the ability to build a stochastic augmentation pipeline
-using simple building blocks. In other words, a stochastic
-augmentation pipeline is simply a sequence of operations for
-which the parameters can (but need not) be random variables.
+using simple building blocks. For our purposes, a stochastic
+augmentation pipeline can be understood as a sequence of
+operations for which the parameters can (but need not) be random
+variables.
 
 ```julia
-julia> pipeline = (FlipX(0.5), Rotate([-5, -3, 0, 3, 5]), CropSize(64, 64), Zoom(1:0.1:1.2))
+julia> pipeline = (FlipX(0.5), Rotate([-5,-3,0,3,5]), CropSize(64,64), Zoom(1:0.1:1.2))
 # 4-step Augmentor.Pipeline:
 #  1.) Either: (50%) Flip the X axis. (50%) No operation.
-#  2.) Rotate by θ ∈ [-5,-3,0,3,5] degree
+#  2.) Rotate by θ ∈ [-5, -3, 0, 3, 5] degree
 #  3.) Crop a 64×64 window around the center
 #  4.) Zoom by I ∈ {1.0×1.0, 1.1×1.1, 1.2×1.2}
 ```
@@ -85,17 +86,21 @@ Input (`img`)                       |   | Output (`img_new`)
 :----------------------------------:|:-:|:------------------------------:
 ![input](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/isic_in.png) | → | ![output](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/isic_out.gif)
 
+## Performance Aspects
+
 While we just used a small preview image in the above example
 (note the term "thumbnail" in the code), it is already possible
 to observe Augmentor's behaviour when comparing the memory
 footprint of `augment` to a simple `copy` of the original.
 
 ```julia
-julia> @allocated(augment(img, pipeline)) / 1024
-15.578125 # KiB
+julia> using BenchmarkTools
 
-julia> @allocated(copy(img)) / 1024
-126.828125 # KiB
+julia> @btime augment($img, $pipeline)
+  348.578 μs (115 allocations: 16.75 KiB)
+
+julia> @btime copy($img)
+  9.010 μs (2 allocations: 126.83 KiB)
 ```
 
 Note how the *whole* process for producing an augmented version
@@ -109,7 +114,7 @@ and the runtime depends on the size of the output image.
 
 To take the output-dependent behaviour to its extreme, consider
 the full sized version of the above thumbnail, which is about 80
-mb in uncompressed size. We will modify our pipeline slightly and
+MiB in uncompressed size. We will modify our pipeline slightly and
 insert a `Scale` operation as the *fourth* step. Doing this will
 cause `augment` to produce a similar looking output as in our
 original example.
@@ -133,8 +138,8 @@ julia> img_new = augment(img_big, pipeline_big)
 # 64×64 Array{RGB{N0f8},2}:
 # [...]
 
-julia> @allocated(augment(img_big, pipeline_big)) / 1024
-15.671875 # KiB
+julia> @btime augment($img_big, $pipeline_big)
+  380.635 μs (121 allocations: 16.98 KiB)
 ````
 
 As we can see the allocated memory did not change notably.
@@ -150,32 +155,21 @@ image is significantly larger and we added an additional
 operation to the pipeline.
 
 ```julia
-julia> using BenchmarkTools
+julia> @btime augment($img, $pipeline) # small image
+  349.346 μs (115 allocations: 16.75 KiB)
 
-julia> @benchmark augment($img, $pipeline) # small image
-BenchmarkTools.Trial:
-  memory estimate:  15.50 KiB
-  allocs estimate:  57
-  minimum time:     338.520 μs (0.00% GC)
+julia> @btime augment($img_big, $pipeline_big) # big image
+  374.419 μs (121 allocations: 16.98 KiB)
 
-julia> @benchmark augment($img_big, $pipeline_big) # big image
-BenchmarkTools.Trial:
-  memory estimate:  15.67 KiB
-  allocs estimate:  59
-  minimum time:     356.819 μs (0.00% GC)
-
-julia> @benchmark copy($img_big) # simple memory copy
-BenchmarkTools.Trial:
-  memory estimate:  83.42 MiB
-  allocs estimate:  2
-  minimum time:     16.122 ms (1.23% GC)
+julia> @btime copy($img_big) # simple memory copy
+  16.357 ms (2 allocations: 83.42 MiB)
 ```
 
 To be fair, the way we aggressively downscaled the large image in
 this example was rather untypical, because doing it this way
 would cause aliasing effects that may not be tolerable (although
 for this particular image these weren't that bad). The point of
-this exercise was to convey an intuition of how Augmentor works.
+this example was to convey an intuition of how Augmentor works.
 
 ```
 julia> versioninfo()
@@ -190,6 +184,87 @@ Platform Info:
   LIBM: libopenlibm
   LLVM: libLLVM-3.7.1 (ORCJIT, haswell)
 ```
+
+## Package Overview
+
+Images are a special class of data that have some interesting
+properties in respect to their structure. For example do the
+dimensions of an image (i.e. the pixel) exhibit a spatial
+relationship to each other. As such, a lot of commonly used
+augmentation strategies for image data revolve around affine
+transformations, such as translations or rotations.
+
+Augmentor ships with a number of predefined operations that
+should be sufficient to describe some of the most commonly used
+augmentation strategies. Each operation is a represented as its
+own unique type (see table below for a concise overview). For a
+more detailed description of all the predefined operations take a
+look at the corresponding section of the
+[documentation](http://augmentorjl.readthedocs.io/en/latest/usersguide/operations.html).
+
+| Category     | Operation    | Description
+|--------------|--------------|-----------------------------------------------------
+| *Mirroring:* | `FlipX`      | Reverse the order of each pixel row.
+|              | `FlipY`      | Reverse the order of each pixel column.
+| *Rotating:*  | `Rotate90`   | Rotate upwards 90 degree.
+|              | `Rotate270`  | Rotate downwards 90 degree.
+|              | `Rotate180`  | Rotate 180 degree.
+|              | `Rotate`     | Rotate for any arbitrary angle(s).
+| *Shearing:*  | `ShearX`     | Shear horizontally for the given degree(s).
+|              | `ShearY`     | Shear vertically for the given degree(s).
+| *Resizing:*  | `Scale`      | Scale X and Y axis by some (random) factor(s).
+|              | `Zoom`       | Scale X and Y axis while preserving image size.
+|              | `Resize`     | Resize image to the specified pixel dimensions.
+| *Cropping:*  | `Crop`       | Crop specific region of the image.
+|              | `CropNative` | Crop specific region of the image in relative space.
+|              | `CropSize`   | Crop area around the center with specified size.
+| *Utilities:* | `NoOp`       | Identity function. Pass image along unchanged.
+|              | `Either`     | Apply one of the given operations at random.
+
+The purpose of an operation is to simply serve as a "dumb
+placeholder" to specify the intent and parameters of the desired
+transformation. What that means is that a pipeline of operations
+can be thought of as a list of instructions (a cookbook of
+sorts), that Augmentor uses internally to construct the required
+code that implements the desired behaviour in the most efficient
+way it can.
+
+The way an operation is implemented depends on the rest of the
+specified pipeline. For example, Augmentor knows three different
+ways to implement the behaviour of the operation `Rotate90` and
+will choose the one that best coincides with the other operations
+of the pipeline and their concrete order.
+
+1. Call the function `rotl90` of Julia's base library, which
+   makes use of the fact that a 90 degree rotation can be
+   implemented very efficiently. While by itself this is the
+   fastest way to compute the result, this function is "eager"
+   and will allocate a new array. If `Rotate90` is followed by
+   another operation this may not be the best choice, since it
+   will cause a temporary image that is later discarded.
+
+3. Create a `SubArray` of a `PermutedDimsArray`. This is more or
+   less a lazy version of `rotl90` that makes use of the fact
+   that a 90 degree rotation can be described 1-to-1 using just
+   the original pixels. By itself this strategy is slower than
+   `rotl90`, but if it is followed by an operation such as `Crop`
+   or `CropSize` it can be significantly faster. The reason for
+   this is that it avoids the computation of unused pixels and
+   also any allocation of temporary memory. The computation
+   overhead per output pixel, while small, grows linearly with
+   the number of chained operations.
+
+2. Create an `AffineMap` using a rotation matrix that describes a
+   90 degree rotation around the center of the image. This will
+   result in a lazy transformation of the original image that is
+   further compose-able with other `AffineMap`. This is the
+   slowest available strategy, unless multiple affine operations
+   are chained together. If that is the case, then chaining the
+   operations can be reduced to composing the tiny affine maps
+   instead. This effectively fuses multiple operations into a
+   single operation for which the computation overhead per output
+   pixel remains approximately constant in respect to the number
+   of chained operations.
 
 ## Documentation
 
@@ -229,11 +304,12 @@ Pkg.checkout("Augmentor")
 
 This code is free to use under the terms of the MIT license.
 
-## Acknowledgment
+## Acknowledgments
 
 This package makes heavy use of the following packages in order
 to provide it's main functionality. To see at full list of
-utilized packages, please take a look at the REQUIRE file.
+utilized packages, please take a look at the [REQUIRE](./REQUIRE)
+file.
 
 - [FugroRoames/CoordinateTransformations.jl](https://github.com/FugroRoames/CoordinateTransformations.jl)
 - [JuliaImages/ImageTransformations.jl](https://github.com/JuliaImages/ImageTransformations.jl)
