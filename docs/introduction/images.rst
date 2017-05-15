@@ -3,23 +3,23 @@ Working with Images in Julia
 
 The `Julia language <http://julialang.org/>`_ provides a rich
 syntax as well as large set of highly-optimized functionality for
-working with (multi-dimensional) arrays of bit types. Because of
-this, the language lends itself particularly well to the fairly
-simple idea of treating images as just plain arrays. Even though
-this may sound as a rather tedious low-level approach, Julia
-makes it possible to still allow for powerful abstraction layers
-without the loss of generality that usually comes with that. This
-is accomplished with help of Julia's flexible type system and
-multiple dispatch (both of which are beyond the scope of this
-tutorial).
+working with (multi-dimensional) arrays of what is known as "bit
+types" or compositions of such. Because of this, the language
+lends itself particularly well to the fairly simple idea of
+treating images as just plain arrays. Even though this may sound
+as a rather tedious low-level approach, Julia makes it possible
+to still allow for powerful abstraction layers without the loss
+of generality that usually comes with that. This is accomplished
+with help of Julia's flexible type system and multiple dispatch
+(both of which are beyond the scope of this tutorial).
 
-While the array-view-treatment makes working with images in Julia
-very performant, it has also been source of confusion to new
-community members. This beginner's guide is an attempt to provide
-a step-by-step overview of how pixel data is handled in Julia. To
-get a more detailed explanation on some particular concept
-involved, please take a look at the documentation of the main
-package `Images.jl <http://juliaimages.github.io/>`_
+While the images-are-arrays-approach makes working with images in
+Julia very performant, it has also been source of confusion to
+new community members. This beginner's guide is an attempt to
+provide a step-by-step overview of how pixel data is handled in
+Julia. To get a more detailed explanation on some particular
+concept involved, please take a look at the documentation of the
+`JuliaImages <http://juliaimages.github.io/>`_ ecosystem.
 
 Multi-dimensional Arrays
 -------------------------
@@ -37,11 +37,11 @@ work with them.
    documentation
    <https://docs.julialang.org/en/latest/manual/arrays.html>`_
 
-Whenever we work with arrays in which the elements are bit types
-(e.g. ``Int64``, ``Float32``, ``UInt8``, etc), we can think of
-the array as a continuous block of memory. This is useful for
-many different reasons, such as cache locality and BLAS
-interaction.
+Whenever we work with an ``Array`` in which the elements are
+bit-types (e.g. ``Int64``, ``Float32``, ``UInt8``, etc), we can
+think of the array as a continuous block of memory. This is
+useful for many different reasons, such as cache locality and
+interacting with external libraries.
 
 The same block of memory can be interpreted in a number of ways.
 Consider the following example in which we allocate a vector
@@ -76,7 +76,7 @@ columns instead (or even the other way around). The function
 
 Note how we specified the number of rows first. This is because
 the Julia language follows the `column-major convention
-<http://docs.julialang.org/en/latest/manual/performance-tips/#access-arrays-in-memory-order-along-columns>`_
+<https://docs.julialang.org/en/latest/manual/performance-tips.html#Access-arrays-in-memory-order,-along-columns-1>`_
 for multi dimensional arrays. What this means can be observed
 when we compare our new matrix ``A`` with the initial vector
 ``memory`` and look at the element layout. Both variables are
@@ -114,7 +114,8 @@ example we can think of this as a 3D array as well.
 If you take a closer look at the dimension sizes, you can see
 that all we did in that example was add a new dimension of size
 ``1``, while not changing the other numbers. In fact we can add
-any number of practically empty dimensions.
+any number of practically empty dimensions, otherwise known as
+*singleton dimensions*.
 
 .. code-block:: julia
 
@@ -132,17 +133,17 @@ any number of practically empty dimensions.
 
 This is a useful property to have when we are confronted with
 greyscale datasets that do not have a color channel, yet we still
-want to work with a library that expects the images to have one
-(such as MXNet). To see a practical example please take a look at
-the corresponding tutorial for :ref:`mxnet_tut`.
+want to work with a library that expects the images to have one.
 
+.. To see a practical example please take a look at the corresponding tutorial for :ref:`mxnet_tut`.
 
 Vertical-Major vs Horizontal-Major
 -----------------------------------
 
-There are a number on different conventions of how to store image
-data into a binary format. The first question one has to address
-is the order in which the image dimensions are transcribed.
+There are a number of different conventions for how to store
+image data into a binary format. The first question one has to
+address is the order in which the image dimensions are
+transcribed.
 
 We have seen before that Julia follows the column-major
 convention for its arrays, which for images would lead to the
@@ -151,6 +152,8 @@ domain, however, it is fairly common to store the pixels in a
 horizontal-major layout. In other words, horizontal-major means
 that images are stored in memory (or file) one pixel row after
 the other.
+
+Usually if you load a file using ``FileIO.load``
 
 **todo** discuss permute dims array
 

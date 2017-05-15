@@ -1,40 +1,47 @@
 Background and Motivation
 =================================
 
-The term *data augmentation* is commonly used to describe the
-process of applying label-preserving transformations to some
-dataset, with the hope that their output (i.e. the newly
-generated observations) bias the model towards learning better
-features. Depending on the structure and semantics of the data,
-coming up with such transformations can be a challenge by itself.
+In this section we will discuss the concept of image augmentation
+in general. In particular we will introduce some terminology and
+useful definitions.
 
-Images are a special class of data that have some interesting
-properties in respect to their structure. For example exhibit the
-dimensions of an image (i.e. the pixel) a spatial relationship to
-each other. Because images are such a popular and special case of
-data, they deserve their own sub category, which we will
+What is Image Augmentation?
+-----------------------------
+
+The term *data augmentation* is commonly used to describe the
+process of repeatedly applying various transformations to some
+dataset, with the hope that the output (i.e. the newly generated
+observations) bias the model towards learning better features.
+Depending on the structure and semantics of the data, coming up
+with such transformations can be a challenge by itself.
+
+Images are a special class of data that exhibit some interesting
+properties in respect to their structure. For example do the
+dimensions of an image (i.e. the pixel) exhibit a spatial
+relationship to each other. As such, a lot of commonly used
+augmentation strategies for image data revolve around affine
+transformations, such as translations or rotations. Because
+images are such a popular and special case of data, they deserve
+their own sub-category of data augmentation, which we will
 unsurprisingly refer to as **image augmentation**.
 
 The general idea is the following: if we want our model to
 generalize well, then we should design the learning process in
-such a way as to bias the model into learning such information
-equivariant properties. One way to do this is via the design of
-the model itself, which for example was idea behind convolutional
-neural networks.
-
-An orthogonal approach - and the focus of the rest if this
-tutorial - to bias the model to learn about this information
-equi-variance, is by using label-preserving transformations
-
+such a way as to bias the model into learning such
+transformation-equivariant properties. One way to do this is via
+the design of the model itself, which for example was idea behind
+convolutional neural networks. An orthogonal approach to bias the
+model to learn about this equivariance - and the focus of this
+package - is by using label-preserving transformations.
 
 Label-preserving Transformations
 ---------------------------------
 
-Before we attempt to train a model using some augmentation
-pipeline we should invest some time in deciding on an appropriate
-set of transformations. Some of these transformations also have
-parameters to tune, and we should also make sure that we settle
-on a decent set of values for those.
+Before attempting to train a model using some augmentation
+pipeline, it's a good idea to invest some time in deciding on an
+appropriate set of transformations to choose from. Some of these
+transformations also have parameters to tune, and we should also
+make sure that we settle on a decent set of values for those.
 
 What constitutes as "decent" depends on the dataset. In general
 we want the augmented images to be fairly dissimilar to the
@@ -66,11 +73,12 @@ depicted by the image on the right side.
 +-----------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------+
 
 To a human, this newly transformed image clearly represents the
-label "9" and not "6" like the original image did. Augmentor,
-however, assumes that the output of the pipeline has the same
-label as the input. That means that in this example we would tell
-our model that the correct answer for the image on the right side
-is "6", which is clearly undesirable for obvious reasons.
+label "9", and not "6" like the original image did. In image
+augmentation, however, the assumption is that the output of the
+pipeline has the same label as the input. That means that in this
+example we would tell our model that the correct answer for the
+image on the right side is "6", which is clearly undesirable for
+obvious reasons.
 
 Thus, for the MNIST dataset, the transformation
 :class:`Rotate180` is **not** label-preserving and should not be
@@ -93,9 +101,9 @@ images. A subset of that data was used in 2016's ISBI challenge
 [ISBI2016]_ where a subtask was lesion classification.
 
 Let's consider the following input image on the left side. It
-shows a photo of a skin lesion that was taken from above. Again
-applying the :class:`Rotate180` transformation on the input image
-we end up with a transformed version shown on the right side.
+shows a photo of a skin lesion that was taken from above. By
+applying the :class:`Rotate180` operation to the input image, we
+end up with a transformed version shown on the right side.
 
 .. code-block:: julia
 
@@ -114,8 +122,9 @@ orientation of the camera is somewhat arbitrary as long as it
 points to the lesion at an approximately orthogonal angle. Thus,
 for the ISIC dataset, the transformation :class:`Rotate180` could
 be considered as label-preserving and very well be tried for
-augmentation. Note, however, that this does not guarantee that it
-will improve the model.
+augmentation. Of course this does not guarantee that it will
+improve training time or model accuracy, but the point is that it
+is unlikely to hurt.
 
 .. [ISIC] https://isic-archive.com/
 

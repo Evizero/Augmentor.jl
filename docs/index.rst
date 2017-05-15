@@ -8,13 +8,14 @@ for Augmentor. You can find the Python version `here
 Augmentor.jl's documentation
 ================================
 
-Augmentor is a real-time image-augmentation library designed to
+Augmentor is a real-time image augmentation library designed to
 render the process of artificial dataset enlargement more
 convenient, less error prone, and easier to reproduce. It offers
 the user the ability to build a stochastic augmentation pipeline
 using simple building blocks. In other words, a stochastic
 augmentation pipeline is simply a sequence of operations for
-which the parameters can (but need not) be random variables.
+which the parameters can (but need not) be random variables as
+the following code snippet demonstrates.
 
 .. code-block:: jlcon
 
@@ -57,6 +58,11 @@ involved and outline the most important terms and definitions.
    :maxdepth: 2
 
    introduction/background
+
+In case you have not worked with image data in Julia before, feel
+free to browse the following documents for a crash course on how
+image data is represented in the Julia language, as well as how
+to visualize it.
 
 .. toctree::
    :maxdepth: 2
