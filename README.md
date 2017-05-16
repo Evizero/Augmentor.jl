@@ -268,7 +268,7 @@ of the pipeline and their concrete order.
 
 ## Documentation
 
-For a much more detailed treatment check out the **[latest
+For a more detailed treatment check out the **[latest
 documentation](http://augmentorjl.readthedocs.io/en/latest/index.html)**.
 
 Additionally, you can make use of Julia's native docsystem.

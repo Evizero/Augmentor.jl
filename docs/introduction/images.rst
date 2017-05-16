@@ -153,24 +153,61 @@ horizontal-major layout. In other words, horizontal-major means
 that images are stored in memory (or file) one pixel row after
 the other.
 
-Usually if you load a file using ``FileIO.load``
+In most cases, when working within the JuliaImages ecosystem, the
+images should already be in the Julia-native column major layout.
+If for some reason that is not the case there are two possible
+ways to convert the image to that format.
 
-**todo** discuss permute dims array
+.. code-block:: julia
 
+   julia> At = reinterpret(UInt8, memory, (3,2))' # "row-major" layout
+   2×3 Array{UInt8,2}:
+    0x01  0x02  0x03
+    0x04  0x05  0x06
+
+1. The first way to alter the pixel order is by using the
+   function ``Base.permutedims``. In contrast to what we have
+   seen before, this function will allocate a new array and copy
+   the values in the appropriate manner.
+
+   .. code-block:: julia
+
+      julia> B = permutedims(At, (2, 1))
+      3×2 Array{UInt8,2}:
+       0x01  0x04
+       0x02  0x05
+       0x03  0x06
+
+2. The second way is using the function
+   ``ImageCore.permuteddimsview`` which results in a lazy view
+   that does not allocate a new array but instead only computes
+   the correct values when queried.
+
+   .. code-block:: jlcon
+
+      julia> using ImageCore
+
+      julia> C = permuteddimsview(At, (2, 1))
+      3×2 permuteddimsview(::Array{UInt8,2}, (2,1)) with element type UInt8:
+       0x01  0x04
+       0x02  0x05
+       0x03  0x06
+
+Either way, it is in general a good idea to make sure that the
+array one is working with ends up in a column-major layout.
 
 Reinterpreting Elements
 ------------------------
 
 Up to this point, all we talked about was how to reinterpreting
-the dimensional layout of some continuous memory block. If you
-look at the examples above you will see that all the arrays have
-elements of type ``UInt8``, which just means that each element is
-represented by a single byte in memory.
+or permuting the dimensional layout of some continuous memory
+block. If you look at the examples above you will see that all
+the arrays have elements of type ``UInt8``, which just means that
+each element is represented by a single byte in memory.
 
-Now that we understand how to reinterpret dimensional layout, we
-can take a step further and think about reinterpreting the
-element types of the array. Let us consider our original vector
-``memory`` again.
+Knowing all this, we can now take the idea a step further and
+think about reinterpreting the element types of the array. Let us
+consider our original vector ``memory`` again.
 
 .. code-block:: julia
 

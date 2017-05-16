@@ -1,9 +1,8 @@
 
 .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/header.png
 
-**Augmentor.jl** is the `Julia <http://julialang.org>`_ package
-for Augmentor. You can find the Python version `here
-<https://github.com/mdbloice/Augmentor>`_ .
+A **fast** library for increasing the number of training images
+by applying various transformations.
 
 Augmentor.jl's documentation
 ================================
@@ -46,6 +45,10 @@ installation instructions and some simple hello world examples.
 
    introduction/gettingstarted
 
+**Augmentor.jl** is the `Julia <http://julialang.org>`_ package
+for Augmentor. You can find the Python version `here
+<https://github.com/mdbloice/Augmentor>`_ .
+
 Introduction and Motivation
 -----------------------------
 
@@ -71,6 +74,10 @@ to visualize it.
 
 User's Guide
 ---------------
+
+Augmentor provides a number of already implemented functionality.
+The following section provides a complete list of all the
+exported operations and their documentation.
 
 .. toctree::
    :maxdepth: 3
