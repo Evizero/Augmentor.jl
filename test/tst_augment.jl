@@ -9,8 +9,12 @@ function test_reference_impl{T<:String}(filename, actual::AbstractArray{T})
     try
         reference = replace.(readlines(reference_path(filename)), ["\n"], [""])
         try
-            @assert reference == actual # to throw error
-            @test true # to increase test counter if reached
+            if Base.have_color
+                @assert reference == actual # to throw error
+                @test true # to increase test counter if reached
+            else
+                println("Test for \"$filename\" skipped. Please run julia with \"--color=yes\" to enable these tests.")
+            end
         catch # test failed
             println("Test for \"$filename\" failed.")
             println("- REFERENCE -------------------")
