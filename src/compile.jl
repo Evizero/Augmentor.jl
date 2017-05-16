@@ -74,8 +74,8 @@ end
 # --------------------------------------------------------------------
 
 # just for user inspection to see how it works. not used internally
-function build_pipeline(pipeline::Pipeline)
-    build_pipeline(:input_image, map(typeof, pipeline))
+function build_pipeline(pipeline::AbstractPipeline)
+    build_pipeline(:input_image, map(typeof, operations(pipeline)))
 end
 
 build_pipeline(op::Operation) = build_pipeline((op,))

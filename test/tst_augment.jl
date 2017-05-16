@@ -58,6 +58,11 @@ end
 # --------------------------------------------------------------------
 
 @testset "single op" begin
+    img = @inferred Augmentor._augment(rect, Augmentor.ImmutablePipeline(Rotate90()))
+    @test typeof(img) <: Array
+    @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
+    @test eltype(img) <: eltype(rect)
+    @test img == rotl90(rect)
     img = @inferred Augmentor._augment(rect, (Rotate90(),))
     @test typeof(img) <: Array
     @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
@@ -70,7 +75,7 @@ end
     @test img == rotl90(square)
 end
 
-ops = (Rotate(90),Rotate(-90)) # forces affine
+ops = Augmentor.ImmutablePipeline(Rotate(90),Rotate(-90)) # forces affine
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
@@ -116,7 +121,7 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
     @test_reference "rot_crop_either_crop" img
 end
 
-ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195))
+ops = Augmentor.ImmutablePipeline(Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray

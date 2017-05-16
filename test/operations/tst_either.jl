@@ -41,6 +41,16 @@
         @test op.chances ≈ @SVector([1/3,1/3,1/3])
         @test op.cum_chances ≈ @SVector([1/3,2/3,3/3])
     end
+    let op = @inferred(Rotate90()*Rotate180()*Rotate270())
+        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+        @test op.chances ≈ @SVector([1/3,1/3,1/3])
+        @test op.cum_chances ≈ @SVector([1/3,2/3,3/3])
+    end
+    let op = @inferred((1=>Rotate90())*(2=>Rotate180())*(1=>Rotate270()))
+        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+        @test op.chances ≈ @SVector([1/4,2/4,1/4])
+        @test op.cum_chances ≈ @SVector([1/4,3/4,4/4])
+    end
 end
 
 @testset "show" begin

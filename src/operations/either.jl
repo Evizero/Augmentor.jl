@@ -3,7 +3,7 @@ immutable Either{N,T<:Tuple} <: Operation
     chances::SVector{N,Float64}
     cum_chances::SVector{N,Float64}
 
-    function (::Type{Either}){N,T}(operations::Pipeline{N}, chances::SVector{N,T})
+    function (::Type{Either}){N,T}(operations::NTuple{N,Operation}, chances::SVector{N,T})
         all(c->c>=0, chances) || throw(ArgumentError("All provided \"chances\" must be positive"))
         length(operations) > 0 || throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
         sum_chances = sum(chances)
@@ -16,7 +16,7 @@ end
 
 Either() = throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
 
-function Either{N}(operations::Pipeline{N}, chances::NTuple{N,Real} = map(op -> 1/length(operations), operations))
+function Either{N}(operations::NTuple{N,Operation}, chances::NTuple{N,Real} = map(op -> 1/length(operations), operations))
     Either(operations, SVector{N}(chances))
 end
 
@@ -34,6 +34,11 @@ function Either(op::Operation, p::Real = .5)
     p2 = 1 - p1
     Either((op, NoOp()), (p1, p2))
 end
+
+
+Base.:*{T<:Number,O<:Operation}(op1::Pair{T,O}, ops::Pair...) =
+    Either(op1, ops...)
+Base.:*(op1::Operation, ops::Operation...) = Either((op1, ops...))
 
 Base.@pure supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
 Base.@pure supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))

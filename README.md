@@ -18,8 +18,8 @@ operations for which the parameters can (but need not) be random
 variables.
 
 ```julia
-julia> pipeline = (FlipX(0.5), Rotate([-5,-3,0,3,5]), CropSize(64,64), Zoom(1:0.1:1.2))
-# 4-step Augmentor.Pipeline:
+julia> pipeline = FlipX(0.5) |> Rotate([-5,-3,0,3,5]) |> CropSize(64,64) |> Zoom(1:0.1:1.2)
+# 4-step Augmentor.ImmutablePipeline:
 #  1.) Either: (50%) Flip the X axis. (50%) No operation.
 #  2.) Rotate by θ ∈ [-5, -3, 0, 3, 5] degree
 #  3.) Crop a 64×64 window around the center
@@ -52,15 +52,13 @@ julia> img = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
 # 169×256 Array{RGB{N0f8},2}:
 # [...]
 
-julia> pipeline = (
-           Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()),
-           Rotate(0:360),
-           Either(ShearX(-5:5), ShearY(-5:5)),
-           CropSize(165, 165),
-           Zoom(1:0.05:1.2),
-           Resize(64, 64)
-       )
-# 6-step Augmentor.Pipeline:
+julia> pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>
+            Rotate(0:360) |>
+            ShearX(-5:5) * ShearY(-5:5) |>
+            CropSize(165, 165) |>
+            Zoom(1:0.05:1.2) |>
+            Resize(64, 64)
+# 6-step Augmentor.ImmutablePipeline:
 #  1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.
 #  2.) Rotate by θ ∈ 0:360 degree
 #  3.) Either: (50%) ShearX by ϕ ∈ -5:5 degree. (50%) ShearY by ψ ∈ -5:5 degree.
@@ -68,7 +66,7 @@ julia> pipeline = (
 #  5.) Zoom by I ∈ {1.0×1.0, 1.05×1.05, 1.1×1.1, 1.15×1.15, 1.2×1.2}
 #  6.) Resize to 64×64
 
-julia> img_new = augment(img, pipeline)
+julia> img_new = augment(img, pl)
 # 64×64 Array{RGB{N0f8},2}:
 # [...]
 ```
@@ -96,10 +94,10 @@ footprint of `augment` to a simple `copy` of the original.
 ```julia
 julia> using BenchmarkTools
 
-julia> @btime augment($img, $pipeline)
-  348.578 μs (115 allocations: 16.75 KiB)
+julia> @btime augment($img, $pl);
+  350.813 μs (115 allocations: 16.75 KiB)
 
-julia> @btime copy($img)
+julia> @btime copy($img);
   9.010 μs (2 allocations: 126.83 KiB)
 ```
 
@@ -124,22 +122,20 @@ julia> img_big = get(ImageDownloadRequest(id = "5592ac599fc3c13155a57a85"))
 # 4399×6628 Array{RGB{N0f8},2}:
 # [...]
 
-julia> pipeline_big = (
-           Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()),
-           Rotate(0:360),
-           Either(ShearX(-5:5), ShearY(-5:5)),
-           Scale(0.05), # NEW
-           CropSize(165, 165),
-           Zoom(1:0.05:1.2),
-           Resize(64, 64)
-       );
+julia> pl_big = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>
+                Rotate(0:360) |>
+                ShearX(-5:5) * ShearY(-5:5) |>
+                Scale(0.05) |> # NEW
+                CropSize(165, 165) |>
+                Zoom(1:0.05:1.2) |>
+                Resize(64, 64);
 
-julia> img_new = augment(img_big, pipeline_big)
+julia> img_new = augment(img_big, pl_big)
 # 64×64 Array{RGB{N0f8},2}:
 # [...]
 
-julia> @btime augment($img_big, $pipeline_big)
-  380.635 μs (121 allocations: 16.98 KiB)
+julia> @btime augment($img_big, $pl_big);
+  369.740 μs (121 allocations: 16.98 KiB)
 ````
 
 As we can see the allocated memory did not change notably.
@@ -155,13 +151,13 @@ image is significantly larger and we added an additional
 operation to the pipeline.
 
 ```julia
-julia> @btime augment($img, $pipeline) # small image
+julia> @btime augment($img, $pl); # small image
   349.346 μs (115 allocations: 16.75 KiB)
 
-julia> @btime augment($img_big, $pipeline_big) # big image
-  374.419 μs (121 allocations: 16.98 KiB)
+julia> @btime augment($img_big, $pl_big); # big image
+  368.133 μs (121 allocations: 16.98 KiB)
 
-julia> @btime copy($img_big) # simple memory copy
+julia> @btime copy($img_big); # simple memory copy
   16.357 ms (2 allocations: 83.42 MiB)
 ```
 

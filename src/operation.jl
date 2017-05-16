@@ -78,7 +78,7 @@ for KIND in (:affine, :lazy) # :permute, :view, :stepview)
     APP = Symbol(:apply, KIND)
     PRE = Symbol(:prepare, KIND)
     @eval begin
-        function ($APP)(pipeline::Pipeline, img)
+        function ($APP)(pipeline::Tuple, img)
             ($APP)(first(pipeline), Base.tail(pipeline), ($PRE)(img))
         end
 

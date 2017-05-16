@@ -1,3 +1,11 @@
+testpattern() = load(joinpath(dirname(@__FILE__()), "testpattern.png"))
+function use_testpattern()
+    info("No custom image specifed. Using \"testpattern()\" for demonstration.")
+    testpattern()
+end
+
+# --------------------------------------------------------------------
+
 @inline _plain_array(A::OffsetArray) = parent(A)
 @inline _plain_array(A::Array) = A
 @inline plain_array(A::OffsetArray) = parent(A)

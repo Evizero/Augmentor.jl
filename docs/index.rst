@@ -18,8 +18,8 @@ the following code snippet demonstrates.
 
 .. code-block:: jlcon
 
-   julia> pipeline = (Rotate([-5, -3, 0, 3, 5]), CropSize(64, 64), Zoom(1:0.1:1.2))
-   3-step Augmentor.Pipeline:
+   julia> pipeline = Rotate([-5, -3, 0, 3, 5]) |> CropSize(64, 64) |> Zoom(1:0.1:1.2)
+   3-step Augmentor.ImmutablePipeline:
     1.) Rotate by θ ∈ [-5, -3, 0, 3, 5] degree
     2.) Crop a 64×64 window around the center
     3.) Zoom by I ∈ {1.0×1.0, 1.1×1.1, 1.2×1.2}
