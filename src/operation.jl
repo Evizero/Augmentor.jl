@@ -1,20 +1,20 @@
-Base.@pure isaffine{T<:AffineOperation}(::Type{T}) = true
-Base.@pure isaffine(::Type) = false
+@inline isaffine{T<:AffineOperation}(::Type{T}) = true
+@inline isaffine(::Type) = false
 
-Base.@pure supports_eager(::Type) = true
-Base.@pure supports_affine{T}(::Type{T}) = isaffine(T)
-Base.@pure supports_permute(::Type) = false
-Base.@pure supports_view(::Type) = false
-Base.@pure supports_stepview(::Type) = false
-Base.@pure supports_lazy{T}(::Type{T}) = supports_affine(T) || supports_stepview(T) || supports_view(T) || supports_permute(T)
+@inline supports_eager(::Type) = true
+@inline supports_affine{T}(::Type{T}) = isaffine(T)
+@inline supports_permute(::Type) = false
+@inline supports_view(::Type) = false
+@inline supports_stepview(::Type) = false
+@inline supports_lazy{T}(::Type{T}) = supports_affine(T) || supports_stepview(T) || supports_view(T) || supports_permute(T)
 
-Base.@pure isaffine(A) = isaffine(typeof(A))
-Base.@pure supports_eager(A)    = supports_eager(typeof(A))
-Base.@pure supports_affine(A)   = supports_affine(typeof(A))
-Base.@pure supports_permute(A)  = supports_permute(typeof(A))
-Base.@pure supports_view(A)     = supports_view(typeof(A))
-Base.@pure supports_stepview(A) = supports_stepview(typeof(A))
-Base.@pure supports_lazy(A)     = supports_lazy(typeof(A))
+@inline isaffine(A) = isaffine(typeof(A))
+@inline supports_eager(A)    = supports_eager(typeof(A))
+@inline supports_affine(A)   = supports_affine(typeof(A))
+@inline supports_permute(A)  = supports_permute(typeof(A))
+@inline supports_view(A)     = supports_view(typeof(A))
+@inline supports_stepview(A) = supports_stepview(typeof(A))
+@inline supports_lazy(A)     = supports_lazy(typeof(A))
 
 # --------------------------------------------------------------------
 

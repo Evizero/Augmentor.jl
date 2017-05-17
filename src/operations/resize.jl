@@ -11,7 +11,7 @@ Resize(; width=64, height=64) = Resize((height,width))
 Resize(size::Vararg{Int}) = Resize(size)
 Resize{N}(size::NTuple{N,Int}) = Resize{N}(size)
 
-Base.@pure supports_affine{T<:Resize}(::Type{T}) = true
+@inline supports_affine{T<:Resize}(::Type{T}) = true
 
 function toaffine(op::Resize{2}, img::AbstractMatrix)
     # emulate behaviour of ImageTransformations.imresize!

@@ -9,7 +9,7 @@ immutable ShearX{T<:AbstractVector} <: AffineOperation
 end
 ShearX(degree::Real) = ShearX(degree:degree)
 
-Base.@pure supports_eager{T<:ShearX}(::Type{T}) = false
+@inline supports_eager{T<:ShearX}(::Type{T}) = false
 
 function toaffine(op::ShearX, img::AbstractMatrix)
     angle = deg2rad(Float64(rand(op.degree)))
@@ -45,7 +45,7 @@ immutable ShearY{T<:AbstractVector} <: AffineOperation
 end
 ShearY(degree::Real) = ShearY(degree:degree)
 
-Base.@pure supports_eager{T<:ShearY}(::Type{T}) = false
+@inline supports_eager{T<:ShearY}(::Type{T}) = false
 
 function toaffine(op::ShearY, img::AbstractMatrix)
     angle = deg2rad(Float64(rand(op.degree)))

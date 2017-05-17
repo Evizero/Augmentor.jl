@@ -3,7 +3,7 @@
 immutable Rotate90 <: AffineOperation end
 Rotate90(p) = Either(Rotate90(), p)
 
-Base.@pure supports_permute(::Type{Rotate90}) = true
+@inline supports_permute(::Type{Rotate90}) = true
 
 toaffine(::Rotate90, img::AbstractMatrix) = recenter(RotMatrix(pi/2), center(img))
 applyeager(::Rotate90, img::AbstractMatrix) = plain_array(rotl90(img))
@@ -35,7 +35,7 @@ end
 immutable Rotate180 <: AffineOperation end
 Rotate180(p) = Either(Rotate180(), p)
 
-Base.@pure supports_stepview(::Type{Rotate180}) = true
+@inline supports_stepview(::Type{Rotate180}) = true
 
 toaffine(::Rotate180, img::AbstractMatrix) = recenter(RotMatrix(pi), center(img))
 applyeager(::Rotate180, img::AbstractMatrix) = plain_array(rot180(img))
@@ -51,7 +51,7 @@ end
 immutable Rotate270 <: AffineOperation end
 Rotate270(p) = Either(Rotate270(), p)
 
-Base.@pure supports_permute(::Type{Rotate270}) = true
+@inline supports_permute(::Type{Rotate270}) = true
 
 toaffine(::Rotate270, img::AbstractMatrix) = recenter(RotMatrix(-pi/2), center(img))
 applyeager(::Rotate270, img::AbstractMatrix) = plain_array(rotr90(img))
@@ -103,7 +103,7 @@ immutable Rotate{T<:AbstractVector} <: AffineOperation
 end
 Rotate(degree::Real) = Rotate(degree:degree)
 
-Base.@pure supports_eager{T<:Rotate}(::Type{T}) = false
+@inline supports_eager{T<:Rotate}(::Type{T}) = false
 
 function toaffine(op::Rotate, img::AbstractMatrix)
     recenter(RotMatrix(deg2rad(Float64(rand(op.degree)))), center(img))

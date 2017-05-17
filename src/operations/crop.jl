@@ -10,10 +10,10 @@ Crop{N}(indexes::NTuple{N,UnitRange}) = Crop{N}(indexes)
 Crop{N}(indexes::Vararg{UnitRange,N}) = Crop(indexes)
 Crop(x, y, width, height) = Crop(y:y+height-1, x:x+width-1)
 
-Base.@pure supports_eager{T<:Crop}(::Type{T})    = false
-Base.@pure supports_affine{T<:Crop}(::Type{T})   = true
-Base.@pure supports_view{T<:Crop}(::Type{T})     = true
-Base.@pure supports_stepview{T<:Crop}(::Type{T}) = true
+@inline supports_eager{T<:Crop}(::Type{T})    = false
+@inline supports_affine{T<:Crop}(::Type{T})   = true
+@inline supports_view{T<:Crop}(::Type{T})     = true
+@inline supports_stepview{T<:Crop}(::Type{T}) = true
 
 applyeager(op::Crop, img) = plain_array(indirect_view(img, op.indexes))
 
@@ -48,10 +48,10 @@ CropNative{N}(indexes::NTuple{N,UnitRange}) = CropNative{N}(indexes)
 CropNative{N}(indexes::Vararg{UnitRange,N}) = CropNative(indexes)
 CropNative(x, y, width, height) = CropNative(y:y+height-1, x:x+width-1)
 
-Base.@pure supports_eager{T<:CropNative}(::Type{T})    = false
-Base.@pure supports_affine{T<:CropNative}(::Type{T})   = true
-Base.@pure supports_view{T<:CropNative}(::Type{T})     = true
-Base.@pure supports_stepview{T<:CropNative}(::Type{T}) = true
+@inline supports_eager{T<:CropNative}(::Type{T})    = false
+@inline supports_affine{T<:CropNative}(::Type{T})   = true
+@inline supports_view{T<:CropNative}(::Type{T})     = true
+@inline supports_stepview{T<:CropNative}(::Type{T}) = true
 
 applyeager(op::CropNative, img)    = plain_array(img[op.indexes...])
 applyaffine(op::CropNative, img)   = direct_view(img, op.indexes)
@@ -86,10 +86,10 @@ CropSize(; width=64, height=64) = CropSize((height,width))
 CropSize(size::Vararg{Int}) = CropSize(size)
 CropSize{N}(size::NTuple{N,Int}) = CropSize{N}(size)
 
-Base.@pure supports_eager{T<:CropSize}(::Type{T}) = false
-Base.@pure supports_affine{T<:CropSize}(::Type{T}) = true
-Base.@pure supports_view{T<:CropSize}(::Type{T}) = true
-Base.@pure supports_stepview{T<:CropSize}(::Type{T}) = true
+@inline supports_eager{T<:CropSize}(::Type{T}) = false
+@inline supports_affine{T<:CropSize}(::Type{T}) = true
+@inline supports_view{T<:CropSize}(::Type{T}) = true
+@inline supports_stepview{T<:CropSize}(::Type{T}) = true
 
 function cropsize_indices(op::CropSize, img::AbstractArray)
     cntr = convert(Tuple, center(img))

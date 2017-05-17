@@ -22,7 +22,7 @@ function (::Type{Scale{N}}){N}(factors::NTuple{N,Any})
     Scale(map(_vectorize, factors))
 end
 
-Base.@pure supports_eager{T<:Scale}(::Type{T}) = false
+@inline supports_eager{T<:Scale}(::Type{T}) = false
 
 function toaffine(op::Scale{2}, img::AbstractMatrix)
     idx = rand(1:length(op.factors[1]))

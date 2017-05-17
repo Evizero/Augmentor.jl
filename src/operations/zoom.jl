@@ -22,8 +22,8 @@ function (::Type{Zoom{N}}){N}(factors::NTuple{N,Any})
     Zoom(map(_vectorize, factors))
 end
 
-Base.@pure supports_affine{T<:Zoom}(::Type{T}) = true
-Base.@pure supports_eager{T<:Zoom}(::Type{T}) = false
+@inline supports_affine{T<:Zoom}(::Type{T}) = true
+@inline supports_eager{T<:Zoom}(::Type{T}) = false
 
 function toaffine(op::Zoom{2}, img::AbstractMatrix)
     idx = rand(1:length(op.factors[1]))

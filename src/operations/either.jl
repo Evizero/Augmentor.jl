@@ -40,15 +40,15 @@ Base.:*{T<:Number,O<:Operation}(op1::Pair{T,O}, ops::Pair...) =
     Either(op1, ops...)
 Base.:*(op1::Operation, ops::Operation...) = Either((op1, ops...))
 
-Base.@pure supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
-Base.@pure supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))
-Base.@pure supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepview, T.types))
+@inline supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
+@inline supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))
+@inline supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepview, T.types))
 # "Either" only supports affine if all its elements are affine
-Base.@pure isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
+@inline isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
 
 # choose lazy strategy based on shared qualities of elements
-Base.@pure isaffine{T,N,P<:InvWarpedView,I,L}(::Type{SubArray{T,N,P,I,L}}) = true
-Base.@pure isaffine{T<:InvWarpedView}(::Type{T}) = true
+@inline isaffine{T,N,P<:InvWarpedView,I,L}(::Type{SubArray{T,N,P,I,L}}) = true
+@inline isaffine{T<:InvWarpedView}(::Type{T}) = true
 @generated function applylazy(op::Either, img)
     if isaffine(img) && supports_affine(op)
         :(applyaffine(op, img))

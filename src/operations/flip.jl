@@ -3,7 +3,7 @@
 immutable FlipX <: AffineOperation end
 FlipX(p) = Either(FlipX(), p)
 
-Base.@pure supports_stepview(::Type{FlipX}) = true
+@inline supports_stepview(::Type{FlipX}) = true
 
 toaffine(::FlipX, img::AbstractMatrix) = recenter(@SMatrix([1. 0; 0 -1.]), center(img))
 # Base.flipdim not type-stable for AbstractArray's
@@ -29,7 +29,7 @@ end
 immutable FlipY <: AffineOperation end
 FlipY(p) = Either(FlipY(), p)
 
-Base.@pure supports_stepview(::Type{FlipY}) = true
+@inline supports_stepview(::Type{FlipY}) = true
 
 toaffine(::FlipY, img::AbstractMatrix) = recenter(@SMatrix([-1. 0; 0 1.]), center(img))
 # Base.flipdim not type-stable for AbstractArray's
