@@ -2,6 +2,7 @@ module Augmentor
 
 using ImageCore
 using ImageTransformations
+using ImageFiltering
 using CoordinateTransformations
 using Rotations
 using Interpolations
@@ -9,6 +10,7 @@ using StaticArrays
 using OffsetArrays
 using IdentityRanges
 using FileIO
+using ShowItLikeYouBuildIt
 using Compat
 using Base.PermutedDimsArrays: PermutedDimsArray
 
@@ -54,6 +56,9 @@ include("operations/resize.jl")
 include("operations/scale.jl")
 include("operations/zoom.jl")
 include("operations/either.jl")
+
+include("distortionfields.jl")
+include("distortedview.jl")
 
 include("pipeline.jl")
 include("compile.jl")

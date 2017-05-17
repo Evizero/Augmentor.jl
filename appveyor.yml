@@ -31,7 +31,7 @@ build_script:
 # Need to convert from shallow to complete for Pkg.clone to work
   - IF EXIST .git\shallow (git fetch --unshallow)
   - C:\projects\julia\bin\julia -e "versioninfo();
-      Pkg.clone(pwd(), \"Augmentor\"); Pkg.checkout(\"ImageTransformations\"); Pkg.build(\"Augmentor\")"
+      Pkg.clone(pwd(), \"Augmentor\"); Pkg.build(\"Augmentor\")"
 
 test_script:
-  - C:\projects\julia\bin\julia --color=yes -e "Pkg.test(\"Augmentor\")"
+  - C:\projects\julia\bin\julia -e "Pkg.test(\"Augmentor\")"

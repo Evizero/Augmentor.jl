@@ -10,7 +10,7 @@ end
 @inline _plain_array(A::Array) = A
 @inline plain_array(A::OffsetArray) = parent(A)
 @inline plain_array(A::Array) = A
-plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
+@inline plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
 
 # --------------------------------------------------------------------
 
@@ -40,11 +40,11 @@ end
 
 # --------------------------------------------------------------------
 
-@inline function indirect_view(A::AbstractArray, I::Tuple)
+function indirect_view(A::AbstractArray, I::Tuple)
     view(A, indirect_indices(indices(A), I)...)
 end
 
-@inline function indirect_view(A::SubArray, I::Tuple)
+function indirect_view(A::SubArray, I::Tuple)
     view(parent(A), indirect_indices(A.indexes, I)...)
 end
 
@@ -68,23 +68,40 @@ end
 
 # --------------------------------------------------------------------
 
-@inline function direct_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,Range})
+function direct_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,Range})
     view(A, direct_indices(indices(A), I)...)
 end
 
-@inline function direct_view{T,N}(A::SubArray{T,N}, I::NTuple{N,Range})
+function direct_view{T,N}(A::SubArray{T,N}, I::NTuple{N,Range})
     view(A, direct_indices(A.indexes, I)...)
 end
 
 # --------------------------------------------------------------------
 
-_vectorize(A::AbstractVector) = A
-_vectorize(A::Real) = A:A
+@inline _vectorize(A::AbstractVector) = A
+@inline _vectorize(A::Real) = A:A
 
-_round(num::Integer, d) = num
+@inline _round(num::Integer, d) = num
 _round(num::AbstractFloat, d) = round(num,d)
 _round(nums::Tuple, d) = map(num->_round(num,d), nums)
 
 function unionrange(i1::AbstractUnitRange, i2::AbstractUnitRange)
     map(min, first(i1), first(i2)):map(max, last(i1), last(i2))
+end
+
+# --------------------------------------------------------------------
+
+function _2dborder!{T}(A::AbstractArray{T,3}, val::T)
+    ndims, h, w = size(A)
+    @inbounds for i = 1:h, j = (1,w)
+        for d = 1:ndims
+            A[d,i,j] = val
+        end
+    end
+    @inbounds for i = (1,h), j = 1:w
+        for d = 1:ndims
+            A[d,i,j] = val
+        end
+    end
+    A
 end

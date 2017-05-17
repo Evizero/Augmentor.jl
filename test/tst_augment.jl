@@ -1,7 +1,13 @@
 reference_path(filename) = joinpath(dirname(@__FILE__), "reference", "$(filename).txt")
 
 function test_reference_impl{T<:Colorant}(filename, img::AbstractArray{T})
-    res = ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), img, 20, 40)[1]
+    old_color = Base.have_color
+    res = try
+        eval(Base, :(have_color = true))
+        ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), img, 20, 40)[1]
+    finally
+        eval(Base, :(have_color = $old_color))
+    end
     test_reference_impl(filename, res)
 end
 
@@ -9,12 +15,8 @@ function test_reference_impl{T<:String}(filename, actual::AbstractArray{T})
     try
         reference = replace.(readlines(reference_path(filename)), ["\n"], [""])
         try
-            if Base.have_color
-                @assert reference == actual # to throw error
-                @test true # to increase test counter if reached
-            else
-                println("Test for \"$filename\" skipped. Please run julia with \"--color=yes\" to enable these tests.")
-            end
+            @assert reference == actual # to throw error
+            @test true # to increase test counter if reached
         catch # test failed
             println("Test for \"$filename\" failed.")
             println("- REFERENCE -------------------")

@@ -1,4 +1,4 @@
-using ImageCore, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
 using ImageInTerminal
 
 # check for ambiguities
@@ -45,6 +45,7 @@ tests = [
     "tst_operations.jl",
     "tst_pipeline.jl",
     "tst_augment.jl",
+    "tst_distortions.jl",
 ]
 
 for t in tests

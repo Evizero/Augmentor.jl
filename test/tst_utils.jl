@@ -1,3 +1,12 @@
+@testset "testpattern" begin
+    tp = testpattern()
+    @test typeof(tp) <: Matrix
+    @test eltype(tp) <: RGBA
+    @test size(tp) === (300,400)
+    tp2 = augment(NoOp())
+    @test tp == tp2
+end
+
 @testset "plain_array" begin
     A = [1 2 3; 4 5 6; 7 8 9]
     As = sparse(A)
@@ -37,4 +46,19 @@ end
     @test @inferred(Augmentor.indirect_view(Av, (IdentityRange(2:2),IdentityRange(1:2)))) === view(Av,3:3,1:2)
     @test_throws MethodError Augmentor.direct_view(Av, (3:-1:2,2:-1:1))
     @test @inferred(Augmentor.indirect_view(Av, (2:-1:1,2:-1:1))) === view(A,3:-1:2,2:-1:1)
+end
+
+@testset "_2dborder!" begin
+    A = rand(2, 5, 6)
+    @test @inferred(Augmentor._2dborder!(A, 0.)) === A
+    s = 0.
+    ndim, h, w = size(A)
+    for i = 1:h, j = 1:w
+        if i == 1 || j == 1 || i == h || j == w
+            for d = 1:ndim
+                s += abs(A[d, i, j])
+            end
+        end
+    end
+    @test s == 0.
 end

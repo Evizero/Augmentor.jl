@@ -11,7 +11,7 @@ notifications:
 # uncomment the following lines to override the default test script
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --color=yes -e 'Pkg.clone(pwd()); Pkg.checkout("ImageTransformations"); Pkg.build("Augmentor"); Pkg.test("Augmentor"; coverage=VERSION >= v"0.6.0-alpha")'
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("Augmentor"); Pkg.test("Augmentor"; coverage=VERSION >= v"0.6.0-alpha")'
 after_success:
   # push coverage results to Coveralls
   - julia -e 'if VERSION >= v"0.6.0-alpha" cd(Pkg.dir("Augmentor")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder()); end'
