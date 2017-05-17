@@ -24,6 +24,10 @@ Base.:(|>)(op1::Operation, p2::ImmutablePipeline) =
     ImmutablePipeline(op1, operations(p2)...)
 Base.:(|>)(p1::ImmutablePipeline, p2::ImmutablePipeline) =
     ImmutablePipeline(operations(p1)..., operations(p2)...)
+Base.:(|>)(op1::Operation, buffer::AbstractArray) =
+    ImmutablePipeline(op1, CacheImage!(buffer))
+Base.:(|>)(p1::ImmutablePipeline, buffer::AbstractArray) =
+    ImmutablePipeline(operations(p1)..., CacheImage!(buffer))
 
 function Base.show(io::IO, pipeline::Pipeline)
     n = length(pipeline)

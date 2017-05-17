@@ -36,8 +36,12 @@ export
     Scale,
     Zoom,
 
+    CacheImage,
+    CacheImage!,
     NoOp,
     Either,
+
+    SmoothedDistortion,
 
     augment,
 
@@ -48,6 +52,7 @@ include("types.jl")
 include("operation.jl")
 
 include("operations/noop.jl")
+include("operations/cache.jl")
 include("operations/rotation.jl")
 include("operations/shear.jl")
 include("operations/flip.jl")
@@ -59,6 +64,7 @@ include("operations/either.jl")
 
 include("distortionfields.jl")
 include("distortedview.jl")
+include("operations/distortion.jl")
 
 include("pipeline.jl")
 include("compile.jl")
