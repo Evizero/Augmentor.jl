@@ -40,7 +40,7 @@ export
     NoOp,
     Either,
 
-    SmoothedDistortion,
+    ElasticDistortion,
 
     augment,
 

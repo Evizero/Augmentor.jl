@@ -89,6 +89,14 @@ ops = (Rotate(-90), Rotate90())
     @test wv2 == rect
 end
 
+ops = (Rotate(-90), Crop(1:2,1:3), Rotate90()) # affine forces affine
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor.applyaffine(ops, rect)
+    @test typeof(wv) === typeof(view(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()),IdentityRange(1:2),IdentityRange(1:2)))
+    wv2 = @inferred Augmentor.applylazy(ops, rect)
+    @test typeof(wv2) == typeof(wv)
+end
+
 ops = (Rotate90(), Rotate270(), Rotate180())
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.applyaffine(ops, rect)

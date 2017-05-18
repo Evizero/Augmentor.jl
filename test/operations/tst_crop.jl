@@ -16,6 +16,7 @@
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Crop(1:10), nothing)
         @test_throws MethodError Augmentor.applyeager(Crop(1:2,2:3), nothing)
+        @test @inferred(Augmentor.supports_eager(Crop)) === false
         for img in (Augmentor.prepareaffine(rect), rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Crop(1:2,2:3), img)) == rect[1:2, 2:3]
             @test typeof(Augmentor.applyeager(Crop(1:2,2:3), img)) <: Array
@@ -64,6 +65,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(CropNative(1:10), nothing)
         @test_throws MethodError Augmentor.applyeager(CropNative(1:2,2:3), nothing)
+        @test @inferred(Augmentor.supports_eager(CropNative)) === false
         for img in (Augmentor.prepareaffine(rect), rect, view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(CropNative(1:2,2:3), img)) == rect[1:2, 2:3]
             @test typeof(Augmentor.applyeager(CropNative(1:2,2:3), img)) <: Array
@@ -125,6 +127,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(CropSize(10), nothing)
         @test_throws MethodError Augmentor.applyeager(CropSize(2,3), nothing)
+        @test @inferred(Augmentor.supports_eager(CropSize)) === false
         for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(CropSize(2,3), img)) == rect
             @test typeof(Augmentor.applyeager(CropSize(2,3), img)) <: Array

@@ -21,7 +21,7 @@ end
     @test sum_border(A) == 0.
     @test 2.5 > mapreduce(abs, +, A) > 0.
 
-    A = @inferred Augmentor.uniform_field(5, 6, .5, true, true)
+    A = @inferred Augmentor.uniform_field(5, 6, .5, false, true)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) == 0.
@@ -33,19 +33,19 @@ end
     @test sum_border(A) == 0.
     @test mapreduce(abs, +, A) > 2.5
 
-    A = @inferred Augmentor.uniform_field(5, 6, .5, false, true)
+    A = @inferred Augmentor.uniform_field(5, 6, .5, true, true)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) != 0.
     @test mapreduce(abs, +, A) > 2.5
 
-    A = Augmentor.uniform_field(5, 6, scale=.5, static_border=false)
+    A = Augmentor.uniform_field(5, 6, scale=.5, border=true)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) != 0.
     @test mapreduce(abs, +, A) > 2.5
 
-    A = @inferred Augmentor.uniform_field(5, 6, .5, true, false)
+    A = @inferred Augmentor.uniform_field(5, 6, .5, false, false)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) == 0.
@@ -70,7 +70,7 @@ end
     @test sum_border(A) == 0.
     @test 2.2 > mapreduce(abs, +, A) > 0.
 
-    A = @inferred Augmentor.gaussian_field(5, 6, .5, 2, 1, true, true)
+    A = @inferred Augmentor.gaussian_field(5, 6, .5, 2, 1, false, true)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) == 0.
@@ -82,13 +82,13 @@ end
     @test sum_border(A) == 0.
     @test mapreduce(abs, +, A) > 2.2
 
-    A = @inferred Augmentor.gaussian_field(5, 6, .5, 2, 1, false, true)
+    A = @inferred Augmentor.gaussian_field(5, 6, .5, 2, 1, true, true)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) != 0.
     @test mapreduce(abs, +, A) > 2.2
 
-    A = Augmentor.gaussian_field(5, 6, scale=.5, static_border=false)
+    A = Augmentor.gaussian_field(5, 6, scale=.5, border=true)
     @test typeof(A) <: Array{Float64}
     @test size(A) === (2, 5, 6)
     @test sum_border(A) != 0.

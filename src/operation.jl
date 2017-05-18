@@ -42,9 +42,9 @@ prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffine(NoOp(), 
 @inline preparelazy(img) = img
 
 # --------------------------------------------------------------------
-# AffineOperation fallbacks
+# Operation and AffineOperation fallbacks
 
-function applyeager(op::AffineOperation, img)
+function applyeager(op::Operation, img)
     plain_array(applylazy(op, img))
 end
 

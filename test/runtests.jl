@@ -42,11 +42,12 @@ tests = [
     "operations/tst_resize.jl",
     "operations/tst_scale.jl",
     "operations/tst_zoom.jl",
+    "operations/tst_distortions.jl",
     "operations/tst_either.jl",
     "tst_operations.jl",
     "tst_pipeline.jl",
     "tst_augment.jl",
-    "tst_distortions.jl",
+    "tst_distortedview.jl",
 ]
 
 for t in tests

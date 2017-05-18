@@ -94,7 +94,7 @@ ops = (CacheImage(),CacheImage()) # forces eager
     @test img === camera
 end
 
-ops = (SmoothedDistortion(4,4),CacheImage()) # forces lazy then eager
+ops = (ElasticDistortion(4,4),CacheImage()) # forces lazy then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(camera, ops)
     @test size(img) == size(camera)

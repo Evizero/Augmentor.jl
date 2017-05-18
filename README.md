@@ -198,25 +198,26 @@ more detailed description of all the predefined operations take a
 look at the corresponding section of the
 [documentation](http://augmentorjl.readthedocs.io/en/latest/usersguide/operations.html).
 
-| Category     | Operation    | Description
-|-------------:|:-------------|:-----------------------------------------------------
-| *Mirroring:* | `FlipX`      | Reverse the order of each pixel row.
-|              | `FlipY`      | Reverse the order of each pixel column.
-| *Rotating:*  | `Rotate90`   | Rotate upwards 90 degree.
-|              | `Rotate270`  | Rotate downwards 90 degree.
-|              | `Rotate180`  | Rotate 180 degree.
-|              | `Rotate`     | Rotate for any arbitrary angle(s).
-| *Shearing:*  | `ShearX`     | Shear horizontally for the given degree(s).
-|              | `ShearY`     | Shear vertically for the given degree(s).
-| *Resizing:*  | `Scale`      | Scale X and Y axis by some (random) factor(s).
-|              | `Zoom`       | Scale X and Y axis while preserving image size.
-|              | `Resize`     | Resize image to the specified pixel dimensions.
-| *Cropping:*  | `Crop`       | Crop specific region of the image.
-|              | `CropNative` | Crop specific region of the image in relative space.
-|              | `CropSize`   | Crop area around the center with specified size.
-| *Utilities:* | `NoOp`       | Identity function. Pass image along unchanged.
-|              | `CacheImage` | Buffer the current image into (preallocated) memory.
-|              | `Either`     | Apply one of the given operations at random.
+| Category      | Operation           | Description
+|--------------:|:--------------------|:-----------------------------------------------------
+| *Mirroring:*  | `FlipX`             | Reverse the order of each pixel row.
+|               | `FlipY`             | Reverse the order of each pixel column.
+| *Rotating:*   | `Rotate90`          | Rotate upwards 90 degree.
+|               | `Rotate270`         | Rotate downwards 90 degree.
+|               | `Rotate180`         | Rotate 180 degree.
+|               | `Rotate`            | Rotate for any arbitrary angle(s).
+| *Shearing:*   | `ShearX`            | Shear horizontally for the given degree(s).
+|               | `ShearY`            | Shear vertically for the given degree(s).
+| *Resizing:*   | `Scale`             | Scale X and Y axis by some (random) factor(s).
+|               | `Zoom`              | Scale X and Y axis while preserving image size.
+|               | `Resize`            | Resize image to the specified pixel dimensions.
+| *Distorting:* | `ElasticDistortion` | Displace image with a smoothed random vector field.
+| *Cropping:*   | `Crop`              | Crop specific region of the image.
+|               | `CropNative`        | Crop specific region of the image in relative space.
+|               | `CropSize`          | Crop area around the center with specified size.
+| *Utilities:*  | `NoOp`              | Identity function. Pass image along unchanged.
+|               | `CacheImage`        | Buffer the current image into (preallocated) memory.
+|               | `Either`            | Apply one of the given operations at random.
 
 The purpose of an operation is to simply serve as a "dumb
 placeholder" to specify the intent and parameters of the desired

@@ -56,16 +56,24 @@ end
     @test res == rect
     @test res === op.buffer
 
+    res = @inferred Augmentor.applylazy(op, v)
+    @test res == v
+    @test typeof(res) <: OffsetArray
+    @test parent(res) === op.buffer
+
+    res = @inferred Augmentor.applylazy(op, rect)
+    @test res == rect
+    @test res === op.buffer
+
     @test_throws BoundsError Augmentor.applyeager(op, camera)
 
     @test @inferred(Augmentor.supports_eager(Augmentor.CacheImageInto)) === true
-    @test @inferred(Augmentor.supports_lazy(Augmentor.CacheImageInto)) === false
+    @test @inferred(Augmentor.supports_lazy(Augmentor.CacheImageInto)) === true
     @test @inferred(Augmentor.supports_view(Augmentor.CacheImageInto)) === false
     @test @inferred(Augmentor.supports_stepview(Augmentor.CacheImageInto)) === false
     @test @inferred(Augmentor.supports_permute(Augmentor.CacheImageInto)) === false
     @test @inferred(Augmentor.supports_affine(Augmentor.CacheImageInto)) === false
 
-    @test_throws MethodError Augmentor.applylazy(CacheImage(buf), v)
     @test_throws MethodError Augmentor.applyview(CacheImage(buf), v)
     @test_throws MethodError Augmentor.applystepview(CacheImage(buf), v)
     @test_throws MethodError Augmentor.applypermute(CacheImage(buf), v)

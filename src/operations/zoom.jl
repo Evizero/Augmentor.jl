@@ -31,10 +31,6 @@ function toaffine(op::Zoom{2}, img::AbstractMatrix)
     tfm
 end
 
-function applyeager(op::Zoom, img)
-    plain_array(applylazy(op, img))
-end
-
 function applylazy(op::Zoom, img)
     applyaffine(op, prepareaffine(img))
 end

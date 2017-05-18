@@ -19,11 +19,15 @@ immutable CacheImageInto{T<:AbstractArray} <: Operation
 end
 CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 
+@inline supports_lazy{T<:CacheImageInto}(::Type{T}) = true
+
 @inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
 @inline match_idx{N}(buffer::Array, inds::NTuple{N,UnitRange}) =
     OffsetArray(buffer, inds)
 
-function applyeager(op::CacheImageInto, img)
+applyeager(op::CacheImageInto, img) = applylazy(op, img)
+
+function applylazy(op::CacheImageInto, img)
     copy!(match_idx(op.buffer, indices(img)), img)
 end
 
