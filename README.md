@@ -1,8 +1,7 @@
 [![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/header.png)](http://augmentorjl.readthedocs.io/)
 
-**Augmentor.jl** is the [Julia](http://julialang.org)
-implementation for Augmentor. The Python version of the same name
-is available [here](https://github.com/mdbloice/Augmentor).
+A **fast** Julia library for increasing the number of training
+images by applying various transformations.
 
 | **Package Status** | **Package Evaluator** | **Build Status**  |
 |:------------------:|:---------------------:|:-----------------:|
@@ -33,6 +32,10 @@ concrete user-specified augmentation pipeline. In particular
 Augmentor tries to avoid the need for any intermediate images,
 but instead aims to compute the output image directly from the
 input in one single pass.
+
+**Augmentor.jl** is the [Julia](http://julialang.org)
+implementation for Augmentor. The Python version of the same name
+is available [here](https://github.com/mdbloice/Augmentor).
 
 ## Introduction
 
