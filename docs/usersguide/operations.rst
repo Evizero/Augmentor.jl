@@ -18,7 +18,7 @@ functionality.
 +-----------------------+----------------------------------------------------------------------------+
 | Cropping              | :class:`Crop` :class:`CropNative` :class:`CropSize`                        |
 +-----------------------+----------------------------------------------------------------------------+
-| Utility Operations    | :class:`NoOp` :class:`Either`                                              |
+| Utility Operations    | :class:`NoOp` :class:`CacheImage` :class:`Either`                          |
 +-----------------------+----------------------------------------------------------------------------+
 
 Affine Transformations
@@ -490,12 +490,35 @@ Aside from "true" operations that specify some kind of
 transformation, there are also a couple of special utility
 operations used for functionality such as stochastic branching.
 
+Buffering
+*******************
+
+.. class:: CacheImage
+
+   Write the current state of the image into the working memory.
+   Optionally a user has the option to specify a preallocated
+   buffer to write the image into.
+
+   Even without a preallocated buffer it can be beneficial to
+   cache the image in some situations. For example when chaining
+   a number of affine transformations after an elastic
+   distortion, because performing that lazily requires nested
+   interpolation.
+
+.. code-block:: jlcon
+
+   julia> CacheImage()
+   Cache into temporary buffer
+
+   julia> CacheImage(rand(5,5))
+   Cache into preallocated 5×5 Array{Float64,2}
+
 Identity Function
 *******************
 
 .. class:: NoOp
 
-   Passes the image along unchanged. Usually used in combination
+   Pass the image along unchanged. Usually used in combination
    with :class:`Either` to denote a "branch" that does not
    perform any computation.
 

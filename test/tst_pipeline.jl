@@ -40,8 +40,22 @@
 end
 
 @testset "ImmutablePipeline with |>" begin
+    buf = rand(2,2)
+
     p = @inferred(FlipX() |> FlipY())
     @test p === Augmentor.ImmutablePipeline(FlipX(), FlipY())
+
+    p = @inferred(FlipX() |> buf |> FlipY())
+    @test p === Augmentor.ImmutablePipeline(FlipX(), CacheImage(buf), FlipY())
+
+    p = @inferred(FlipX() |> CacheImage(buf) |> FlipY())
+    @test p === Augmentor.ImmutablePipeline(FlipX(), CacheImage(buf), FlipY())
+
+    p = @inferred(FlipX() |> CacheImage() |> FlipY())
+    @test p === Augmentor.ImmutablePipeline(FlipX(), CacheImage(), FlipY())
+
+    p = @inferred(FlipX() |> FlipY() |> buf)
+    @test p === Augmentor.ImmutablePipeline(FlipX(), FlipY(), CacheImage(buf))
 
     p = @inferred(FlipX() |> NoOp() |> FlipY())
     @test p === Augmentor.ImmutablePipeline(FlipX(), NoOp(), FlipY())

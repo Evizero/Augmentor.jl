@@ -37,7 +37,6 @@ export
     Zoom,
 
     CacheImage,
-    CacheImage!,
     NoOp,
     Either,
 

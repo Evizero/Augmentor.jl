@@ -1,6 +1,8 @@
 immutable CacheImage <: Operation end
 
-applyeager(op::CacheImage, img) = plain_array(img)
+applyeager(op::CacheImage, img::Array) = img
+applyeager(op::CacheImage, img::OffsetArray) = img
+applyeager(op::CacheImage, img) = copy(img)
 
 function Base.show(io::IO, op::CacheImage)
     if get(io, :compact, false)
@@ -12,20 +14,20 @@ end
 
 # --------------------------------------------------------------------
 
-immutable CacheImage!{T<:AbstractArray} <: Operation
+immutable CacheImageInto{T<:AbstractArray} <: Operation
     buffer::T
 end
+CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 
-@inline _offset{N}(buffer::OffsetArray, inds::NTuple{N,UnitRange}) = buffer
-@inline _offset(buffer::AbstractArray, inds::Tuple) = buffer
-@inline _offset{N}(buffer::Array, inds::NTuple{N,UnitRange}) =
+@inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
+@inline match_idx{N}(buffer::Array, inds::NTuple{N,UnitRange}) =
     OffsetArray(buffer, inds)
 
-function applyeager(op::CacheImage!, img)
-    copy!(_offset(op.buffer, indices(img)), img)
+function applyeager(op::CacheImageInto, img)
+    copy!(match_idx(op.buffer, indices(img)), img)
 end
 
-function Base.show(io::IO, op::CacheImage!)
+function Base.show(io::IO, op::CacheImageInto)
     if get(io, :compact, false)
         print(io, "Cache into preallocated ", summary(op.buffer))
     else

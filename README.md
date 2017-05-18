@@ -136,7 +136,7 @@ julia> img_new = augment(img_big, pl_big)
 
 julia> @btime augment($img_big, $pl_big);
   369.740 μs (121 allocations: 16.98 KiB)
-````
+```
 
 As we can see the allocated memory did not change notably.
 Furthermore, it is worth pointing out explicitly how we added the
@@ -199,7 +199,7 @@ look at the corresponding section of the
 [documentation](http://augmentorjl.readthedocs.io/en/latest/usersguide/operations.html).
 
 | Category     | Operation    | Description
-|--------------|--------------|-----------------------------------------------------
+|-------------:|:-------------|:-----------------------------------------------------
 | *Mirroring:* | `FlipX`      | Reverse the order of each pixel row.
 |              | `FlipY`      | Reverse the order of each pixel column.
 | *Rotating:*  | `Rotate90`   | Rotate upwards 90 degree.
@@ -215,6 +215,7 @@ look at the corresponding section of the
 |              | `CropNative` | Crop specific region of the image in relative space.
 |              | `CropSize`   | Crop area around the center with specified size.
 | *Utilities:* | `NoOp`       | Identity function. Pass image along unchanged.
+|              | `CacheImage` | Buffer the current image into (preallocated) memory.
 |              | `Either`     | Apply one of the given operations at random.
 
 The purpose of an operation is to simply serve as a "dumb

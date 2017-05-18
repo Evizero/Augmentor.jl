@@ -34,6 +34,7 @@ checkers = Gray{N0f8}[1 0 1 0 1; 0 1 0 1 0; 1 0 1 0 1]
 tests = [
     "tst_utils.jl",
     "operations/tst_noop.jl",
+    "operations/tst_cache.jl",
     "operations/tst_rotation.jl",
     "operations/tst_shear.jl",
     "operations/tst_flip.jl",
