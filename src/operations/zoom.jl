@@ -36,7 +36,8 @@ function applylazy(op::Zoom, img)
 end
 
 function applyaffine{T,N}(op::Zoom{N}, img::AbstractArray{T,N})
-    invwarpedview(img, toaffine(op, img), indices(img))
+    wv = invwarpedview(img, toaffine(op, img), indices(img))
+    direct_view(wv, indices(img))
 end
 
 function applyaffine{T,N,W<:InvWarpedView}(op::Zoom{N}, v::SubArray{T,N,W})

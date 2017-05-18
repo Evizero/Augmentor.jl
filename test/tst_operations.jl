@@ -19,6 +19,13 @@
     @test @inferred(Augmentor.prepareaffine(v)) === v
 end
 
+ops = (Zoom(2.), NoOp()) # make sure Zoom sticks
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor.applyaffine(ops, rect)
+    @test typeof(wv) <: SubArray
+    @test indices(wv) == (1:2,1:3)
+end
+
 ops = (FlipX(), FlipY())
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.applyaffine(ops, rect)

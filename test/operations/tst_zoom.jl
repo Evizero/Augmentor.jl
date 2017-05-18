@@ -66,15 +66,21 @@
         @test @inferred(Augmentor.toaffine(Zoom([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.15,0.4])
         wv = @inferred Augmentor.applyaffine(Zoom(2,3), Augmentor.prepareaffine(square))
         # TODO: better tests
-        @test parent(wv).itp.coefs === square
-        @test typeof(wv) <: InvWarpedView{eltype(square),2}
+        @test eltype(wv) == eltype(square)
+        @test typeof(wv) <: SubArray
+        @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
     end
     @testset "lazy" begin
         @test @inferred(Augmentor.supports_lazy(Zoom)) === true
         wv = @inferred Augmentor.applylazy(Zoom(2,3), square)
         # TODO: better tests
-        @test parent(wv).itp.coefs === square
-        @test typeof(wv) <: InvWarpedView{eltype(square),2}
+        @test eltype(wv) == eltype(square)
+        @test typeof(wv) <: SubArray
+        @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
     end
     @testset "view" begin
         @test @inferred(Augmentor.supports_view(Zoom)) === false

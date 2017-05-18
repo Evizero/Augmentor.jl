@@ -305,9 +305,13 @@ end
 ops = (Rotate(45),Zoom(2))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
-    @test typeof(wv) <: InvWarpedView
-    @test parent(wv).itp.coefs === camera
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
     @test_reference "rot45_zoom" wv
+    wv2 = Augmentor._augment(camera, (ops..., NoOp()))
+    @test_reference "rot45_zoom" wv2
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
