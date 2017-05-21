@@ -7,8 +7,10 @@ using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
 if VERSION < v"0.6.0-" # good enough. the 10 on 0.5 are spurious
     @test length(setdiff(ambs, refambs)) <= 10
-else
+elseif VERSION > v"0.6.0-rc1"
     @test length(setdiff(ambs, refambs)) == 0
+else
+    info("test for ambiguities skipped because of untested julia version")
 end
 
 function str_show(obj)
