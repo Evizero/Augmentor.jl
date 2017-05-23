@@ -33,12 +33,10 @@ function Base.show(io::IO, pipeline::Pipeline)
     n = length(pipeline)
     ops = operations(pipeline)
     if get(io, :compact, false)
-        print(io, '(')
         for (i, op) in enumerate(ops)
-            Base.showcompact(io, op)
+            showconstruction(io, op)
             i < n && print(io, " |> ")
         end
-        print(io, ')')
     else
         k = length("$n")
         print(io, "$n-step $(typeof(pipeline).name):")

@@ -3,6 +3,7 @@
     @testset "constructor" begin
         @test @inferred(FlipX(0.7)) === Either(FlipX(), 0.7)
         @test str_show(FlipX()) == "Augmentor.FlipX()"
+        @test str_showconst(FlipX()) == "FlipX()"
         @test str_showcompact(FlipX()) == "Flip the X axis"
     end
     @testset "eager" begin
@@ -56,6 +57,7 @@ end
     @testset "constructor" begin
         @test @inferred(FlipY(0.7)) === Either(FlipY(), 0.7)
         @test str_show(FlipY()) == "Augmentor.FlipY()"
+        @test str_showconst(FlipY()) == "FlipY()"
         @test str_showcompact(FlipY()) == "Flip the Y axis"
     end
     @testset "eager" begin

@@ -19,10 +19,15 @@ function applystepview(::NoOp, img)
     indirect_view(img, idx)
 end
 
+function showconstruction(io::IO, op::NoOp)
+    print(io, typeof(op).name.name, "()")
+end
+
 function Base.show(io::IO, op::NoOp)
     if get(io, :compact, false)
         print(io, "No operation")
     else
-        print(io, typeof(op), "()")
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end

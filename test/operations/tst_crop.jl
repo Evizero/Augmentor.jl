@@ -7,10 +7,13 @@
         @test typeof(@inferred(Crop(1:10,3:5))) <: Crop{2} <: Crop <: Augmentor.Operation
         @test @inferred(Crop(1,4,10,5)) === @inferred(Crop((4:8,1:10)))
         @test str_show(Crop(3:4)) == "Augmentor.Crop{1}((3:4,))"
+        @test str_showconst(Crop(3:4)) == "Crop(3:4)"
         @test str_showcompact(Crop(3:4)) == "Crop region (3:4,)"
         @test str_show(Crop(1:2,2:3)) == "Augmentor.Crop{2}((1:2,$(SPACE)2:3))"
+        @test str_showconst(Crop(1:2,2:3)) == "Crop(1:2, 2:3)"
         @test str_showcompact(Crop(1:2,2:3)) == "Crop region 1:2×2:3"
         @test str_show(Crop(1:2,2:3,3:4)) == "Augmentor.Crop{3}((1:2,$(SPACE)2:3,$(SPACE)3:4))"
+        @test str_showconst(Crop(1:2,2:3,3:4)) == "Crop(1:2, 2:3, 3:4)"
         @test str_showcompact(Crop(1:2,2:3,3:4)) == "Crop region (1:2,$(SPACE)2:3,$(SPACE)3:4)"
     end
     @testset "eager" begin
@@ -56,10 +59,13 @@ end
         @test typeof(@inferred(CropNative(1:10,3:5))) <: CropNative{2} <: CropNative <: Augmentor.Operation
         @test @inferred(CropNative(1,4,10,5)) === @inferred(CropNative((4:8,1:10)))
         @test str_show(CropNative(3:4)) == "Augmentor.CropNative{1}((3:4,))"
+        @test str_showconst(CropNative(3:4)) == "CropNative(3:4)"
         @test str_showcompact(CropNative(3:4)) == "Crop native region (3:4,)"
         @test str_show(CropNative(1:2,2:3)) == "Augmentor.CropNative{2}((1:2,$(SPACE)2:3))"
+        @test str_showconst(CropNative(1:2,2:3)) == "CropNative(1:2, 2:3)"
         @test str_showcompact(CropNative(1:2,2:3)) == "Crop native region 1:2×2:3"
         @test str_show(CropNative(1:2,2:3,3:4)) == "Augmentor.CropNative{3}((1:2,$(SPACE)2:3,$(SPACE)3:4))"
+        @test str_showconst(CropNative(1:2,2:3,3:4)) == "CropNative(1:2, 2:3, 3:4)"
         @test str_showcompact(CropNative(1:2,2:3,3:4)) == "Crop native region (1:2,$(SPACE)2:3,$(SPACE)3:4)"
     end
     @testset "eager" begin
@@ -111,17 +117,20 @@ end
         @test_throws ArgumentError CropSize(0,2)
         op = @inferred(CropSize(10))
         @test str_show(op) == "Augmentor.CropSize{1}((10,))"
+        @test str_showconst(op) == "CropSize(10)"
         @test str_showcompact(op) == "Crop a 10-length window at the center"
         op = @inferred(CropSize(20,30))
         @test op === CropSize(width=30, height=20)
         @test op.size == (20,30)
         @test str_show(op) == "Augmentor.CropSize{2}((20,$(SPACE)30))"
+        @test str_showconst(op) == "CropSize(20, 30)"
         @test str_showcompact(op) == "Crop a 20×30 window around the center"
         op = @inferred(CropSize(20,30,40))
         @test op === @inferred(CropSize((20,30,40)))
         @test op === @inferred(CropSize{3}((20,30,40)))
         @test op.size == (20,30,40)
         @test str_show(op) == "Augmentor.CropSize{3}((20,$(SPACE)30,$(SPACE)40))"
+        @test str_showconst(op) == "CropSize(20, 30, 40)"
         @test str_showcompact(op) == "Crop a 20×30×40 window around the center"
     end
     @testset "eager" begin

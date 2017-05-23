@@ -13,16 +13,20 @@
         @test @inferred(ShearX(-70)) === ShearX(-70:-70)
         @test @inferred(ShearX(0.7)) === ShearX(0.7:1:0.7)
         @test str_show(ShearX(0.7)) == "Augmentor.ShearX(0.7)"
+        @test str_showconst(ShearX(0.7)) == "ShearX(0.7)"
         @test str_showcompact(ShearX(0.7)) == "ShearX 0.7 degree"
         @test @inferred(ShearX(10)) === ShearX(10:10)
         @test str_show(ShearX(10)) == "Augmentor.ShearX(10)"
+        @test str_showconst(ShearX(10)) == "ShearX(10)"
         @test str_showcompact(ShearX(10)) == "ShearX 10 degree"
         op = @inferred(ShearX(-1:1))
         @test str_show(op) == "Augmentor.ShearX(-1:1)"
+        @test str_showconst(op) == "ShearX(-1:1)"
         @test str_showcompact(op) == "ShearX by ϕ ∈ -1:1 degree"
         op = @inferred(ShearX([2,30]))
         @test op.degree == [2,30]
         @test str_show(op) == "Augmentor.ShearX([2,$(SPACE)30])"
+        @test str_showconst(op) == "ShearX([2,$(SPACE)30])"
         @test str_showcompact(op) == "ShearX by ϕ ∈ [2,$(SPACE)30] degree"
     end
     @testset "eager" begin
@@ -92,16 +96,20 @@ end
         @test @inferred(ShearY(-70)) === ShearY(-70:-70)
         @test @inferred(ShearY(0.7)) === ShearY(0.7:1:0.7)
         @test str_show(ShearY(0.7)) == "Augmentor.ShearY(0.7)"
+        @test str_showconst(ShearY(0.7)) == "ShearY(0.7)"
         @test str_showcompact(ShearY(0.7)) == "ShearY 0.7 degree"
         @test @inferred(ShearY(10)) === ShearY(10:10)
         @test str_show(ShearY(10)) == "Augmentor.ShearY(10)"
+        @test str_showconst(ShearY(10)) == "ShearY(10)"
         @test str_showcompact(ShearY(10)) == "ShearY 10 degree"
         op = @inferred(ShearY(-1:1))
         @test str_show(op) == "Augmentor.ShearY(-1:1)"
+        @test str_showconst(op) == "ShearY(-1:1)"
         @test str_showcompact(op) == "ShearY by ψ ∈ -1:1 degree"
         op = @inferred(ShearY([2,30]))
         @test op.degree == [2,30]
         @test str_show(op) == "Augmentor.ShearY([2,$(SPACE)30])"
+        @test str_showconst(op) == "ShearY([2,$(SPACE)30])"
         @test str_showcompact(op) == "ShearY by ψ ∈ [2,$(SPACE)30] degree"
     end
     @testset "eager" begin

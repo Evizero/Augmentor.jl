@@ -75,6 +75,9 @@ end
       -  4.5% chance to: No operation"""
     @test str_showcompact(Either((Rotate90(),Rotate270(),NoOp()), (0.155,0.8,0.045))) ==
         "Either: (16%) Rotate 90 degree. (80%) Rotate 270 degree. (4%) No operation."
+        @test str_showconst(Either(Rotate90(), Rotate270(), NoOp())) == "Rotate90() * Rotate270() * NoOp()"
+        @test str_showconst(Either((Rotate90(), Rotate270(), NoOp()),(1,1,2))) == "(0.25=>Rotate90()) * (0.25=>Rotate270()) * (0.5=>NoOp())"
+        @test str_showconst(Either((Rotate90(), NoOp()),(1,2))) == "(0.333=>Rotate90()) * (0.667=>NoOp())"
 end
 
 @testset "eager" begin

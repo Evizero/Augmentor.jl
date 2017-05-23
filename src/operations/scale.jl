@@ -30,6 +30,11 @@ function toaffine(op::Scale{2}, img::AbstractMatrix)
     tfm
 end
 
+function showconstruction(io::IO, op::Scale)
+    fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
+    print(io, typeof(op).name.name, '(', join(map(string, fct),", "), ')')
+end
+
 function Base.show{N}(io::IO, op::Scale{N})
     if get(io, :compact, false)
         str = join(map(t->join(t,"×"), collect(zip(op.factors...))), ", ")
@@ -40,6 +45,6 @@ function Base.show{N}(io::IO, op::Scale{N})
         end
     else
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
-        print(io, "Augmentor.Scale{$N}($(fct))")
+        print(io, typeof(op).name, "{$N}($(fct))")
     end
 end

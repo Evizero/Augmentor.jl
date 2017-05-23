@@ -1,4 +1,4 @@
-testpattern() = load(joinpath(dirname(@__FILE__()), "testpattern.png"))
+testpattern() = load(joinpath(dirname(@__FILE__()), "resources", "testpattern.png"))
 function use_testpattern()
     info("No custom image specifed. Using \"testpattern()\" for demonstration.")
     testpattern()

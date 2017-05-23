@@ -3,6 +3,7 @@
     @testset "constructor" begin
         @test @inferred(Rotate90(0.7)) === Either(Rotate90(), 0.7)
         @test str_show(Rotate90()) == "Augmentor.Rotate90()"
+        @test str_showconst(Rotate90()) == "Rotate90()"
         @test str_showcompact(Rotate90()) == "Rotate 90 degree"
     end
     @testset "eager" begin
@@ -63,6 +64,7 @@ end
     @testset "constructor" begin
         @test @inferred(Rotate180(0.7)) === Either(Rotate180(), 0.7)
         @test str_show(Rotate180()) == "Augmentor.Rotate180()"
+        @test str_showconst(Rotate180()) == "Rotate180()"
         @test str_showcompact(Rotate180()) == "Rotate 180 degree"
     end
     @testset "eager" begin
@@ -121,6 +123,7 @@ end
     @testset "constructor" begin
         @test @inferred(Rotate270(0.7)) === Either(Rotate270(), 0.7)
         @test str_show(Rotate270()) == "Augmentor.Rotate270()"
+        @test str_showconst(Rotate270()) == "Rotate270()"
         @test str_showcompact(Rotate270()) == "Rotate 270 degree"
     end
     @testset "eager" begin
@@ -185,16 +188,20 @@ end
         @test_throws ArgumentError Rotate(3:1)
         @test @inferred(Rotate(0.7)) === Rotate(0.7:1:0.7)
         @test str_show(Rotate(0.7)) == "Augmentor.Rotate(0.7)"
+        @test str_showconst(Rotate(0.7)) == "Rotate(0.7)"
         @test str_showcompact(Rotate(0.7)) == "Rotate 0.7 degree"
         @test @inferred(Rotate(10)) === Rotate(10:10)
         @test str_show(Rotate(10)) == "Augmentor.Rotate(10)"
+        @test str_showconst(Rotate(10)) == "Rotate(10)"
         @test str_showcompact(Rotate(10)) == "Rotate 10 degree"
         op = @inferred(Rotate(-1:1))
         @test str_show(op) == "Augmentor.Rotate(-1:1)"
+        @test str_showconst(op) == "Rotate(-1:1)"
         @test str_showcompact(op) == "Rotate by θ ∈ -1:1 degree"
         op = @inferred(Rotate([2,30]))
         @test op.degree == [2,30]
         @test str_show(op) == "Augmentor.Rotate([2,$(SPACE)30])"
+        @test str_showconst(op) == "Rotate([2,$(SPACE)30])"
         @test str_showcompact(op) == "Rotate by θ ∈ [2,$(SPACE)30] degree"
     end
     @testset "eager" begin

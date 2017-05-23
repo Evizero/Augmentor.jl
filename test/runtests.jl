@@ -25,6 +25,12 @@ function str_showcompact(obj)
     readstring(seek(io, 0))
 end
 
+function str_showconst(obj)
+    io = IOBuffer()
+    Augmentor.showconstruction(io, obj)
+    readstring(seek(io, 0))
+end
+
 SPACE = VERSION < v"0.6.0-dev.2505" ? "" : " " # julia PR #20288
 
 camera = testimage("cameraman")

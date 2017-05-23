@@ -82,6 +82,9 @@ end
 
 for deg in (90, 180, 270)
     T = Symbol(:Rotate, deg)
+    @eval function showconstruction(io::IO, op::$T)
+        print(io, typeof(op).name.name, "()")
+    end
     @eval function Base.show(io::IO, op::$T)
         if get(io, :compact, false)
             print(io, "Rotate ", $deg, " degree")
@@ -117,10 +120,7 @@ function Base.show(io::IO, op::Rotate)
             print(io, "Rotate by θ ∈ ", op.degree, " degree")
         end
     else
-        if length(op.degree) == 1
-            print(io, "Augmentor.Rotate($(first(op.degree)))")
-        else
-            print(io, "Augmentor.Rotate($(op.degree))")
-        end
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end

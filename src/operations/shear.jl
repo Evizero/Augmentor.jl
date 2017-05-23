@@ -24,11 +24,8 @@ function Base.show(io::IO, op::ShearX)
             print(io, "ShearX by ϕ ∈ ", op.degree, " degree")
         end
     else
-        if length(op.degree) == 1
-            print(io, "Augmentor.ShearX($(first(op.degree)))")
-        else
-            print(io, "Augmentor.ShearX($(op.degree))")
-        end
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end
 
@@ -60,10 +57,17 @@ function Base.show(io::IO, op::ShearY)
             print(io, "ShearY by ψ ∈ ", op.degree, " degree")
         end
     else
-        if length(op.degree) == 1
-            print(io, "Augmentor.ShearY($(first(op.degree)))")
-        else
-            print(io, "Augmentor.ShearY($(op.degree))")
-        end
+        print(io, "Augmentor.")
+        showconstruction(io, op)
+    end
+end
+
+# --------------------------------------------------------------------
+
+function showconstruction(io::IO, op::Union{Rotate,ShearX,ShearY})
+    if length(op.degree) == 1
+        print(io, typeof(op).name.name, '(', first(op.degree), ')')
+    else
+        print(io, typeof(op).name.name, '(', op.degree, ')')
     end
 end

@@ -97,6 +97,23 @@ for KIND in (:eager, :permute, :view, :stepview)
     end
 end
 
+function showconstruction(io::IO, op::Either)
+    chances_float = map(c->round(c, 3), op.chances)
+    if all(x->x≈chances_float[1], chances_float)
+        for (i, op_i) in enumerate(op.operations)
+            showconstruction(io, op_i)
+            i < length(op.operations) && print(io, " * ")
+        end
+    else
+        for (i, (op_i, p_i)) in enumerate(zip(op.operations, chances_float))
+            print(io, '(', p_i, "=>")
+            showconstruction(io, op_i)
+            print(io, ')')
+            i < length(op.operations) && print(io, " * ")
+        end
+    end
+end
+
 function Base.show(io::IO, op::Either)
     if get(io, :compact, false)
         print(io, "Either:")
@@ -106,7 +123,7 @@ function Base.show(io::IO, op::Either)
             print(io, '.')
         end
     else
-        print(io, "Augmentor.Either (1 out of ", length(op.operations), " operation(s)):")
+        print(io, typeof(op).name, " (1 out of ", length(op.operations), " operation(s)):")
         percent_int   = map(c->round(Int, c*100), op.chances)
         percent_float = map(c->round(c*100, 1), op.chances)
         percent = if any(i != f for (i,f) in zip(percent_int,percent_float))

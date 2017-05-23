@@ -3,6 +3,7 @@
     @test (CacheImage <: Augmentor.Operation) == true
     @test typeof(@inferred(CacheImage())) <: CacheImage
     @test str_show(CacheImage()) == "Augmentor.CacheImage()"
+    @test str_showconst(CacheImage()) == "CacheImage()"
     @test str_showcompact(CacheImage()) == "Cache into temporary buffer"
 
     @test @inferred(Augmentor.applyeager(CacheImage(),square)) === square
@@ -44,6 +45,11 @@ end
     op = @inferred CacheImage(buf)
     @test Augmentor.CacheImageInto(buf) === op
     @test str_show(op) == "Augmentor.CacheImageInto(::Array{Gray{N0f8},2})"
+    @test str_showconst(op) == "CacheImage(Array{Gray{N0f8}}(2, 3))"
+    op2 = @inferred CacheImage(Array{Gray{N0f8}}(2, 3))
+    @test typeof(op) == typeof(op2)
+    @test typeof(op.buffer) == typeof(op2.buffer)
+    @test size(op.buffer) == size(op2.buffer)
     @test str_showcompact(op) == "Cache into preallocated 2×3 Array{Gray{N0f8},2}"
 
     v = Augmentor.applylazy(Resize(2,3), camera)

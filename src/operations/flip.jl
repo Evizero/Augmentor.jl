@@ -16,11 +16,16 @@ function applystepview(::FlipX, img::AbstractMatrix)
     indirect_view(img, (idx[1], reverse(idx[2])))
 end
 
+function showconstruction(io::IO, op::FlipX)
+    print(io, typeof(op).name.name, "()")
+end
+
 function Base.show(io::IO, op::FlipX)
     if get(io, :compact, false)
         print(io, "Flip the X axis")
     else
-        print(io, "$(typeof(op))()")
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end
 
@@ -42,10 +47,15 @@ function applystepview(::FlipY, img::AbstractMatrix)
     indirect_view(img, (reverse(idx[1]), idx[2]))
 end
 
+function showconstruction(io::IO, op::FlipY)
+    print(io, typeof(op).name.name, "()")
+end
+
 function Base.show(io::IO, op::FlipY)
     if get(io, :compact, false)
         print(io, "Flip the Y axis")
     else
-        print(io, "$(typeof(op))()")
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end

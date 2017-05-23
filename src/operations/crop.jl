@@ -30,7 +30,7 @@ function Base.show{N}(io::IO, op::Crop{N})
             print(io, "Crop region $(op.indexes)")
         end
     else
-        print(io, "Augmentor.Crop{$N}($(op.indexes))")
+        print(io, typeof(op).name, "{$N}($(op.indexes))")
     end
 end
 
@@ -59,6 +59,10 @@ applylazy(op::CropNative, img)     = direct_view(img, op.indexes)
 applyview(op::CropNative, img)     = direct_view(img, op.indexes)
 applystepview(op::CropNative, img) = direct_view(img, map(StepRange, op.indexes))
 
+function showconstruction(io::IO, op::Union{Crop,CropNative})
+    print(io, typeof(op).name.name, '(', join(map(string, op.indexes),", "), ')')
+end
+
 function Base.show{N}(io::IO, op::CropNative{N})
     if get(io, :compact, false)
         if N == 2
@@ -67,7 +71,7 @@ function Base.show{N}(io::IO, op::CropNative{N})
             print(io, "Crop native region $(op.indexes)")
         end
     else
-        print(io, "Augmentor.CropNative{$N}($(op.indexes))")
+        print(io, typeof(op).name, "{$N}($(op.indexes))")
     end
 end
 
@@ -109,6 +113,10 @@ function applystepview(op::CropSize, img)
     direct_view(img, map(StepRange, cropsize_indices(op, img)))
 end
 
+function showconstruction(io::IO, op::CropSize)
+    print(io, typeof(op).name.name, '(', join(map(string, op.size),", "), ')')
+end
+
 function Base.show{N}(io::IO, op::CropSize{N})
     if get(io, :compact, false)
         if N == 1
@@ -117,6 +125,6 @@ function Base.show{N}(io::IO, op::CropSize{N})
             print(io, "Crop a $(join(op.size,"×")) window around the center")
         end
     else
-        print(io, "$(typeof(op))($(op.size))")
+        print(io, typeof(op), "($(op.size))")
     end
 end

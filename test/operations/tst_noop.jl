@@ -2,6 +2,7 @@
 
 @testset "constructor" begin
     @test str_show(NoOp()) == "Augmentor.NoOp()"
+    @test str_showconst(NoOp()) == "NoOp()"
     @test str_showcompact(NoOp()) == "No operation"
 end
 @testset "eager" begin

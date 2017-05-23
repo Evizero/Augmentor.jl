@@ -48,6 +48,11 @@ function applyaffine{T,N,W<:InvWarpedView}(op::Zoom{N}, v::SubArray{T,N,W})
     view(wv, v.indexes...)
 end
 
+function showconstruction(io::IO, op::Zoom)
+    fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
+    print(io, typeof(op).name.name, '(', join(map(string, fct),", "), ')')
+end
+
 function Base.show{N}(io::IO, op::Zoom{N})
     if get(io, :compact, false)
         str = join(map(t->join(_round(t,2),"×"), collect(zip(op.factors...))), ", ")
@@ -58,6 +63,6 @@ function Base.show{N}(io::IO, op::Zoom{N})
         end
     else
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
-        print(io, "Augmentor.Zoom{$N}($(fct))")
+        print(io, typeof(op).name, "{$N}($(fct))")
     end
 end

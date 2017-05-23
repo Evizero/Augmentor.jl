@@ -4,11 +4,16 @@ applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
 applyeager(op::CacheImage, img) = copy(img)
 
+function showconstruction(io::IO, op::CacheImage)
+    print(io, typeof(op).name.name, "()")
+end
+
 function Base.show(io::IO, op::CacheImage)
     if get(io, :compact, false)
         print(io, "Cache into temporary buffer")
     else
-        print(io, "$(typeof(op))()")
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end
 
@@ -31,11 +36,20 @@ function applylazy(op::CacheImageInto, img)
     copy!(match_idx(op.buffer, indices(img)), img)
 end
 
+function showconstruction(io::IO, op::CacheImageInto)
+    print(io, "CacheImage(") # shows exported API
+    print(io, "Array{")
+    ImageCore.showcoloranttype(io, eltype(op.buffer))
+    print(io, "}(")
+    print(io, join(map(i->string(length(i)), indices(op.buffer)), ", "))
+    print(io, "))")
+end
+
 function Base.show(io::IO, op::CacheImageInto)
     if get(io, :compact, false)
         print(io, "Cache into preallocated ", summary(op.buffer))
     else
-        print(io, "$(typeof(op).name)(")
+        print(io, typeof(op).name, "(")
         showarg(io, op.buffer)
         print(io, ')')
     end

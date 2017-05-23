@@ -46,6 +46,10 @@ function applyaffine{T,N}(op::Resize{N}, img::AbstractArray{T,N})
     indirect_view(wv, map(s->2:s+1, op.size))
 end
 
+function showconstruction(io::IO, op::Resize)
+    print(io, typeof(op).name.name, '(', join(map(string, op.size),", "), ')')
+end
+
 function Base.show{N}(io::IO, op::Resize{N})
     if get(io, :compact, false)
         if N == 2
@@ -54,6 +58,6 @@ function Base.show{N}(io::IO, op::Resize{N})
             print(io, "Resize to $(op.size)")
         end
     else
-        print(io, "$(typeof(op))($(op.size))")
+        print(io, typeof(op), "($(op.size))")
     end
 end
