@@ -16,7 +16,7 @@ of the native Julia package manger.
 
 .. code-block:: julia
 
-   Pkg.clone("https://github.com/Evizero/Augmentor.jl.git")
+   Pkg.add("Augmentor")
 
 Additionally, for example if you encounter any sudden issues,
 or in the case you would like to contribute to the package,

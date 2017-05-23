@@ -288,7 +288,7 @@ package manager. Once installed the Augmentor package can be
 imported just as any other Julia package.
 
 ```julia
-Pkg.clone("https://github.com/Evizero/Augmentor.jl.git")
+Pkg.add("Augmentor")
 using Augmentor
 ```
 
