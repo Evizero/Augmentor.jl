@@ -1,4 +1,16 @@
+"""
+    testpattern() -> Matrix{RGBA{N0f8}}
+
+Load and return the provided 300x400 test image.
+
+The returned image was specifically designed to be informative
+about the effects of the applied augmentation operations. It is
+thus well suited to prototype an augmentation pipeline, because
+it makes it easy to see what kind of effects one can achieve with
+it.
+"""
 testpattern() = load(joinpath(dirname(@__FILE__()), "resources", "testpattern.png"))
+
 function use_testpattern()
     info("No custom image specifed. Using \"testpattern()\" for demonstration.")
     testpattern()
