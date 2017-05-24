@@ -1,3 +1,52 @@
+"""
+    Crop <: Augmentor.Operation
+
+Description
+--------------
+
+Crops out the area of the specified pixel dimensions starting at
+a specified position, which in turn denotes the top-left corner
+of the crop. A position of ``x = 1``, and ``y = 1`` would mean
+that the crop is located in the top-left corner of the given
+image
+
+Usage
+--------------
+
+    Crop(indices)
+
+    Crop(indices...)
+
+Arguments
+--------------
+
+- **`indices`** : `NTuple` or `Vararg` of `UnitRange` that denote
+    the croping range for each array dimension. This is very
+    similar to how the indices for `view` are specified.
+
+Methods
+--------------
+
+- **[`augment`](@ref)** : Applies the operation to the given Image.
+
+Examples
+--------------
+
+```julia
+julia> img = testpattern()
+300×400 Array{RGBA{N0f8},2}:
+[...]
+
+julia> augment(img, Crop(1:30, 361:400)) # crop upper right corner
+30×40 Array{RGBA{N0f8},2}:
+[...]
+```
+
+see also
+--------------
+
+[`CropNative`](@ref), [`CropSize`](@ref), [`augment`](@ref)
+"""
 immutable Crop{N,I<:Tuple} <: Operation
     indexes::I
 
