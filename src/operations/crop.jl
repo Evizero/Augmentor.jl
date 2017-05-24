@@ -85,6 +85,57 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    CropNative <: Augmentor.Operation
+
+Description
+--------------
+
+Crops out the area of the specified pixel dimensions starting at
+a specified position. In contrast to [`Crop`](@ref), the the
+position (1,1) is not located at the top left of the current
+image, but instead depends on the previous transformations. This
+is useful for combining transformations such as
+[`Rotation`](@ref) or [`ShearX`](@ref) with a crop around the
+center area.
+
+Usage
+--------------
+
+    CropNative(indices)
+
+    CropNative(indices...)
+
+Arguments
+--------------
+
+- **`indices`** : `NTuple` or `Vararg` of `UnitRange` that denote
+    the croping range for each array dimension. This is very
+    similar to how the indices for `view` are specified.
+
+Methods
+--------------
+
+- **[`augment`](@ref)** : Applies the operation to the given Image.
+
+Examples
+--------------
+
+```julia
+img = testpattern()
+
+# cropped at top left corner
+augment(img, Rotate(45) |> Crop(1:300, 1:400))
+
+# cropped around center of rotated image
+augment(img, Rotate(45) |> CropNative(1:300, 1:400))
+```
+
+see also
+--------------
+
+[`Crop`](@ref), [`CropSize`](@ref), [`augment`](@ref)
+"""
 immutable CropNative{N,I<:Tuple} <: Operation
     indexes::I
 
