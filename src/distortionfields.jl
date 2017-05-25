@@ -18,8 +18,7 @@ end
 function uniform_field(gridheight::Int, gridwidth::Int, scale, border, normalize)
     A = if !border
         @assert gridwidth > 2 && gridheight > 2
-        A_t = rand(2, gridheight, gridwidth)
-        _2dborder!(A_t, .5)
+        _2dborder!(rand(2, gridheight, gridwidth), .5)
     else
         @assert gridwidth > 0 && gridheight > 0
         rand(2, gridheight, gridwidth)

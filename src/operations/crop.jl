@@ -4,11 +4,15 @@
 Description
 --------------
 
-Crops out the area of the specified pixel dimensions starting at
-a specified position, which in turn denotes the top-left corner
-of the crop. A position of ``x = 1``, and ``y = 1`` would mean
-that the crop is located in the top-left corner of the given
-image
+Crops out the area denoted by the specified pixel ranges.
+
+For example the operation `Crop(5:100, 2:10)` would denote a crop
+for the rectangle that starts at `x=2` and `y=5` in the top left
+corner and ends at `x=10` and `y=100` in the bottom right corner.
+As we can see the y-axis is specified first, because that is how
+the image is stored in an array. Thus the order of the provided
+indices ranges needs to reflect the order of the array
+dimensions.
 
 Usage
 --------------
@@ -21,18 +25,15 @@ Arguments
 --------------
 
 - **`indices`** : `NTuple` or `Vararg` of `UnitRange` that denote
-    the croping range for each array dimension. This is very
+    the cropping range for each array dimension. This is very
     similar to how the indices for `view` are specified.
-
-Methods
---------------
-
-- **[`augment`](@ref)** : Applies the operation to the given Image.
 
 Examples
 --------------
 
 ```julia
+julia> using Augmentor
+
 julia> img = testpattern()
 300×400 Array{RGBA{N0f8},2}:
 [...]
@@ -91,13 +92,21 @@ end
 Description
 --------------
 
-Crops out the area of the specified pixel dimensions starting at
-a specified position. In contrast to [`Crop`](@ref), the the
-position (1,1) is not located at the top left of the current
-image, but instead depends on the previous transformations. This
-is useful for combining transformations such as
-[`Rotation`](@ref) or [`ShearX`](@ref) with a crop around the
-center area.
+Crops out the area denoted by the specified pixel ranges.
+
+For example the operation `CropNative(5:100, 2:10)` would denote
+a crop for the rectangle that starts at `x=2` and `y=5` in the
+top left corner of native space and ends at `x=10` and `y=100` in
+the bottom right corner of native space.
+
+In contrast to [`Crop`](@ref), the position `x=1` `y=1` is not
+necessarily located at the top left of the current image, but
+instead depends on the cumulative effect of the previous
+transformations. The reason for this is because affine
+transformations are usually performed around the center of the
+image, which is reflected in "native space". This is useful for
+combining transformations such as [`Rotation`](@ref) or
+[`ShearX`](@ref) with a crop around the center area.
 
 Usage
 --------------
@@ -110,18 +119,14 @@ Arguments
 --------------
 
 - **`indices`** : `NTuple` or `Vararg` of `UnitRange` that denote
-    the croping range for each array dimension. This is very
+    the cropping range for each array dimension. This is very
     similar to how the indices for `view` are specified.
-
-Methods
---------------
-
-- **[`augment`](@ref)** : Applies the operation to the given Image.
 
 Examples
 --------------
 
 ```julia
+using Augmentor
 img = testpattern()
 
 # cropped at top left corner
@@ -177,6 +182,48 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    CropSize <: Augmentor.Operation
+
+Description
+--------------
+
+Crops out the area of the specified pixel size around the center
+of the input image.
+
+For example the operation `CropSize(10, 50)` would denote a crop
+for a rectangle of height 10 and width 50 around the center of
+the input image.
+
+Usage
+--------------
+
+    CropSize(size)
+
+    CropSize(size...)
+
+Arguments
+--------------
+
+- **`size`** : `NTuple` or `Vararg` of `Int` that denote the
+    output size for each dimension.
+
+Examples
+--------------
+
+```julia
+using Augmentor
+img = testpattern()
+
+# cropped around center of rotated image
+augment(img, Rotate(45) |> CropSize(300, 400))
+```
+
+see also
+--------------
+
+[`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+"""
 immutable CropSize{N} <: Operation
     size::NTuple{N,Int}
 
@@ -209,6 +256,7 @@ applyaffine(op::CropSize, img) = applyview(op, img)
 function applyview(op::CropSize, img)
     direct_view(img, cropsize_indices(op, img))
 end
+
 function applystepview(op::CropSize, img)
     direct_view(img, map(StepRange, cropsize_indices(op, img)))
 end

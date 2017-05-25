@@ -9,10 +9,11 @@ Optionally a user has the option to specify a preallocated
 `buffer` to write the image into. Note that if a `buffer` is
 provided, then it has to be of the correct size and eltype.
 
-Even without a preallocated `buffer` it can be beneficial to
-cache the image in some situations. For example when chaining a
-number of affine transformations after an elastic distortion,
-because performing that lazily requires nested interpolation.
+Even without a preallocated `buffer` it can be beneficial in some
+situations to cache the image. An example for such a scenario is
+when chaining a number of affine transformations after an elastic
+distortion, because performing that lazily requires nested
+interpolation.
 
 Usage
 --------------
@@ -25,17 +26,14 @@ Arguments
 --------------
 
 - **`buffer`** : Optional. A preallocated `AbstractArray` of the
-                 appropriate size and eltype.
-
-Methods
---------------
-
-- **[`augment`](@ref)** : Applies the operation to the given Image.
+    appropriate size and eltype.
 
 Examples
 --------------
 
 ```julia
+using Augmentor
+
 # make pipeline that forces caching after elastic distortion
 pl = ElasticDistortion(3,3) |> CacheImage() |> Rotate(-10:10) |> ShearX(-5:5)
 
@@ -44,7 +42,7 @@ pl = ElasticDistortion(3,3) |> CacheImage() |> Rotate(-10:10) |> ShearX(-5:5)
 # the input image is also a 20x20 Matrix{Float64}
 pl = ElasticDistortion(3,3) |> CacheImage(zeros(20,20)) |> Rotate(-10:10)
 
-# convenience syntax with the same effect as above
+# convenience syntax with the same effect as above.
 pl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)
 ```
 
