@@ -552,27 +552,41 @@ Stochastic Branches
 
 .. class:: Either
 
-   Allows for choosing between different ImageOperations at
-   random. This is particularly useful if one for example wants
-   to first either rotate the image 90 degree clockwise or
+   Allows for choosing between different operations at random
+   when applied. This is particularly useful if one for example
+   wants to first either rotate the image 90 degree clockwise or
    anticlockwise (but never both) and then apply some other
    operation(s) afterwards.
 
+   When compiling a pipeline, :class:`Either` will analyze the
+   provided operations in order to identify the most preferred
+   way to apply the individual operation when sampled, that is
+   supported by all given operations. This way the output of
+   applying :class:`Either` will be inferable and the whole
+   pipeline will remain type-stable, even though randomness is
+   involved.
+
    By default each specified image operation has the same
-   probability of occurance. This default behaviour can be
-   overwritten by specifying the "chance" manually.
+   probability of occurrence. This default behaviour can be
+   overwritten by specifying the chance manually.
 
 .. code-block:: jlcon
+
+   julia> FlipX() * FlipY()
+   Augmentor.Either (1 out of 2 operation(s)):
+     - 50% chance to: Flip the X axis
+     - 50% chance to: Flip the Y axis
 
    julia> Either(FlipX(), FlipY())
    Augmentor.Either (1 out of 2 operation(s)):
      - 50% chance to: Flip the X axis
      - 50% chance to: Flip the Y axis
 
-   julia> Either(0.6=>FlipX(), 0.4=>FlipY())
-   Augmentor.Either (1 out of 2 operation(s)):
-     - 60% chance to: Flip the X axis
-     - 40% chance to: Flip the Y axis
+   julia> Either((FlipX(), FlipY(), NoOp()), (1,1,2))
+   Augmentor.Either (1 out of 3 operation(s)):
+     - 25% chance to: Flip the X axis
+     - 25% chance to: Flip the Y axis
+     - 50% chance to: No operation
 
    julia> Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp())
    Augmentor.Either (1 out of 3 operation(s)):
@@ -580,7 +594,7 @@ Stochastic Branches
      - 25% chance to: Flip the Y axis
      - 50% chance to: No operation
 
-   julia> Either((FlipX(), FlipY(), NoOp()), (1,1,2))
+   julia> (1=>FlipX()) * (1=>FlipY()) * (2=>NoOp())
    Augmentor.Either (1 out of 3 operation(s)):
      - 25% chance to: Flip the X axis
      - 25% chance to: Flip the Y axis
