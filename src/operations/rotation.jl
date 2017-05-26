@@ -1,7 +1,61 @@
 # TODO: implement methods for n-dim arrays
 
+"""
+    Rotate90 <: Augmentor.AffineOperation
+
+Description
+--------------
+
+Rotates the image upwards 90 degrees. This is a special case
+rotation because it can be performed very efficiently by simply
+rearranging the existing pixels. However, it is generally not the
+case that the output image will have the same size as the input
+image, which is something to be aware of.
+
+If created using the parameter `p`, the operation will be lifted
+into `Either(p=>Rotate90(), 1-p=>NoOp())`, where `p` denotes the
+probability of applying `Rotate90` and `1-p` the probability for
+applying [`NoOp`](@ref). See the documentation of
+[`Either`](@ref) for more information.
+
+Usage
+--------------
+
+    Rotate90()
+
+    Rotate90(p)
+
+Arguments
+--------------
+
+- **`p`** : Optional. Probability of applying the operation. Must
+    be in the interval [0,1].
+
+Examples
+--------------
+
+```julia
+julia> using Augmentor
+
+julia> img = [200 150; 50 1]
+2×2 Array{Int64,2}:
+ 200  150
+  50    1
+
+julia> img_new = augment(img, Rotate90())
+2×2 Array{Int64,2}:
+ 150   1
+ 200  50
+```
+
+see also
+--------------
+
+[`Rotate180`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
+[`Either`](@ref), [`augment`](@ref)
+"""
 immutable Rotate90 <: AffineOperation end
-Rotate90(p) = Either(Rotate90(), p)
+Rotate90(p::Number) = Either(Rotate90(), p)
 
 @inline supports_permute(::Type{Rotate90}) = true
 
@@ -32,8 +86,61 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    Rotate180 <: Augmentor.AffineOperation
+
+Description
+--------------
+
+Rotates the image 180 degrees. This is a special case rotation
+because it can be performed very efficiently by simply
+rearranging the existing pixels. Furthermore, the output image
+will have the same dimensions as the input image.
+
+If created using the parameter `p`, the operation will be lifted
+into `Either(p=>Rotate180(), 1-p=>NoOp())`, where `p` denotes the
+probability of applying `Rotate180` and `1-p` the probability for
+applying [`NoOp`](@ref). See the documentation of
+[`Either`](@ref) for more information.
+
+Usage
+--------------
+
+    Rotate180()
+
+    Rotate180(p)
+
+Arguments
+--------------
+
+- **`p`** : Optional. Probability of applying the operation. Must
+    be in the interval [0,1].
+
+Examples
+--------------
+
+```julia
+julia> using Augmentor
+
+julia> img = [200 150; 50 1]
+2×2 Array{Int64,2}:
+ 200  150
+  50    1
+
+julia> img_new = augment(img, Rotate180())
+2×2 Array{Int64,2}:
+   1   50
+ 150  200
+```
+
+see also
+--------------
+
+[`Rotate90`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
+[`Either`](@ref), [`augment`](@ref)
+"""
 immutable Rotate180 <: AffineOperation end
-Rotate180(p) = Either(Rotate180(), p)
+Rotate180(p::Number) = Either(Rotate180(), p)
 
 @inline supports_stepview(::Type{Rotate180}) = true
 
@@ -48,8 +155,63 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    Rotate270 <: Augmentor.AffineOperation
+
+Description
+--------------
+
+Rotates the image upwards 270 degrees, which can also be
+described as rotating the image downwards 90 degrees. This is a
+special case rotation, because it can be performed very
+efficiently by simply rearranging the existing pixels. However,
+it is generally not the case that the output image will have the
+same size as the input image, which is something to be aware of.
+
+If created using the parameter `p`, the operation will be lifted
+into `Either(p=>Rotate270(), 1-p=>NoOp())`, where `p` denotes the
+probability of applying `Rotate270` and `1-p` the probability for
+applying [`NoOp`](@ref). See the documentation of
+[`Either`](@ref) for more information.
+
+Usage
+--------------
+
+    Rotate270()
+
+    Rotate270(p)
+
+Arguments
+--------------
+
+- **`p`** : Optional. Probability of applying the operation. Must
+    be in the interval [0,1].
+
+Examples
+--------------
+
+```julia
+julia> using Augmentor
+
+julia> img = [200 150; 50 1]
+2×2 Array{Int64,2}:
+ 200  150
+  50    1
+
+julia> img_new = augment(img, Rotate270())
+2×2 Array{Int64,2}:
+ 50  200
+  1  150
+```
+
+see also
+--------------
+
+[`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate`](@ref),
+[`Either`](@ref), [`augment`](@ref)
+"""
 immutable Rotate270 <: AffineOperation end
-Rotate270(p) = Either(Rotate270(), p)
+Rotate270(p::Number) = Either(Rotate270(), p)
 
 @inline supports_permute(::Type{Rotate270}) = true
 
@@ -96,6 +258,59 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    Rotate <: Augmentor.AffineOperation
+
+Description
+--------------
+
+Rotate the image upwards for the given `degree`. This operation
+can only be described as an affine transformation and will in
+general cause other operations of the pipeline to use their
+affine formulation as well (if they have one).
+
+In contrast to the special case rotations outlined above, the
+type `Rotate` can describe any arbitrary number of degrees. It
+will always perform the rotation around the center of the image.
+This can be particularly useful when combining the operation with
+[`CropNative`](@ref).
+
+Usage
+--------------
+
+    Rotate(degree)
+
+Arguments
+--------------
+
+- **`degree`** : `Real` or `AbstractVector` of `Real` that denote
+    the rotation angle(s) in degree. If a vector is provided,
+    then a random element will be sampled each time the operation
+    is applied.
+
+Examples
+--------------
+
+```julia
+using Augmentor
+img = testpattern()
+
+# rotate exactly 45 degree
+augment(img, Rotate(45))
+
+# rotate between 10 and 20 degree upwards
+augment(img, Rotate(10:20))
+
+# rotate one of the five specified degrees
+augment(img, Rotate([-10, -5, 0, 5, 10]))
+```
+
+see also
+--------------
+
+[`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate270`](@ref),
+[`CropNative`](@ref), [`augment`](@ref)
+"""
 immutable Rotate{T<:AbstractVector} <: AffineOperation
     degree::T
 

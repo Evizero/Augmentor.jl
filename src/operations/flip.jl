@@ -1,7 +1,58 @@
 # TODO: implement methods for n-dim arrays
 
+"""
+    FlipX <: Augmentor.AffineOperation
+
+Description
+--------------
+
+Reverses the x-order of each pixel row. Another way of describing
+it would be to mirror the image on the y-axis, or to mirror the
+image horizontally.
+
+If created using the parameter `p`, the operation will be lifted
+into `Either(p=>FlipX(), 1-p=>NoOp())`, where `p` denotes the
+probability of applying `FlipX` and `1-p` the probability for
+applying [`NoOp`](@ref). See the documentation of
+[`Either`](@ref) for more information.
+
+Usage
+--------------
+
+    FlipX()
+
+    FlipX(p)
+
+Arguments
+--------------
+
+- **`p`** : Optional. Probability of applying the operation. Must
+    be in the interval [0,1].
+
+Examples
+--------------
+
+```julia
+julia> using Augmentor
+
+julia> img = [200 150; 50 1]
+2×2 Array{Int64,2}:
+ 200  150
+  50    1
+
+julia> img_new = augment(img, FlipX())
+2×2 Array{Int64,2}:
+ 150  200
+   1   50
+```
+
+see also
+--------------
+
+[`FlipY`](@ref), [`Either`](@ref), [`augment`](@ref)
+"""
 immutable FlipX <: AffineOperation end
-FlipX(p) = Either(FlipX(), p)
+FlipX(p::Number) = Either(FlipX(), p)
 
 @inline supports_stepview(::Type{FlipX}) = true
 
@@ -31,8 +82,59 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    FlipY <: Augmentor.AffineOperation
+
+Description
+--------------
+
+Reverses the y-order of each pixel column. Another way of
+describing it would be to mirror the image on the x-axis, or to
+mirror the image vertically.
+
+If created using the parameter `p`, the operation will be lifted
+into `Either(p=>FlipY(), 1-p=>NoOp())`, where `p` denotes the
+probability of applying `FlipY` and `1-p` the probability for
+applying [`NoOp`](@ref). See the documentation of
+[`Either`](@ref) for more information.
+
+Usage
+--------------
+
+    FlipY()
+
+    FlipY(p)
+
+Arguments
+--------------
+
+- **`p`** : Optional. Probability of applying the operation. Must
+    be in the interval [0,1].
+
+Examples
+--------------
+
+```julia
+julia> using Augmentor
+
+julia> img = [200 150; 50 1]
+2×2 Array{Int64,2}:
+ 200  150
+  50    1
+
+julia> img_new = augment(img, FlipY())
+2×2 Array{Int64,2}:
+  50    1
+ 200  150
+```
+
+see also
+--------------
+
+[`FlipX`](@ref), [`Either`](@ref), [`augment`](@ref)
+"""
 immutable FlipY <: AffineOperation end
-FlipY(p) = Either(FlipY(), p)
+FlipY(p::Number) = Either(FlipY(), p)
 
 @inline supports_stepview(::Type{FlipY}) = true
 

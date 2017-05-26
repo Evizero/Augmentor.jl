@@ -206,7 +206,7 @@ Arguments
 --------------
 
 - **`size`** : `NTuple` or `Vararg` of `Int` that denote the
-    output size for each dimension.
+    output size in pixel for each dimension.
 
 Examples
 --------------
