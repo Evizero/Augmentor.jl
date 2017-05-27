@@ -170,3 +170,77 @@ end
         @test @inferred(Augmentor.supports_permute(CropSize)) === false
     end
 end
+
+# --------------------------------------------------------------------
+
+@testset "CropRatio" begin
+    @test (CropRatio <: Augmentor.AffineOperation) == false
+    @test typeof(@inferred(CropRatio())) <: CropRatio <: Augmentor.Operation
+    @testset "constructor" begin
+        @test_throws MethodError CropRatio(())
+        @test_throws MethodError CropRatio(1.,2.)
+        @test_throws MethodError CropRatio(:a)
+        @test_throws MethodError CropRatio([:a])
+        @test_throws ArgumentError CropRatio(-1)
+        @test_throws ArgumentError CropRatio(0)
+        op = @inferred(CropRatio(3/4))
+        @test op === CropRatio(ratio=3/4)
+        @test str_show(op) == "Augmentor.CropRatio(0.75)"
+        @test str_showconst(op) == "CropRatio(0.75)"
+        @test str_showcompact(op) == "Crop to 3:4 aspect ratio"
+        op = @inferred(CropRatio(1))
+        @test op === @inferred(CropRatio())
+        @test op === CropRatio(ratio=1)
+        @test str_show(op) == "Augmentor.CropRatio(1.0)"
+        @test str_showconst(op) == "CropRatio(1.0)"
+        @test str_showcompact(op) == "Crop to 1:1 aspect ratio"
+        op = @inferred(CropRatio(2.5))
+        @test op === CropRatio(ratio=2.5)
+        @test str_show(op) == "Augmentor.CropRatio(2.5)"
+        @test str_showconst(op) == "CropRatio(2.5)"
+        @test str_showcompact(op) == "Crop to 5:2 aspect ratio"
+        op = @inferred(CropRatio(sqrt(2)))
+        @test str_showcompact(op) == "Crop to 1.41 aspect ratio"
+    end
+    @testset "eager" begin
+        @test_throws MethodError Augmentor.applyeager(CropRatio(10), nothing)
+        @test_throws MethodError Augmentor.applyeager(CropRatio(2), nothing)
+        @test @inferred(Augmentor.supports_eager(CropRatio)) === false
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
+            @test @inferred(Augmentor.applyeager(CropRatio(3/2), img)) == rect
+            @test typeof(Augmentor.applyeager(CropRatio(3/2), img)) <: Array
+        end
+        @test @inferred(Augmentor.applyeager(CropRatio(1), rect)) == rect[1:2,1:2]
+        @test @inferred(Augmentor.applyeager(CropRatio(1), square)) == square
+        @test @inferred(Augmentor.applyeager(CropRatio(1), square2)) == square2
+    end
+    @testset "affine" begin
+        @test @inferred(Augmentor.isaffine(CropRatio)) === false
+        @test @inferred(Augmentor.supports_affine(CropRatio)) === true
+        @test_throws MethodError Augmentor.applyaffine(CropRatio(1), nothing)
+        @test @inferred(Augmentor.applyaffine(CropRatio(1), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applyaffine(CropRatio(2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyaffine(CropRatio(.5), square2)) === view(square2, IdentityRange(1:4), IdentityRange(2:3))
+    end
+    @testset "lazy" begin
+        @test @inferred(Augmentor.supports_lazy(CropRatio)) === true
+        @test @inferred(Augmentor.applylazy(CropRatio(1), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applylazy(CropRatio(2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applylazy(CropRatio(.5), square2)) === view(square2, IdentityRange(1:4), IdentityRange(2:3))
+    end
+    @testset "view" begin
+        @test @inferred(Augmentor.supports_view(CropRatio)) === true
+        @test @inferred(Augmentor.applyview(CropRatio(1), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applyview(CropRatio(2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyview(CropRatio(.5), square2)) === view(square2, IdentityRange(1:4), IdentityRange(2:3))
+    end
+    @testset "stepview" begin
+        @test @inferred(Augmentor.supports_stepview(CropRatio)) === true
+        @test @inferred(Augmentor.applystepview(CropRatio(1), rect)) === view(rect, 1:1:2, 1:1:2)
+        @test @inferred(Augmentor.applystepview(CropRatio(2), square2)) === view(square2, 2:1:3, 1:1:4)
+        @test @inferred(Augmentor.applystepview(CropRatio(.5), square2)) === view(square2, 1:1:4, 2:1:3)
+    end
+    @testset "permute" begin
+        @test @inferred(Augmentor.supports_permute(CropRatio)) === false
+    end
+end

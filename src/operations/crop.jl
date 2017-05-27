@@ -46,7 +46,7 @@ julia> augment(img, Crop(1:30, 361:400)) # crop upper right corner
 see also
 --------------
 
-[`CropNative`](@ref), [`CropSize`](@ref), [`augment`](@ref)
+[`CropNative`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
 immutable Crop{N,I<:Tuple} <: Operation
     indexes::I
@@ -139,7 +139,7 @@ augment(img, Rotate(45) |> CropNative(1:300, 1:400))
 see also
 --------------
 
-[`Crop`](@ref), [`CropSize`](@ref), [`augment`](@ref)
+[`Crop`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
 immutable CropNative{N,I<:Tuple} <: Operation
     indexes::I
@@ -222,7 +222,7 @@ augment(img, Rotate(45) |> CropSize(300, 400))
 see also
 --------------
 
-[`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+[`CropRatio`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 immutable CropSize{N} <: Operation
     size::NTuple{N,Int}
@@ -274,5 +274,126 @@ function Base.show{N}(io::IO, op::CropSize{N})
         end
     else
         print(io, typeof(op), "($(op.size))")
+    end
+end
+
+# --------------------------------------------------------------------
+
+"""
+    CropRatio <: Augmentor.Operation
+
+Description
+--------------
+
+Crops out the biggest area around the center of the given image
+such that the output image satisfies the specified aspect ratio
+(i.e. width divided by height).
+
+For example the operation `CropRatio(1)` would denote a crop
+for the biggest square around the center of the image.
+
+Usage
+--------------
+
+    CropSize(ratio)
+
+    CropSize(; ratio = 1)
+
+Arguments
+--------------
+
+- **`ratio`** : Optional. A number denoting the aspect ratio. For
+    example specifying `ratio=16/9` would denote a 16:9 aspect
+    ratio. Defaults to `1`, which describes a square crop.
+
+Examples
+--------------
+
+```julia
+using Augmentor
+img = testpattern()
+
+# crop biggest square around the image center
+augment(img, CropRatio(1))
+```
+
+see also
+--------------
+
+[`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+"""
+immutable CropRatio <: Operation
+    ratio::Float64
+
+    function (::Type{CropRatio})(ratio::Real)
+        ratio > 0 || throw(ArgumentError("ratio has to be greater than 0"))
+        new(Float64(ratio))
+    end
+end
+CropRatio(; ratio = 1.) = CropRatio(ratio)
+
+@inline supports_eager{T<:CropRatio}(::Type{T}) = false
+@inline supports_affine{T<:CropRatio}(::Type{T}) = true
+@inline supports_view{T<:CropRatio}(::Type{T}) = true
+@inline supports_stepview{T<:CropRatio}(::Type{T}) = true
+
+function cropratio_indices(op::CropRatio, img::AbstractMatrix)
+    h, w = map(length, indices(img)) #convert(Tuple, center(img))
+    ratio = op.ratio
+    # compute new size based on ratio
+    nw = floor(Int, h * ratio)
+    nh = floor(Int, w / ratio)
+    nw = nw > 1 ? nw : 1
+    nh = nh > 1 ? nh : 1
+    sze = nh < h ? nh : h, nw < w ? nw : w
+    # compute indices around center for given size
+    cntr = convert(Tuple, center(img))
+    corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
+    map((b,s)->b:(b+s-1), corner, sze)
+end
+
+applyeager(op::CropRatio, img)  = plain_array(applyview(op, img))
+applylazy(op::CropRatio, img)   = applyview(op, img)
+applyaffine(op::CropRatio, img) = applyview(op, img)
+
+function applyview(op::CropRatio, img)
+    direct_view(img, cropratio_indices(op, img))
+end
+
+function applystepview(op::CropRatio, img)
+    direct_view(img, map(StepRange, cropratio_indices(op, img)))
+end
+
+function showconstruction(io::IO, op::CropRatio)
+    print(io, typeof(op).name.name, '(', op.ratio, ')')
+end
+
+function Base.show(io::IO, op::CropRatio)
+    if get(io, :compact, false)
+        high0 = if op.ratio >= 1
+            op.ratio
+        else
+            1 / op.ratio
+        end
+        low, high = 1, high0
+        found = false
+        for i = 1:20
+            high = i * high0
+            if round(high) == round(high,2)
+                low = i
+                found = true
+                break
+            end
+        end
+        if !found
+            print(io, "Crop to $(round(op.ratio,2)) aspect ratio")
+        elseif op.ratio >= 1
+            print(io, "Crop to $(round(Int,high)):$low aspect ratio")
+        else
+            print(io, "Crop to $low:$(round(Int,high)) aspect ratio")
+        end
+    else
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end

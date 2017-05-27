@@ -244,6 +244,21 @@ ops = (Scale(.1,.2),NoOp())
     @test_reference "scale_noop" img
 end
 
+ops = (Scale(.1,.2),CropRatio())
+@testset "$(str_showcompact(ops))" begin
+    wv = @inferred Augmentor._augment(camera, ops)
+    @test typeof(wv) <: SubArray
+    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(parent(wv)) <: InvWarpedView
+    @test parent(parent(wv)).itp.coefs === camera
+    @test_reference "scale_cropratio" wv
+    img = @inferred augment(camera, ops)
+    @test img == parent(copy(wv))
+    @test typeof(img) <: Array
+    @test eltype(img) <: eltype(camera)
+    @test_reference "scale_cropratio" img
+end
+
 ops = (ShearX(45),NoOp())
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)

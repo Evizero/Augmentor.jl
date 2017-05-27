@@ -18,7 +18,7 @@ functionality.
 +-----------------------+----------------------------------------------------------------------------+
 | Scaling and Resizing  | :class:`Scale` :class:`Zoom` :class:`Resize`                               |
 +-----------------------+----------------------------------------------------------------------------+
-| Cropping              | :class:`Crop` :class:`CropNative` :class:`CropSize`                        |
+| Cropping              | :class:`Crop` :class:`CropNative` :class:`CropSize` :class:`CropRatio`     |
 +-----------------------+----------------------------------------------------------------------------+
 | Utility Operations    | :class:`NoOp` :class:`CacheImage` :class:`Either`                          |
 +-----------------------+----------------------------------------------------------------------------+
@@ -479,6 +479,30 @@ Cropping
 | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png   | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/CropSize.png |
 +-----------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------+
 
+.. class:: CropRatio
+
+   Crops out the biggest area around the center of the given
+   image such that the output image satisfies the specified
+   aspect ratio (i.e. width divided by height).
+
+   For example the operation ``CropRatio(1)`` would denote a crop
+   for the biggest square around the center of the image, while
+   ``CropRatio(16/9)`` would result in a rectangle with 16:9
+   aspect ratio.
+
+.. code-block:: jlcon
+
+   julia> CropRatio(1)
+   Crop to 1:1 aspect ratio
+
+   julia> CropRatio(2.5)
+   Crop to 5:2 aspect ratio
+
++------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+| Input                                                                                                      | Output for ``CropRatio(1)``                                                                                |
++============================================================================================================+============================================================================================================+
+| .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png    | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/CropRatio.png |
++------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
 
 Resizing
 ***********
