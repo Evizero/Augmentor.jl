@@ -32,6 +32,7 @@ export
     CropNative,
     CropSize,
     CropRatio,
+    RCropRatio,
 
     Resize,
 

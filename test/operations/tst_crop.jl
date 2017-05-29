@@ -244,3 +244,110 @@ end
         @test @inferred(Augmentor.supports_permute(CropRatio)) === false
     end
 end
+
+# --------------------------------------------------------------------
+
+@testset "RCropRatio" begin
+    @test (RCropRatio <: Augmentor.AffineOperation) == false
+    @test typeof(@inferred(RCropRatio())) <: RCropRatio <: Augmentor.Operation
+    @testset "constructor" begin
+        @test_throws MethodError RCropRatio(())
+        @test_throws MethodError RCropRatio(1.,2.)
+        @test_throws MethodError RCropRatio(:a)
+        @test_throws MethodError RCropRatio([:a])
+        @test_throws ArgumentError RCropRatio(-1)
+        @test_throws ArgumentError RCropRatio(0)
+        op = @inferred(RCropRatio(3/4))
+        @test op === RCropRatio(ratio=3/4)
+        @test str_show(op) == "Augmentor.RCropRatio(0.75)"
+        @test str_showconst(op) == "RCropRatio(0.75)"
+        @test str_showcompact(op) == "Crop random window with 3:4 aspect ratio"
+        op = @inferred(RCropRatio(1))
+        @test op === @inferred(RCropRatio())
+        @test op === RCropRatio(ratio=1)
+        @test str_show(op) == "Augmentor.RCropRatio(1.0)"
+        @test str_showconst(op) == "RCropRatio(1.0)"
+        @test str_showcompact(op) == "Crop random window with 1:1 aspect ratio"
+        op = @inferred(RCropRatio(2.5))
+        @test op === RCropRatio(ratio=2.5)
+        @test str_show(op) == "Augmentor.RCropRatio(2.5)"
+        @test str_showconst(op) == "RCropRatio(2.5)"
+        @test str_showcompact(op) == "Crop random window with 5:2 aspect ratio"
+        op = @inferred(RCropRatio(sqrt(2)))
+        @test str_showcompact(op) == "Crop random window with 1.41 aspect ratio"
+    end
+    @testset "eager" begin
+        @test_throws MethodError Augmentor.applyeager(RCropRatio(10), nothing)
+        @test_throws MethodError Augmentor.applyeager(RCropRatio(2), nothing)
+        @test @inferred(Augmentor.supports_eager(RCropRatio)) === false
+        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
+            @test @inferred(Augmentor.applyeager(RCropRatio(3/2), img)) == rect
+            @test typeof(Augmentor.applyeager(RCropRatio(3/2), img)) <: Array
+        end
+        @test @inferred(Augmentor.applyeager(RCropRatio(1), square)) == square
+        @test @inferred(Augmentor.applyeager(RCropRatio(1), square2)) == square2
+        out = @inferred Augmentor.applyeager(RCropRatio(1), rect)
+        @test out == rect[1:2,1:2] || out == rect[1:2,2:3]
+    end
+    @testset "affine" begin
+        @test @inferred(Augmentor.isaffine(RCropRatio)) === false
+        @test @inferred(Augmentor.supports_affine(RCropRatio)) === true
+        @test_throws MethodError Augmentor.applyaffine(RCropRatio(1), nothing)
+        # preserve aspect ratio (i.e. not random)
+        @test @inferred(Augmentor.applyaffine(RCropRatio(3/2), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffine(RCropRatio(1), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffine(RCropRatio(1), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        # randomly placed
+        out = @inferred Augmentor.applyaffine(RCropRatio(1), rect)
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applyaffine(RCropRatio(2/3), square)
+        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out === view(square, IdentityRange(1:3), IdentityRange(2:3))
+        out = @inferred Augmentor.applyaffine(RCropRatio(3/2), square)
+        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out === view(square, IdentityRange(2:3), IdentityRange(1:3))
+    end
+    @testset "lazy" begin
+        @test @inferred(Augmentor.supports_lazy(RCropRatio)) === true
+        # preserve aspect ratio (i.e. not random)
+        @test @inferred(Augmentor.applylazy(RCropRatio(3/2), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(RCropRatio(1), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(RCropRatio(1), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        # randomly placed
+        out = @inferred Augmentor.applylazy(RCropRatio(1), rect)
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applylazy(RCropRatio(2/3), square)
+        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out === view(square, IdentityRange(1:3), IdentityRange(2:3))
+        out = @inferred Augmentor.applylazy(RCropRatio(3/2), square)
+        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out === view(square, IdentityRange(2:3), IdentityRange(1:3))
+    end
+    @testset "view" begin
+        @test @inferred(Augmentor.supports_view(RCropRatio)) === true
+        # preserve aspect ratio (i.e. not random)
+        @test @inferred(Augmentor.applyview(RCropRatio(3/2), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(RCropRatio(1), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(RCropRatio(1), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        # randomly placed
+        out = @inferred Augmentor.applyview(RCropRatio(1), rect)
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applyview(RCropRatio(2/3), square)
+        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out === view(square, IdentityRange(1:3), IdentityRange(2:3))
+        out = @inferred Augmentor.applyview(RCropRatio(3/2), square)
+        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out === view(square, IdentityRange(2:3), IdentityRange(1:3))
+    end
+    @testset "stepview" begin
+        @test @inferred(Augmentor.supports_stepview(RCropRatio)) === true
+        # preserve aspect ratio (i.e. not random)
+        @test @inferred(Augmentor.applystepview(RCropRatio(3/2), rect)) === view(rect, 1:1:2, 1:1:3)
+        @test @inferred(Augmentor.applystepview(RCropRatio(1), square)) === view(square, 1:1:3, 1:1:3)
+        @test @inferred(Augmentor.applystepview(RCropRatio(1), square2)) === view(square2, 1:1:4, 1:1:4)
+        # randomly placed
+        out = @inferred Augmentor.applystepview(RCropRatio(1), rect)
+        @test out === view(rect, 1:1:2, 1:1:2) || out === view(rect, 1:1:2, 2:1:3)
+        out = @inferred Augmentor.applystepview(RCropRatio(2/3), square)
+        @test out === view(square, 1:1:3, 1:1:2) || out === view(square, 1:1:3, 2:1:3)
+        out = @inferred Augmentor.applystepview(RCropRatio(3/2), square)
+        @test out === view(square, 1:1:2, 1:1:3) || out === view(square, 2:1:3, 1:1:3)
+    end
+    @testset "permute" begin
+        @test @inferred(Augmentor.supports_permute(RCropRatio)) === false
+    end
+end

@@ -292,12 +292,14 @@ such that the output image satisfies the specified aspect ratio
 For example the operation `CropRatio(1)` would denote a crop
 for the biggest square around the center of the image.
 
+For randomly placed crops take a look at [`RCropRatio`](@ref).
+
 Usage
 --------------
 
-    CropSize(ratio)
+    CropRatio(ratio)
 
-    CropSize(; ratio = 1)
+    CropRatio(; ratio = 1)
 
 Arguments
 --------------
@@ -320,7 +322,7 @@ augment(img, CropRatio(1))
 see also
 --------------
 
-[`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+[`RCropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 immutable CropRatio <: Operation
     ratio::Float64
@@ -338,7 +340,7 @@ CropRatio(; ratio = 1.) = CropRatio(ratio)
 @inline supports_stepview{T<:CropRatio}(::Type{T}) = true
 
 function cropratio_indices(op::CropRatio, img::AbstractMatrix)
-    h, w = map(length, indices(img)) #convert(Tuple, center(img))
+    h, w = map(length, indices(img))
     ratio = op.ratio
     # compute new size based on ratio
     nw = floor(Int, h * ratio)
@@ -364,34 +366,146 @@ function applystepview(op::CropRatio, img)
     direct_view(img, map(StepRange, cropratio_indices(op, img)))
 end
 
-function showconstruction(io::IO, op::CropRatio)
-    print(io, typeof(op).name.name, '(', op.ratio, ')')
+function _ratio2str(ratio)
+    high0 = if ratio >= 1
+        ratio
+    else
+        1 / ratio
+    end
+    low, high = 1, high0
+    found = false
+    for i = 1:20
+        high = i * high0
+        if round(high) == round(high,2)
+            low = i
+            found = true
+            break
+        end
+    end
+    if !found
+        string(round(ratio,2))
+    elseif ratio >= 1
+        string(round(Int,high), ':', low)
+    else
+        string(low, ':', round(Int,high))
+    end
 end
 
 function Base.show(io::IO, op::CropRatio)
     if get(io, :compact, false)
-        high0 = if op.ratio >= 1
-            op.ratio
-        else
-            1 / op.ratio
-        end
-        low, high = 1, high0
-        found = false
-        for i = 1:20
-            high = i * high0
-            if round(high) == round(high,2)
-                low = i
-                found = true
-                break
-            end
-        end
-        if !found
-            print(io, "Crop to $(round(op.ratio,2)) aspect ratio")
-        elseif op.ratio >= 1
-            print(io, "Crop to $(round(Int,high)):$low aspect ratio")
-        else
-            print(io, "Crop to $low:$(round(Int,high)) aspect ratio")
-        end
+        print(io, "Crop to ", _ratio2str(op.ratio), " aspect ratio")
+    else
+        print(io, "Augmentor.")
+        showconstruction(io, op)
+    end
+end
+
+# --------------------------------------------------------------------
+
+"""
+    RCropRatio <: Augmentor.Operation
+
+Description
+--------------
+
+Crops out the biggest possible area at some random position of
+the given image, such that the output image satisfies the
+specified aspect ratio (i.e. width divided by height).
+
+For example the operation `RCropRatio(1)` would denote a crop for
+the biggest possible square. If there is more than one such
+square, then one will be selected at random.
+
+Usage
+--------------
+
+    RCropRatio(ratio)
+
+    RCropRatio(; ratio = 1)
+
+Arguments
+--------------
+
+- **`ratio`** : Optional. A number denoting the aspect ratio. For
+    example specifying `ratio=16/9` would denote a 16:9 aspect
+    ratio. Defaults to `1`, which describes a square crop.
+
+Examples
+--------------
+
+```julia
+using Augmentor
+img = testpattern()
+
+# crop a randomly placed square of maxmimum size
+augment(img, RCropRatio(1))
+```
+
+see also
+--------------
+
+[`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+"""
+immutable RCropRatio <: Operation
+    ratio::Float64
+
+    function (::Type{RCropRatio})(ratio::Real)
+        ratio > 0 || throw(ArgumentError("ratio has to be greater than 0"))
+        new(Float64(ratio))
+    end
+end
+RCropRatio(; ratio = 1.) = RCropRatio(ratio)
+
+@inline supports_eager{T<:RCropRatio}(::Type{T}) = false
+@inline supports_affine{T<:RCropRatio}(::Type{T}) = true
+@inline supports_view{T<:RCropRatio}(::Type{T}) = true
+@inline supports_stepview{T<:RCropRatio}(::Type{T}) = true
+
+function rcropratio_indices(op::RCropRatio, img::AbstractMatrix)
+    h, w = map(length, indices(img))
+    ratio = op.ratio
+    # compute new size based on ratio
+    nw = floor(Int, h * ratio)
+    nh = floor(Int, w / ratio)
+    nw = nw > 1 ? nw : 1
+    nh = nh > 1 ? nh : 1
+    # place window at a random place
+    if nw == w || nh == h
+        1:h, 1:w
+    elseif nw < w
+        x_max = w - nw + 1
+        @assert x_max > 0
+        x = rand(1:x_max)
+        1:h, x:(x+nw-1)
+    elseif nh < h
+        y_max = h - nh + 1
+        @assert y_max > 0
+        y = rand(1:y_max)
+        y:(y+nh-1), 1:w
+    else
+        error("unreachable code reached")
+    end
+end
+
+applyeager(op::RCropRatio, img)  = plain_array(applyview(op, img))
+applylazy(op::RCropRatio, img)   = applyview(op, img)
+applyaffine(op::RCropRatio, img) = applyview(op, img)
+
+function applyview(op::RCropRatio, img)
+    indirect_view(img, rcropratio_indices(op, img))
+end
+
+function applystepview(op::RCropRatio, img)
+    indirect_view(img, map(StepRange, rcropratio_indices(op, img)))
+end
+
+function showconstruction(io::IO, op::Union{RCropRatio,CropRatio})
+    print(io, typeof(op).name.name, '(', op.ratio, ')')
+end
+
+function Base.show(io::IO, op::RCropRatio)
+    if get(io, :compact, false)
+        print(io, "Crop random window with ", _ratio2str(op.ratio), " aspect ratio")
     else
         print(io, "Augmentor.")
         showconstruction(io, op)

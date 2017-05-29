@@ -19,6 +19,7 @@ functionality.
 | Scaling and Resizing  | :class:`Scale` :class:`Zoom` :class:`Resize`                               |
 +-----------------------+----------------------------------------------------------------------------+
 | Cropping              | :class:`Crop` :class:`CropNative` :class:`CropSize` :class:`CropRatio`     |
+|                       | :class:`RCropRatio`                                                        |
 +-----------------------+----------------------------------------------------------------------------+
 | Utility Operations    | :class:`NoOp` :class:`CacheImage` :class:`Either`                          |
 +-----------------------+----------------------------------------------------------------------------+
@@ -503,6 +504,30 @@ Cropping
 +============================================================================================================+============================================================================================================+
 | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png    | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/CropRatio.png |
 +------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+
+.. class:: RCropRatio
+
+   Crops out the biggest possible area at some random position of
+   the given image, such that the output image satisfies the
+   specified aspect ratio (i.e. width divided by height).
+
+   For example the operation ``RCropRatio(1)`` would denote a
+   crop for the biggest possible square. If there is more than
+   one such square, then one will be selected at random.
+
+.. code-block:: jlcon
+
+   julia> RCropRatio(1)
+   Crop random window with 1:1 aspect ratio
+
+   julia> CropRatio(2.5)
+   Crop random window with 5:2 aspect ratio
+
++-------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Input                                                                                                       | Sampled outputs for ``RCropRatio(1)``                                                                       |
++=============================================================================================================+=============================================================================================================+
+| .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png     | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/RCropRatio.gif |
++-------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 
 Resizing
 ***********

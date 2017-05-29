@@ -2,4 +2,6 @@
 
 New operations:
 
-- `CropRatio`: crop down to the specified aspect ratio.
+- `CropRatio`: crop to the specified aspect ratio around the center.
+
+- `RCropRatio`: crop random window with the specified aspect ratio.

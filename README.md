@@ -219,6 +219,7 @@ look at the corresponding section of the
 |               | `CropNative`        | Crop specific region of the image in relative space.
 |               | `CropSize`          | Crop area around the center with specified size.
 |               | `CropRatio`         | Crop to specified aspect ratio.
+|               | `RCropRatio`        | Crop random window of specified aspect ratio.
 | *Utilities:*  | `NoOp`              | Identity function. Pass image along unchanged.
 |               | `CacheImage`        | Buffer the current image into (preallocated) memory.
 |               | `Either`            | Apply one of the given operations at random.
