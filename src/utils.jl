@@ -22,7 +22,9 @@ end
 @inline _plain_array(A::Array) = A
 @inline plain_array(A::OffsetArray) = parent(A)
 @inline plain_array(A::Array) = A
-@inline plain_array(A::AbstractArray) = _plain_array(copy(A)) # avoid recursion
+# avoid recursion
+@inline plain_array(A::SubArray) = _plain_array(copy(A))
+@inline plain_array(A::AbstractArray) = _plain_array(collect(A))
 
 # --------------------------------------------------------------------
 
