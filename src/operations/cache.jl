@@ -1,5 +1,5 @@
 """
-    CacheImage <: Augmentor.Operation
+    CacheImage <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -51,7 +51,7 @@ see also
 
 [`augment`](@ref)
 """
-immutable CacheImage <: Operation end
+immutable CacheImage <: ImageOperation end
 
 applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
@@ -72,7 +72,7 @@ end
 
 # --------------------------------------------------------------------
 
-immutable CacheImageInto{T<:AbstractArray} <: Operation
+immutable CacheImageInto{T<:AbstractArray} <: ImageOperation
     buffer::T
 end
 CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)

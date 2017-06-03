@@ -1,6 +1,6 @@
 @testset "ElasticDistortion" begin
     @test (ElasticDistortion <: Augmentor.AffineOperation) == false
-    @test (ElasticDistortion <: Augmentor.Operation) == true
+    @test (ElasticDistortion <: Augmentor.ImageOperation) == true
 
     @testset "constructor" begin
         @test_throws MethodError ElasticDistortion()

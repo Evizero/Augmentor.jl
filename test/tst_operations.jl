@@ -1,8 +1,10 @@
 # test not exported
 @test_throws UndefVarError Operation
+@test_throws UndefVarError ImageOperation
 @test_throws UndefVarError AffineOperation
 
-@test Augmentor.AffineOperation <: Augmentor.Operation
+@test Augmentor.ImageOperation <: Augmentor.Operation
+@test Augmentor.AffineOperation <: Augmentor.ImageOperation
 
 @testset "prepare" begin
     @test @inferred(Augmentor.prepareview(rect)) === rect

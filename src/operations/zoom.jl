@@ -1,5 +1,5 @@
 """
-    Zoom <: Augmentor.Operation
+    Zoom <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -63,7 +63,7 @@ see also
 
 [`Scale`](@ref), [`Resize`](@ref), [`augment`](@ref)
 """
-immutable Zoom{N,T<:AbstractVector} <: Operation
+immutable Zoom{N,T<:AbstractVector} <: ImageOperation
     factors::NTuple{N,T}
 
     function (::Type{Zoom{N}}){N,T<:AbstractVector}(factors::NTuple{N,T})

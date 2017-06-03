@@ -1,6 +1,6 @@
 @testset "Zoom" begin
     @test (Zoom <: Augmentor.AffineOperation) == false
-    @test typeof(@inferred(Zoom(1))) <: Zoom <: Augmentor.Operation
+    @test typeof(@inferred(Zoom(1))) <: Zoom <: Augmentor.ImageOperation
     @testset "constructor" begin
         @test_throws MethodError Zoom()
         @test_throws MethodError Zoom(())

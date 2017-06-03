@@ -5,7 +5,7 @@ const ED_DEFAULT_BORDER = false
 const ED_DEFAULT_NORM   = true
 
 @doc """
-    ElasticDistortion <: Augmentor.Operation
+    ElasticDistortion <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -94,7 +94,7 @@ see also
 
 [`RandomDistortion`](@ref), [`augment`](@ref)
 """ ->
-immutable ElasticDistortion <: Operation
+immutable ElasticDistortion <: ImageOperation
     gridheight::Int
     gridwidth::Int
     scale::Float64

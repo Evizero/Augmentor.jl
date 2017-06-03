@@ -1,5 +1,5 @@
 """
-    Resize <: Augmentor.Operation
+    Resize <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -41,7 +41,7 @@ see also
 
 [`CropSize`](@ref), [`augment`](@ref)
 """
-immutable Resize{N} <: Operation
+immutable Resize{N} <: ImageOperation
     size::NTuple{N,Int}
 
     function (::Type{Resize{N}}){N}(size::NTuple{N,Int})

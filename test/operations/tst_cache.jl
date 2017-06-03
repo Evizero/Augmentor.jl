@@ -1,6 +1,6 @@
 @testset "CacheImage" begin
     @test (CacheImage <: Augmentor.AffineOperation) == false
-    @test (CacheImage <: Augmentor.Operation) == true
+    @test (CacheImage <: Augmentor.ImageOperation) == true
     @test typeof(@inferred(CacheImage())) <: CacheImage
     @test str_show(CacheImage()) == "Augmentor.CacheImage()"
     @test str_showconst(CacheImage()) == "CacheImage()"
@@ -37,7 +37,7 @@ end
 @testset "CacheImageInto" begin
     @test_throws UndefVarError CacheImageInto
     @test (Augmentor.CacheImageInto <: Augmentor.AffineOperation) == false
-    @test (Augmentor.CacheImageInto <: Augmentor.Operation) == true
+    @test (Augmentor.CacheImageInto <: Augmentor.ImageOperation) == true
     @test_throws MethodError Augmentor.CacheImageInto()
 
     buf = copy(rect)

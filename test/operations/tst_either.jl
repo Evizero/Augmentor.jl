@@ -1,4 +1,5 @@
 @test (Either <: Augmentor.AffineOperation) == false
+@test Either <: Augmentor.ImageOperation
 
 @testset "constructor" begin
     @test_throws ArgumentError Either()

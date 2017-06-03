@@ -9,7 +9,7 @@ thus well suited to prototype an augmentation pipeline, because
 it makes it easy to see what kind of effects one can achieve with
 it.
 """
-testpattern() = load(joinpath(dirname(@__FILE__()), "resources", "testpattern.png"))
+testpattern() = load(joinpath(dirname(@__FILE__()), "..", "resources", "testpattern.png"))
 
 function use_testpattern()
     info("No custom image specifed. Using \"testpattern()\" for demonstration.")

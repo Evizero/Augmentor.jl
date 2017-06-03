@@ -3,8 +3,8 @@
     @testset "constructor" begin
         @test_throws MethodError Crop()
         @test_throws MethodError Crop(())
-        @test typeof(@inferred(Crop(1:10))) <: Crop{1} <: Crop <: Augmentor.Operation
-        @test typeof(@inferred(Crop(1:10,3:5))) <: Crop{2} <: Crop <: Augmentor.Operation
+        @test typeof(@inferred(Crop(1:10))) <: Crop{1} <: Crop <: Augmentor.ImageOperation
+        @test typeof(@inferred(Crop(1:10,3:5))) <: Crop{2} <: Crop <: Augmentor.ImageOperation
         @test @inferred(Crop(1,4,10,5)) === @inferred(Crop((4:8,1:10)))
         @test str_show(Crop(3:4)) == "Augmentor.Crop{1}((3:4,))"
         @test str_showconst(Crop(3:4)) == "Crop(3:4)"
@@ -55,8 +55,8 @@ end
     @testset "constructor" begin
         @test_throws MethodError CropNative()
         @test_throws MethodError CropNative(())
-        @test typeof(@inferred(CropNative(1:10))) <: CropNative{1} <: CropNative <: Augmentor.Operation
-        @test typeof(@inferred(CropNative(1:10,3:5))) <: CropNative{2} <: CropNative <: Augmentor.Operation
+        @test typeof(@inferred(CropNative(1:10))) <: CropNative{1} <: CropNative <: Augmentor.ImageOperation
+        @test typeof(@inferred(CropNative(1:10,3:5))) <: CropNative{2} <: CropNative <: Augmentor.ImageOperation
         @test @inferred(CropNative(1,4,10,5)) === @inferred(CropNative((4:8,1:10)))
         @test str_show(CropNative(3:4)) == "Augmentor.CropNative{1}((3:4,))"
         @test str_showconst(CropNative(3:4)) == "CropNative(3:4)"
@@ -107,7 +107,7 @@ end
 
 @testset "CropSize" begin
     @test (CropSize <: Augmentor.AffineOperation) == false
-    @test typeof(@inferred(CropSize())) <: CropSize <: Augmentor.Operation
+    @test typeof(@inferred(CropSize())) <: CropSize <: Augmentor.ImageOperation
     @testset "constructor" begin
         @test_throws MethodError CropSize(())
         @test_throws MethodError CropSize(1.,2.)
@@ -175,7 +175,7 @@ end
 
 @testset "CropRatio" begin
     @test (CropRatio <: Augmentor.AffineOperation) == false
-    @test typeof(@inferred(CropRatio())) <: CropRatio <: Augmentor.Operation
+    @test typeof(@inferred(CropRatio())) <: CropRatio <: Augmentor.ImageOperation
     @testset "constructor" begin
         @test_throws MethodError CropRatio(())
         @test_throws MethodError CropRatio(1.,2.)
@@ -249,7 +249,7 @@ end
 
 @testset "RCropRatio" begin
     @test (RCropRatio <: Augmentor.AffineOperation) == false
-    @test typeof(@inferred(RCropRatio())) <: RCropRatio <: Augmentor.Operation
+    @test typeof(@inferred(RCropRatio())) <: RCropRatio <: Augmentor.ImageOperation
     @testset "constructor" begin
         @test_throws MethodError RCropRatio(())
         @test_throws MethodError RCropRatio(1.,2.)

@@ -1,5 +1,5 @@
 """
-    Crop <: Augmentor.Operation
+    Crop <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -48,7 +48,7 @@ see also
 
 [`CropNative`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
-immutable Crop{N,I<:Tuple} <: Operation
+immutable Crop{N,I<:Tuple} <: ImageOperation
     indexes::I
 
     function (::Type{Crop{N}}){N}(indexes::NTuple{N,UnitRange})
@@ -87,7 +87,7 @@ end
 # --------------------------------------------------------------------
 
 """
-    CropNative <: Augmentor.Operation
+    CropNative <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -141,7 +141,7 @@ see also
 
 [`Crop`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
-immutable CropNative{N,I<:Tuple} <: Operation
+immutable CropNative{N,I<:Tuple} <: ImageOperation
     indexes::I
 
     function (::Type{CropNative{N}}){N}(indexes::NTuple{N,UnitRange})
@@ -183,7 +183,7 @@ end
 # --------------------------------------------------------------------
 
 """
-    CropSize <: Augmentor.Operation
+    CropSize <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -224,7 +224,7 @@ see also
 
 [`CropRatio`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable CropSize{N} <: Operation
+immutable CropSize{N} <: ImageOperation
     size::NTuple{N,Int}
 
     function (::Type{CropSize{N}}){N}(size::NTuple{N,Int})
@@ -280,7 +280,7 @@ end
 # --------------------------------------------------------------------
 
 """
-    CropRatio <: Augmentor.Operation
+    CropRatio <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -324,7 +324,7 @@ see also
 
 [`RCropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable CropRatio <: Operation
+immutable CropRatio <: ImageOperation
     ratio::Float64
 
     function (::Type{CropRatio})(ratio::Real)
@@ -403,7 +403,7 @@ end
 # --------------------------------------------------------------------
 
 """
-    RCropRatio <: Augmentor.Operation
+    RCropRatio <: Augmentor.ImageOperation
 
 Description
 --------------
@@ -446,7 +446,7 @@ see also
 
 [`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable RCropRatio <: Operation
+immutable RCropRatio <: ImageOperation
     ratio::Float64
 
     function (::Type{RCropRatio})(ratio::Real)

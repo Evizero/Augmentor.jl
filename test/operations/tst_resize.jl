@@ -1,6 +1,6 @@
 @testset "Resize" begin
     @test (Resize <: Augmentor.AffineOperation) == false
-    @test typeof(@inferred(Resize())) <: Resize <: Augmentor.Operation
+    @test typeof(@inferred(Resize())) <: Resize <: Augmentor.ImageOperation
     @testset "constructor" begin
         @test_throws MethodError Resize(())
         @test_throws MethodError Resize(1.,2.)
