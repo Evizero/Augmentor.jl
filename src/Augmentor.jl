@@ -2,6 +2,7 @@ __precompile__()
 module Augmentor
 
 using ColorTypes
+using ColorTypes: AbstractGray
 using ImageCore
 using ImageTransformations
 using ImageFiltering
