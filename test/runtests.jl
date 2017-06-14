@@ -38,9 +38,11 @@ square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]
 square2 = rand(Gray{N0f8}, 4, 4)
 rect = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6]
 checkers = Gray{N0f8}[1 0 1 0 1; 0 1 0 1 0; 1 0 1 0 1]
+rgb_rect = rand(RGB{N0f8}, 2, 3)
 
 tests = [
     "tst_utils.jl",
+    "operations/tst_channels.jl",
     "operations/tst_noop.jl",
     "operations/tst_cache.jl",
     "operations/tst_rotation.jl",

@@ -113,9 +113,9 @@ function Either(op::ImageOperation, p::Real = .5)
 end
 
 
-Base.:*{T<:Number,O<:ImageOperation}(op1::Pair{T,O}, ops::Pair...) =
+Base.:*{T<:Number,O<:Operation}(op1::Pair{T,O}, ops::Pair...) =
     Either(op1, ops...)
-Base.:*(op1::ImageOperation, ops::ImageOperation...) = Either((op1, ops...))
+Base.:*(op1::Operation, ops::Operation...) = Either((op1, ops...))
 
 @inline supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
 @inline supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))

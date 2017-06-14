@@ -49,10 +49,23 @@ immutable SplitChannels <: Operation end
 @inline supports_eager(::Type{SplitChannels}) = false
 @inline supports_lazy(::Type{SplitChannels}) = true
 
-applylazy(op::SplitChannels, img) = channelview(img)
+applylazy{T<:Colorant}(op::SplitChannels, img::AbstractArray{T}) = channelview(img)
 function applylazy{T<:AbstractGray}(op::SplitChannels, img::AbstractArray{T})
     ns = (1, map(length, indices(img))...)
     reshape(channelview(img), ns)
+end
+
+function showconstruction(io::IO, op::SplitChannels)
+    print(io, typeof(op).name.name, "()")
+end
+
+function Base.show(io::IO, op::SplitChannels)
+    if get(io, :compact, false)
+        print(io, "Split colorant into its color channels")
+    else
+        print(io, "Augmentor.")
+        showconstruction(io, op)
+    end
 end
 
 # --------------------------------------------------------------------
@@ -120,11 +133,30 @@ end
 @inline supports_eager{T<:CombineChannels}(::Type{T}) = false
 @inline supports_lazy{T<:CombineChannels}(::Type{T}) = true
 
-applylazy(op::CombineChannels, img) = colorview(op.colortype, img)
-function applylazy{T<:AbstractGray}(op::CombineChannels{T}, img)
+function applylazy{S<:Number}(op::CombineChannels, img::AbstractArray{S})
+    colorview(op.colortype, img)
+end
+
+function applylazy{T<:AbstractGray,S<:Number}(op::CombineChannels{T}, img::AbstractArray{S})
     length(indices(img,1)) == 1 || throw(ArgumentError("The given image must have a singleton colorchannel in the first dimension in order to combine the channels to a AbstractGray colorant"))
     ns = Base.tail(map(length, indices(img)))
     colorview(op.colortype, reshape(img, ns))
+end
+
+function showconstruction(io::IO, op::CombineChannels)
+    print(io, typeof(op).name.name, '(')
+    ImageCore.showcoloranttype(io, op.colortype)
+    print(io, ')')
+end
+
+function Base.show(io::IO, op::CombineChannels)
+    if get(io, :compact, false)
+        print(io, "Combine color channels into colorant ")
+        ImageCore.showcoloranttype(io, op.colortype)
+    else
+        print(io, "Augmentor.")
+        showconstruction(io, op)
+    end
 end
 
 # --------------------------------------------------------------------
@@ -190,15 +222,29 @@ see also
 [`SplitChannels`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
 """
 immutable PermuteDims{N,perm,iperm} <: Operation end
+PermuteDims() = throw(MethodError(PermuteDims, ()))
+PermuteDims(perm::Tuple{}) = throw(MethodError(PermuteDims, (perm,)))
 PermuteDims{N}(perm::NTuple{N,Int}) = PermuteDims{N,perm,invperm(perm)}()
 PermuteDims{N}(perm::Vararg{Int,N}) = PermuteDims{N,perm,invperm(perm)}()
 
 @inline supports_eager{T<:PermuteDims}(::Type{T}) = true
 @inline supports_lazy{T<:PermuteDims}(::Type{T}) = true
 
-applyeager{N,perm}(op::PermuteDims{N,perm}, img) = permutedims(img, perm)
+applyeager{T,N,perm}(op::PermuteDims{N,perm}, img::AbstractArray{T,N}) = permutedims(img, perm)
 function applylazy{T,N,perm,iperm}(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N})
     PermutedDimsArray{T,N,perm,iperm,typeof(img)}(img)
+end
+
+function showconstruction{N,perm}(io::IO, op::PermuteDims{N,perm})
+    print(io, typeof(op).name.name, '(', join(map(string, perm),", "), ')')
+end
+
+function Base.show{N,perm}(io::IO, op::PermuteDims{N,perm})
+    if get(io, :compact, false)
+        print(io, "Permute dimension order to ", perm)
+    else
+        print(io, typeof(op).name, '(', perm, ')')
+    end
 end
 
 # --------------------------------------------------------------------
@@ -217,9 +263,9 @@ converting an image to a feature vector and vice versa.
 Usage
 --------------
 
-    PermuteDims(dims)
+    Reshape(dims)
 
-    PermuteDims(dims...)
+    Reshape(dims...)
 
 Arguments
 --------------
@@ -248,12 +294,30 @@ see also
 
 [`CombineChannels`](@ref), [`augment`](@ref)
 """
-immutable Reshape{T<:Tuple{Vararg{Int}}} <: Operation
-    dims::T
+immutable Reshape{N} <: Operation
+    dims::NTuple{N,Int}
 end
+Reshape() = throw(MethodError(Reshape, ()))
+Reshape(dims::Tuple{}) = throw(MethodError(Reshape, (dims,)))
 Reshape(dims::Int...) = Reshape(dims)
 
 @inline supports_eager{T<:Reshape}(::Type{T}) = false
 @inline supports_lazy{T<:Reshape}(::Type{T}) = true
 
 applylazy(op::Reshape, img) = reshape(img, op.dims)
+
+function showconstruction(io::IO, op::Reshape)
+    print(io, typeof(op).name.name, '(', join(map(string, op.dims),", "), ')')
+end
+
+function Base.show{N}(io::IO, op::Reshape{N})
+    if get(io, :compact, false)
+        if N == 1
+            print(io, "Reshape array to ", first(op.dims), "-element vector")
+        else
+            print(io, "Reshape array to ", join(op.dims,"×"))
+        end
+    else
+        print(io, typeof(op), '(', op.dims, ')')
+    end
+end
