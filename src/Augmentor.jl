@@ -1,6 +1,8 @@
 __precompile__()
 module Augmentor
 
+using ColorTypes
+using ColorTypes: AbstractGray
 using ImageCore
 using ImageTransformations
 using ImageFiltering
@@ -16,6 +18,11 @@ using Compat
 using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
+
+    SplitChannels,
+    CombineChannels,
+    PermuteDims,
+    Reshape,
 
     Rotate90,
     Rotate180,
@@ -52,6 +59,8 @@ export
 include("utils.jl")
 include("types.jl")
 include("operation.jl")
+
+include("operations/channels.jl")
 
 include("operations/noop.jl")
 include("operations/cache.jl")

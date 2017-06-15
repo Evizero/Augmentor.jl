@@ -55,7 +55,7 @@ immutable CacheImage <: ImageOperation end
 
 applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
-applyeager(op::CacheImage, img) = copy(img)
+applyeager(op::CacheImage, img) = copy(img) # FIXME: collect
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")

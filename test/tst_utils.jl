@@ -10,9 +10,14 @@ end
 @testset "plain_array" begin
     A = [1 2 3; 4 5 6; 7 8 9]
     As = sparse(A)
+    Ar = reshape(As, 3, 3, 1)
     Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
-    @test_throws MethodError Augmentor.plain_array(As)
-    @test_throws MethodError Augmentor.plain_array(Ast)
+    @test @inferred(Augmentor.plain_array(As)) == A
+    @test typeof(Augmentor.plain_array(As)) == typeof(A)
+    @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
+    @test typeof(Augmentor.plain_array(Ar)) <: Array
+    @test @inferred(Augmentor.plain_array(Ast)) == A
+    @test typeof(Augmentor.plain_array(Ast)) == typeof(A)
     @test @inferred(Augmentor.plain_array(A)) === A
     @test @inferred(Augmentor.plain_array(OffsetArray(A, (-2,-1)))) === A
     v = view(A, 2:3, 1:2)
