@@ -21,6 +21,9 @@ functionality.
 | Cropping              | :class:`Crop` :class:`CropNative` :class:`CropSize` :class:`CropRatio`     |
 |                       | :class:`RCropRatio`                                                        |
 +-----------------------+----------------------------------------------------------------------------+
+| Information Layout    | :class:`SplitChannels` :class:`CombineChannels` :class:`PermuteDims`       |
+|                       | :class:`Reshape`                                                           |
++-----------------------+----------------------------------------------------------------------------+
 | Utility Operations    | :class:`NoOp` :class:`CacheImage` :class:`Either`                          |
 +-----------------------+----------------------------------------------------------------------------+
 
@@ -551,6 +554,132 @@ Resizing
 | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/Resize.png |
 +---------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+
 
+Information Layout
+--------------------
+
+It is not uncommon that machine learning frameworks require the
+data in a specific form and layout. For example many deep
+learning frameworks expect the colorchannel of the images to be
+encoded in the third dimension of a 4-dimensional array.
+
+Augmentor allows to convert from (and to) these different layouts
+using special operations that are mainly useful in the beginning
+or end of a augmentation pipeline.
+
+Color Channels
+********************
+
+.. class:: SplitChannels
+
+   Separate the color channels of the given image into a
+   dedicated array dimension. This will effectively create a new
+   array dimension for the colors as the first dimension. In the
+   case of greyscale images a singleton dimension will be created
+
+   This operation is mainly useful at the end of a pipeline in
+   combination with :class:`PermuteDims` in order to prepare the
+   image for the training algorithm, which often requires the
+   color channels to be separate.
+
+.. code-block:: jlcon
+
+   julia> op = SplitChannels()
+   Split colorant into its color channels
+
+   julia> img = testpattern()
+   300×400 Array{RGBA{N0f8},2}:
+   [...]
+
+   julia> augment(img, op))
+   4×300×400 Array{N0f8,3}:
+   [...]
+
+.. class:: CombineChannels
+
+   Combines the first dimension of a given array into a colorant
+   of the specified type ``colortype``. A separate color channel
+   is also expected for Gray images.
+
+   The shape of the input image has to be appropriate for the
+   given ``colortype``, which also means that the separated color
+   channel has to be the first dimension of the array. Use
+   :class:`PermuteDims` and/or :class:`Reshape` if that is not
+   the case.
+
+   This operation is mainly useful at the beginning of the
+   pipline, if the colorchannels of the input images are
+   separated.
+
+.. code-block:: jlcon
+
+   julia> op = CombineChannels(RGB)
+   Combine color channels into colorant RGB{Any}
+
+   julia> A = rand(3, 10, 10) # random 10x10 RGB image
+   3×10×10 Array{Float64,3}:
+   [...]
+
+   julia> augment(A, op)
+   10×10 Array{RGB{Float64},2}:
+   [...]
+
+Array Shape
+********************
+
+.. class:: PermuteDims
+
+   Permute the dimensions of the given array with the predefined
+   permutation ``perm``. This operation is particularly useful if
+   the order of the dimensions needs to be different than the
+   default "julian" layout.
+
+   More concretely, Augmentor expects the given images to be in
+   vertical-major layout for which the colors are encoded in the
+   element type itself. Many deep learning frameworks however
+   require their input in a different order. For example it is
+   not untypical that the color channels are expected to be
+   encoded in the third dimension.
+
+.. code-block:: jlcon
+
+   julia> op = PermuteDims(3,2,1)
+   Permute dimension order to (3,2,1)
+
+   julia> img = testpattern()
+   300×400 Array{RGBA{N0f8},2}:
+   [...]
+
+   julia> augment(img, PermuteDims(2,1))
+   400×300 Array{RGBA{N0f8},2}:
+   [...]
+
+.. class:: Reshape
+
+   Reinterpret the shape of the given array of numbers or
+   colorants. This is useful for example to create singleton
+   dimensions that deep learning frameworks may need for
+   colorless images, or for converting an image to a feature
+   vector and vice versa.
+
+   Note that this operation has nothing to do with image
+   resizing, but instead is strictly concerned with changing
+   the shape of the array.
+
+.. code-block:: jlcon
+
+   julia> Reshape(10,15)
+   Reshape array to 10×15
+
+   julia> op = Reshape(25)
+   Reshape array to 25-element vector
+
+   julia> A = rand(5,5)
+   5×5 Array{Float64,2}:
+   [...]
+
+   julia> augment(A, op)
+   25-element Array{Float64,1}:
+   [...]
 
 Utility Operations
 --------------------

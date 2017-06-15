@@ -202,7 +202,7 @@ look at the corresponding section of the
 [documentation](http://augmentorjl.readthedocs.io/en/latest/usersguide/operations.html).
 
 | Category      | Operation           | Description
-|--------------:|:--------------------|:-----------------------------------------------------
+|--------------:|:--------------------|:-----------------------------------------------------------------
 | *Mirroring:*  | `FlipX`             | Reverse the order of each pixel row.
 |               | `FlipY`             | Reverse the order of each pixel column.
 | *Rotating:*   | `Rotate90`          | Rotate upwards 90 degree.
@@ -220,6 +220,10 @@ look at the corresponding section of the
 |               | `CropSize`          | Crop area around the center with specified size.
 |               | `CropRatio`         | Crop to specified aspect ratio.
 |               | `RCropRatio`        | Crop random window of specified aspect ratio.
+| *Layout:*     | `SplitChannels`     | Separate the color channels into a dedicated array dimension.
+|               | `CombineChannels`   | Collapse the first dimension into a specific colorant.
+|               | `PermuteDims`       | Reorganize the array dimensions into a specific order.
+|               | `Reshape`           | Change or reinterpret the shape of the array.
 | *Utilities:*  | `NoOp`              | Identity function. Pass image along unchanged.
 |               | `CacheImage`        | Buffer the current image into (preallocated) memory.
 |               | `Either`            | Apply one of the given operations at random.
