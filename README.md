@@ -98,10 +98,10 @@ footprint of `augment` to a simple `copy` of the original.
 julia> using BenchmarkTools
 
 julia> @btime augment($img, $pl);
-  350.813 μs (115 allocations: 16.75 KiB)
+  312.121 μs (150 allocations: 22.47 KiB)
 
 julia> @btime copy($img);
-  9.010 μs (2 allocations: 126.83 KiB)
+  5.866 μs (2 allocations: 126.83 KiB)
 ```
 
 Note how the *whole* process for producing an augmented version
@@ -138,7 +138,7 @@ julia> img_new = augment(img_big, pl_big)
 # [...]
 
 julia> @btime augment($img_big, $pl_big);
-  369.740 μs (121 allocations: 16.98 KiB)
+  333.493 μs (152 allocations: 22.64 KiB)
 ```
 
 As we can see the allocated memory did not change notably.
@@ -155,13 +155,13 @@ operation to the pipeline.
 
 ```julia
 julia> @btime augment($img, $pl); # small image
-  349.346 μs (115 allocations: 16.75 KiB)
+  312.610 μs (150 allocations: 22.47 KiB)
 
 julia> @btime augment($img_big, $pl_big); # big image
-  368.133 μs (121 allocations: 16.98 KiB)
+  335.518 μs (152 allocations: 22.64 KiB)
 
 julia> @btime copy($img_big); # simple memory copy
-  16.357 ms (2 allocations: 83.42 MiB)
+  18.304 ms (2 allocations: 83.42 MiB)
 ```
 
 To be fair, the way we aggressively downscaled the large image in
@@ -171,17 +171,23 @@ for this particular image these weren't that bad). The point of
 this example was to convey an intuition of how Augmentor works.
 
 ```
+shell> date
+Thu Jun 22 11:31:24 CEST 2017
+
+shell> git show --oneline -s
+6086196 drop 0.5 support
+
 julia> versioninfo()
-Julia Version 0.5.0
-Commit 3c9d753 (2016-09-19 18:14 UTC)
+Julia Version 0.6.1-pre.0
+Commit dcf39a1 (2017-06-19 13:06 UTC)
 Platform Info:
-  System: Linux (x86_64-linux-gnu)
+  OS: Linux (x86_64-linux-gnu)
   CPU: Intel(R) Xeon(R) CPU E5-1650 v3 @ 3.50GHz
   WORD_SIZE: 64
-  BLAS: libopenblas (NO_LAPACK NO_LAPACKE DYNAMIC_ARCH NO_AFFINITY Haswell)
-  LAPACK: liblapack.so.3
+  BLAS: libopenblas (USE64BITINT DYNAMIC_ARCH NO_AFFINITY Haswell)
+  LAPACK: libopenblas64_
   LIBM: libopenlibm
-  LLVM: libLLVM-3.7.1 (ORCJIT, haswell)
+  LLVM: libLLVM-3.9.1 (ORCJIT, haswell)
 ```
 
 ## Package Overview
