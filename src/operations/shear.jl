@@ -51,15 +51,16 @@ see also
 immutable ShearX{T<:AbstractVector} <: AffineOperation
     degree::T
 
-    function (::Type{ShearX}){T<:Real}(degree::AbstractVector{T})
+    function ShearX{T}(degree::T) where {T<:AbstractVector{S} where S<:Real}
         length(degree) > 0 || throw(ArgumentError("The number of different angles passed to \"ShearX(...)\" must be non-zero"))
         (minimum(degree) >= -70 && maximum(degree) <= 70) || throw(ArgumentError("The specified shearing angle(s) must be in the interval [-70, 70]"))
-        new{typeof(degree)}(degree)
+        new{T}(degree)
     end
 end
+ShearX(degree::T) where {T<:AbstractVector} = ShearX{T}(degree)
 ShearX(degree::Real) = ShearX(degree:degree)
 
-@inline supports_eager{T<:ShearX}(::Type{T}) = false
+@inline supports_eager(::Type{<:ShearX}) = false
 
 function toaffine(op::ShearX, img::AbstractMatrix)
     angle = deg2rad(Float64(rand(op.degree)))
@@ -134,15 +135,16 @@ see also
 immutable ShearY{T<:AbstractVector} <: AffineOperation
     degree::T
 
-    function (::Type{ShearY}){T<:Real}(degree::AbstractVector{T})
+    function ShearY{T}(degree::T) where {T<:AbstractVector{S} where S<:Real}
         length(degree) > 0 || throw(ArgumentError("The number of different angles passed to \"ShearY(...)\" must be non-zero"))
         (minimum(degree) >= -70 && maximum(degree) <= 70) || throw(ArgumentError("The specified shearing angle(s) must be in the interval [-70, 70]"))
-        new{typeof(degree)}(degree)
+        new{T}(degree)
     end
 end
+ShearY(degree::T) where {T<:AbstractVector} = ShearY{T}(degree)
 ShearY(degree::Real) = ShearY(degree:degree)
 
-@inline supports_eager{T<:ShearY}(::Type{T}) = false
+@inline supports_eager(::Type{<:ShearY}) = false
 
 function toaffine(op::ShearY, img::AbstractMatrix)
     angle = deg2rad(Float64(rand(op.degree)))

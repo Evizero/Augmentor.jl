@@ -49,8 +49,8 @@ immutable SplitChannels <: Operation end
 @inline supports_eager(::Type{SplitChannels}) = false
 @inline supports_lazy(::Type{SplitChannels}) = true
 
-applylazy{T<:Colorant}(op::SplitChannels, img::AbstractArray{T}) = channelview(img)
-function applylazy{T<:AbstractGray}(op::SplitChannels, img::AbstractArray{T})
+applylazy(op::SplitChannels, img::AbstractArray{<:Colorant}) = channelview(img)
+function applylazy(op::SplitChannels, img::AbstractArray{<:AbstractGray})
     ns = (1, map(length, indices(img))...)
     reshape(channelview(img), ns)
 end
@@ -130,14 +130,14 @@ immutable CombineChannels{T<:Colorant} <: Operation
     colortype::Type{T}
 end
 
-@inline supports_eager{T<:CombineChannels}(::Type{T}) = false
-@inline supports_lazy{T<:CombineChannels}(::Type{T}) = true
+@inline supports_eager(::Type{<:CombineChannels}) = false
+@inline supports_lazy(::Type{<:CombineChannels}) = true
 
-function applylazy{S<:Number}(op::CombineChannels, img::AbstractArray{S})
+function applylazy(op::CombineChannels, img::AbstractArray{<:Number})
     colorview(op.colortype, img)
 end
 
-function applylazy{T<:AbstractGray,S<:Number}(op::CombineChannels{T}, img::AbstractArray{S})
+function applylazy(op::CombineChannels{<:AbstractGray}, img::AbstractArray{<:Number})
     length(indices(img,1)) == 1 || throw(ArgumentError("The given image must have a singleton colorchannel in the first dimension in order to combine the channels to a AbstractGray colorant"))
     ns = Base.tail(map(length, indices(img)))
     colorview(op.colortype, reshape(img, ns))
@@ -224,22 +224,25 @@ see also
 immutable PermuteDims{N,perm,iperm} <: Operation end
 PermuteDims() = throw(MethodError(PermuteDims, ()))
 PermuteDims(perm::Tuple{}) = throw(MethodError(PermuteDims, (perm,)))
-PermuteDims{N}(perm::NTuple{N,Int}) = PermuteDims{N,perm,invperm(perm)}()
-PermuteDims{N}(perm::Vararg{Int,N}) = PermuteDims{N,perm,invperm(perm)}()
+PermuteDims(perm::NTuple{N,Int}) where {N} = PermuteDims{N,perm,invperm(perm)}()
+PermuteDims(perm::Vararg{Int,N}) where {N} = PermuteDims{N,perm,invperm(perm)}()
 
-@inline supports_eager{T<:PermuteDims}(::Type{T}) = true
-@inline supports_lazy{T<:PermuteDims}(::Type{T}) = true
+@inline supports_eager(::Type{<:PermuteDims}) = true
+@inline supports_lazy(::Type{<:PermuteDims}) = true
 
-applyeager{T,N,perm}(op::PermuteDims{N,perm}, img::AbstractArray{T,N}) = permutedims(img, perm)
-function applylazy{T,N,perm,iperm}(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N})
+function applyeager(op::PermuteDims{N,perm}, img::AbstractArray{T,N}) where {T,N,perm}
+    permutedims(img, perm)
+end
+
+function applylazy(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N}) where {T,N,perm,iperm}
     PermutedDimsArray{T,N,perm,iperm,typeof(img)}(img)
 end
 
-function showconstruction{N,perm}(io::IO, op::PermuteDims{N,perm})
+function showconstruction(io::IO, op::PermuteDims{N,perm}) where {N,perm}
     print(io, typeof(op).name.name, '(', join(map(string, perm),", "), ')')
 end
 
-function Base.show{N,perm}(io::IO, op::PermuteDims{N,perm})
+function Base.show(io::IO, op::PermuteDims{N,perm}) where {N,perm}
     if get(io, :compact, false)
         print(io, "Permute dimension order to ", perm)
     else
@@ -301,8 +304,8 @@ Reshape() = throw(MethodError(Reshape, ()))
 Reshape(dims::Tuple{}) = throw(MethodError(Reshape, (dims,)))
 Reshape(dims::Int...) = Reshape(dims)
 
-@inline supports_eager{T<:Reshape}(::Type{T}) = false
-@inline supports_lazy{T<:Reshape}(::Type{T}) = true
+@inline supports_eager(::Type{<:Reshape}) = false
+@inline supports_lazy(::Type{<:Reshape}) = true
 
 applylazy(op::Reshape, img) = reshape(img, op.dims)
 
@@ -310,7 +313,7 @@ function showconstruction(io::IO, op::Reshape)
     print(io, typeof(op).name.name, '(', join(map(string, op.dims),", "), ')')
 end
 
-function Base.show{N}(io::IO, op::Reshape{N})
+function Base.show(io::IO, op::Reshape{N}) where N
     if get(io, :compact, false)
         if N == 1
             print(io, "Reshape array to ", first(op.dims), "-element vector")

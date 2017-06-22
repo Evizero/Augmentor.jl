@@ -200,13 +200,13 @@ end
         @test str_showcompact(op) == "Rotate by θ ∈ -1:1 degree"
         op = @inferred(Rotate([2,30]))
         @test op.degree == [2,30]
-        @test str_show(op) == "Augmentor.Rotate([2,$(SPACE)30])"
-        @test str_showconst(op) == "Rotate([2,$(SPACE)30])"
-        @test str_showcompact(op) == "Rotate by θ ∈ [2,$(SPACE)30] degree"
+        @test str_show(op) == "Augmentor.Rotate([2, 30])"
+        @test str_showconst(op) == "Rotate([2, 30])"
+        @test str_showcompact(op) == "Rotate by θ ∈ [2, 30] degree"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate(10), nothing)
-        @test @inferred(Augmentor.supports_eager(Rotate)) === false
+        @test Augmentor.supports_eager(Rotate) === false
         # TODO: more tests
         for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate(90), img)) == rotl90(square)
@@ -216,8 +216,8 @@ end
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(Rotate)) === true
-        @test @inferred(Augmentor.supports_affine(Rotate)) === true
+        @test Augmentor.isaffine(Rotate) === true
+        @test Augmentor.supports_affine(Rotate) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate(90), nothing)
         @test @inferred(Augmentor.toaffine(Rotate(45), rect)) ≈ AffineMap([0.70710678118 -0.70710678118; 0.70710678118 0.70710678118], [1.85355339059,-0.47487373415])
         @test @inferred(Augmentor.toaffine(Rotate(90), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
@@ -232,7 +232,7 @@ end
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(Rotate(90))) === true
+        @test Augmentor.supports_lazy(Rotate(90)) === true
         wv = @inferred Augmentor.applylazy(Rotate(90), square)
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
@@ -243,12 +243,12 @@ end
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(Rotate)) === false
+        @test Augmentor.supports_view(Rotate) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(Rotate)) === false
+        @test Augmentor.supports_stepview(Rotate) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(Rotate)) === false
+        @test Augmentor.supports_permute(Rotate) === false
     end
 end

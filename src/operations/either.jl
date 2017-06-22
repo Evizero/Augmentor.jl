@@ -80,7 +80,7 @@ immutable Either{N,T<:Tuple} <: ImageOperation
     chances::SVector{N,Float64}
     cum_chances::SVector{N,Float64}
 
-    function (::Type{Either}){N,T}(operations::NTuple{N,ImageOperation}, chances::SVector{N,T})
+    function Either(operations::NTuple{N,ImageOperation}, chances::SVector{N}) where N
         all(c->c>=0, chances) || throw(ArgumentError("All provided \"chances\" must be positive"))
         length(operations) > 0 || throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
         sum_chances = sum(chances)
@@ -93,15 +93,19 @@ end
 
 Either() = throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
 
-function Either{N}(operations::NTuple{N,ImageOperation}, chances::NTuple{N,Real} = map(op -> 1/length(operations), operations))
+function Either(operations::NTuple{N,ImageOperation},
+                chances::NTuple{N,Real} = map(op -> 1/length(operations), operations)
+               ) where N
     Either(operations, SVector{N}(chances))
 end
 
-function Either{N}(operations::Vararg{ImageOperation,N}; chances = map(op -> 1/length(operations), operations))
+function Either(operations::Vararg{ImageOperation,N};
+                chances = map(op -> 1/length(operations), operations)
+               ) where N
     Either(operations, SVector{N}(map(Float64, chances)))
 end
 
-function Either{N}(operations::Vararg{Pair,N})
+function Either(operations::Pair...)
     Either(map(last, operations), map(first, operations))
 end
 
@@ -113,19 +117,19 @@ function Either(op::ImageOperation, p::Real = .5)
 end
 
 
-Base.:*{T<:Number,O<:Operation}(op1::Pair{T,O}, ops::Pair...) =
+Base.:*(op1::Pair{<:Number,<:Operation}, ops::Pair...) =
     Either(op1, ops...)
 Base.:*(op1::Operation, ops::Operation...) = Either((op1, ops...))
 
-@inline supports_permute{N,T}(::Type{Either{N,T}}) = all(map(supports_permute, T.types))
-@inline supports_view{N,T}(::Type{Either{N,T}}) = all(map(supports_view, T.types))
-@inline supports_stepview{N,T}(::Type{Either{N,T}}) = all(map(supports_stepview, T.types))
+@inline supports_permute(::Type{Either{N,T}}) where {N,T} = all(map(supports_permute, T.types))
+@inline supports_view(::Type{Either{N,T}}) where {N,T} = all(map(supports_view, T.types))
+@inline supports_stepview(::Type{Either{N,T}}) where {N,T} = all(map(supports_stepview, T.types))
 # "Either" only supports affine if all its elements are affine
-@inline isaffine{N,T}(::Type{Either{N,T}}) = all(map(isaffine, T.types))
+@inline isaffine(::Type{Either{N,T}}) where {N,T} = all(map(isaffine, T.types))
 
 # choose lazy strategy based on shared qualities of elements
-@inline isaffine{T,N,P<:InvWarpedView,I,L}(::Type{SubArray{T,N,P,I,L}}) = true
-@inline isaffine{T<:InvWarpedView}(::Type{T}) = true
+@inline isaffine(::Type{SubArray{T,N,P,I,L}}) where {T,N,P<:InvWarpedView,I,L} = true
+@inline isaffine(::Type{<:InvWarpedView}) = true
 @generated function applylazy(op::Either, img)
     if isaffine(img) && supports_affine(op)
         :(applyaffine(op, img))

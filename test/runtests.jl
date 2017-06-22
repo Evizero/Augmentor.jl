@@ -5,13 +5,7 @@ using ImageInTerminal
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
-if VERSION < v"0.6.0-" # good enough. the 10 on 0.5 are spurious
-    @test length(setdiff(ambs, refambs)) <= 10
-elseif VERSION > v"0.6.0-rc1"
-    @test length(setdiff(ambs, refambs)) == 0
-else
-    info("test for ambiguities skipped because of untested julia version")
-end
+@test length(setdiff(ambs, refambs)) == 0
 
 function str_show(obj)
     io = IOBuffer()
@@ -30,8 +24,6 @@ function str_showconst(obj)
     Augmentor.showconstruction(io, obj)
     readstring(seek(io, 0))
 end
-
-SPACE = VERSION < v"0.6.0-dev.2505" ? "" : " " # julia PR #20288
 
 camera = testimage("cameraman")
 square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]

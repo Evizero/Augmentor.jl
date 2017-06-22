@@ -1,3 +1,7 @@
+# v0.2.0
+
+Dropped 0.5 support
+
 # v0.1.0
 
 New operations:

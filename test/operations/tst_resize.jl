@@ -15,16 +15,16 @@
         op = @inferred(Resize(20,30))
         @test op === Resize(width=30, height=20)
         @test op.size == (20,30)
-        @test str_show(op) == "Augmentor.Resize{2}((20,$(SPACE)30))"
+        @test str_show(op) == "Augmentor.Resize{2}((20, 30))"
         @test str_showconst(op) == "Resize(20, 30)"
         @test str_showcompact(op) == "Resize to 20×30"
         op = @inferred(Resize(20,30,40))
         @test op === @inferred(Resize((20,30,40)))
         @test op === @inferred(Resize{3}((20,30,40)))
         @test op.size == (20,30,40)
-        @test str_show(op) == "Augmentor.Resize{3}((20,$(SPACE)30,$(SPACE)40))"
+        @test str_show(op) == "Augmentor.Resize{3}((20, 30, 40))"
         @test str_showconst(op) == "Resize(20, 30, 40)"
-        @test str_showcompact(op) == "Resize to (20,$(SPACE)30,$(SPACE)40)"
+        @test str_showcompact(op) == "Resize to (20, 30, 40)"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Resize(10,10), nothing)

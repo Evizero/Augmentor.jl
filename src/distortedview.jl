@@ -4,7 +4,7 @@ immutable DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: Abs
     grid::G
     field::D
 
-    function (::Type{DistortedView}){T}(parent::AbstractMatrix{T}, grid::AbstractArray{Float64,3})
+    function DistortedView(parent::AbstractMatrix{T}, grid::AbstractArray{Float64,3}) where T
         @assert size(grid,1) == 2
         etp = ImageTransformations.box_extrapolation(parent, Flat())
         field = ImageTransformations.box_extrapolation(grid, 0.0)
@@ -25,7 +25,7 @@ function ShowItLikeYouBuildIt.showarg(io::IO, A::DistortedView)
 end
 
 # showargs for SubArray{<:Colorant} is already implemented by ImageCore
-function ShowItLikeYouBuildIt.showarg{T<:Number,N,W<:DistortedView}(io::IO, A::SubArray{T,N,W})
+function ShowItLikeYouBuildIt.showarg(io::IO, A::SubArray{<:Number,N,<:DistortedView}) where N
     print(io, "view(")
     showarg(io, parent(A))
     print(io, ", ")
@@ -37,7 +37,7 @@ function ShowItLikeYouBuildIt.showarg{T<:Number,N,W<:DistortedView}(io::IO, A::S
 end
 
 Base.summary(A::DistortedView) = summary_build(A)
-Base.summary{T<:Number,N,W<:DistortedView}(A::SubArray{T,N,W}) = summary_build(A)
+Base.summary(A::SubArray{<:Number,N,<:DistortedView}) where {N} = summary_build(A)
 
 # inline speeds up ~30%
 @inline function Base.getindex(A::DistortedView, i::Int, j::Int)

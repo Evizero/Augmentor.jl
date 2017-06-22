@@ -44,17 +44,17 @@ see also
 immutable Resize{N} <: ImageOperation
     size::NTuple{N,Int}
 
-    function (::Type{Resize{N}}){N}(size::NTuple{N,Int})
+    function Resize{N}(size::NTuple{N,Int}) where N
         all(s->s>0, size) || throw(ArgumentError("Specified sizes must be strictly greater than 0. Actual: $size"))
         new{N}(size)
     end
 end
 Resize(::Tuple{}) = throw(MethodError(Resize, ((),)))
+Resize(size::NTuple{N,Int}) where {N} = Resize{N}(size)
+Resize(size::Int...) = Resize(size)
 Resize(; width=64, height=64) = Resize((height,width))
-Resize(size::Vararg{Int}) = Resize(size)
-Resize{N}(size::NTuple{N,Int}) = Resize{N}(size)
 
-@inline supports_affine{T<:Resize}(::Type{T}) = true
+@inline supports_affine(::Type{<:Resize}) = true
 
 function toaffine(op::Resize{2}, img::AbstractMatrix)
     # emulate behaviour of ImageTransformations.imresize!
@@ -76,7 +76,7 @@ function padrange(range::AbstractUnitRange, pad)
     first(range)-pad:last(range)+pad
 end
 
-function applyaffine{T,N}(op::Resize{N}, img::AbstractArray{T,N})
+function applyaffine(op::Resize{N}, img::AbstractArray{T,N}) where {T,N}
     Rin, Rout = CartesianRange(indices(img)), CartesianRange(op.size)
     sf = map(/, (last(Rout)-first(Rout)+1).I, (last(Rin)-first(Rin)+1).I)
     # We have to extrapolate if the image is upscaled,
@@ -93,7 +93,7 @@ function showconstruction(io::IO, op::Resize)
     print(io, typeof(op).name.name, '(', join(map(string, op.size),", "), ')')
 end
 
-function Base.show{N}(io::IO, op::Resize{N})
+function Base.show(io::IO, op::Resize{N}) where {N}
     if get(io, :compact, false)
         if N == 2
             print(io, "Resize to $(op.size[1])×$(op.size[2])")

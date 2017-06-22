@@ -1,5 +1,5 @@
-@compat abstract type Operation end
-@compat abstract type ImageOperation <: Operation end
-@compat abstract type AffineOperation <: ImageOperation end
-@compat abstract type Pipeline end
-@compat const AbstractPipeline = Union{Pipeline,Tuple{Vararg{Operation}}}
+abstract type Operation end
+abstract type ImageOperation <: Operation end
+abstract type AffineOperation <: ImageOperation end
+abstract type Pipeline end
+const AbstractPipeline = Union{Pipeline,Tuple{Vararg{Operation}}}

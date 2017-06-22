@@ -51,19 +51,22 @@ see also
 immutable Crop{N,I<:Tuple} <: ImageOperation
     indexes::I
 
-    function (::Type{Crop{N}}){N}(indexes::NTuple{N,UnitRange})
+    function Crop{N}(indexes::NTuple{N,UnitRange}) where N
         new{N,typeof(indexes)}(indexes)
     end
 end
+function Crop(indexes::NTuple{N,AbstractUnitRange}) where N
+    Crop{N}(map(UnitRange, indexes))
+end
 Crop(::Tuple{}) = throw(MethodError(Crop, ((),)))
-Crop{N}(indexes::NTuple{N,UnitRange}) = Crop{N}(indexes)
-Crop{N}(indexes::Vararg{UnitRange,N}) = Crop(indexes)
-Crop(x, y, width, height) = Crop(y:y+height-1, x:x+width-1)
+Crop(indexes::Range...) = Crop(indexes)
 
-@inline supports_eager{T<:Crop}(::Type{T})    = false
-@inline supports_affine{T<:Crop}(::Type{T})   = true
-@inline supports_view{T<:Crop}(::Type{T})     = true
-@inline supports_stepview{T<:Crop}(::Type{T}) = true
+@deprecate Crop(x, y, width, height) Crop(y:y+height-1, x:x+width-1)
+
+@inline supports_eager(::Type{<:Crop})    = false
+@inline supports_affine(::Type{<:Crop})   = true
+@inline supports_view(::Type{<:Crop})     = true
+@inline supports_stepview(::Type{<:Crop}) = true
 
 applyeager(op::Crop, img) = plain_array(indirect_view(img, op.indexes))
 
@@ -72,7 +75,7 @@ applylazy(op::Crop, img)     = indirect_view(img, op.indexes)
 applyview(op::Crop, img)     = indirect_view(img, op.indexes)
 applystepview(op::Crop, img) = indirect_view(img, map(StepRange, op.indexes))
 
-function Base.show{N}(io::IO, op::Crop{N})
+function Base.show(io::IO, op::Crop{N}) where N
     if get(io, :compact, false)
         if N == 2
             print(io, "Crop region $(op.indexes[1])×$(op.indexes[2])")
@@ -144,19 +147,22 @@ see also
 immutable CropNative{N,I<:Tuple} <: ImageOperation
     indexes::I
 
-    function (::Type{CropNative{N}}){N}(indexes::NTuple{N,UnitRange})
+    function CropNative{N}(indexes::NTuple{N,UnitRange}) where N
         new{N,typeof(indexes)}(indexes)
     end
 end
+function CropNative(indexes::NTuple{N,AbstractUnitRange}) where N
+    CropNative{N}(map(UnitRange, indexes))
+end
 CropNative(::Tuple{}) = throw(MethodError(CropNative, ((),)))
-CropNative{N}(indexes::NTuple{N,UnitRange}) = CropNative{N}(indexes)
-CropNative{N}(indexes::Vararg{UnitRange,N}) = CropNative(indexes)
-CropNative(x, y, width, height) = CropNative(y:y+height-1, x:x+width-1)
+CropNative(indexes::Range...) = CropNative(indexes)
 
-@inline supports_eager{T<:CropNative}(::Type{T})    = false
-@inline supports_affine{T<:CropNative}(::Type{T})   = true
-@inline supports_view{T<:CropNative}(::Type{T})     = true
-@inline supports_stepview{T<:CropNative}(::Type{T}) = true
+@deprecate CropNative(x, y, width, height) CropNative(y:y+height-1, x:x+width-1)
+
+@inline supports_eager(::Type{<:CropNative})    = false
+@inline supports_affine(::Type{<:CropNative})   = true
+@inline supports_view(::Type{<:CropNative})     = true
+@inline supports_stepview(::Type{<:CropNative}) = true
 
 applyeager(op::CropNative, img)    = plain_array(img[op.indexes...])
 applyaffine(op::CropNative, img)   = direct_view(img, op.indexes)
@@ -168,7 +174,7 @@ function showconstruction(io::IO, op::Union{Crop,CropNative})
     print(io, typeof(op).name.name, '(', join(map(string, op.indexes),", "), ')')
 end
 
-function Base.show{N}(io::IO, op::CropNative{N})
+function Base.show(io::IO, op::CropNative{N}) where N
     if get(io, :compact, false)
         if N == 2
             print(io, "Crop native region $(op.indexes[1])×$(op.indexes[2])")
@@ -227,20 +233,20 @@ see also
 immutable CropSize{N} <: ImageOperation
     size::NTuple{N,Int}
 
-    function (::Type{CropSize{N}}){N}(size::NTuple{N,Int})
+    function CropSize{N}(size::NTuple{N,Int}) where N
         all(s->s>0, size) || throw(ArgumentError("Specified sizes must be strictly greater than 0. Actual: $size"))
         new{N}(size)
     end
 end
 CropSize(::Tuple{}) = throw(MethodError(CropSize, ((),)))
+CropSize(size::NTuple{N,Int}) where {N} = CropSize{N}(size)
+CropSize(size::Int...) = CropSize(size)
 CropSize(; width=64, height=64) = CropSize((height,width))
-CropSize(size::Vararg{Int}) = CropSize(size)
-CropSize{N}(size::NTuple{N,Int}) = CropSize{N}(size)
 
-@inline supports_eager{T<:CropSize}(::Type{T}) = false
-@inline supports_affine{T<:CropSize}(::Type{T}) = true
-@inline supports_view{T<:CropSize}(::Type{T}) = true
-@inline supports_stepview{T<:CropSize}(::Type{T}) = true
+@inline supports_eager(::Type{<:CropSize})    = false
+@inline supports_affine(::Type{<:CropSize})   = true
+@inline supports_view(::Type{<:CropSize})     = true
+@inline supports_stepview(::Type{<:CropSize}) = true
 
 function cropsize_indices(op::CropSize, img::AbstractArray)
     cntr = convert(Tuple, center(img))
@@ -265,7 +271,7 @@ function showconstruction(io::IO, op::CropSize)
     print(io, typeof(op).name.name, '(', join(map(string, op.size),", "), ')')
 end
 
-function Base.show{N}(io::IO, op::CropSize{N})
+function Base.show(io::IO, op::CropSize{N}) where N
     if get(io, :compact, false)
         if N == 1
             print(io, "Crop a $(first(op.size))-length window at the center")
@@ -327,17 +333,17 @@ see also
 immutable CropRatio <: ImageOperation
     ratio::Float64
 
-    function (::Type{CropRatio})(ratio::Real)
+    function CropRatio(ratio::Real)
         ratio > 0 || throw(ArgumentError("ratio has to be greater than 0"))
         new(Float64(ratio))
     end
 end
 CropRatio(; ratio = 1.) = CropRatio(ratio)
 
-@inline supports_eager{T<:CropRatio}(::Type{T}) = false
-@inline supports_affine{T<:CropRatio}(::Type{T}) = true
-@inline supports_view{T<:CropRatio}(::Type{T}) = true
-@inline supports_stepview{T<:CropRatio}(::Type{T}) = true
+@inline supports_eager(::Type{CropRatio})    = false
+@inline supports_affine(::Type{CropRatio})   = true
+@inline supports_view(::Type{CropRatio})     = true
+@inline supports_stepview(::Type{CropRatio}) = true
 
 function cropratio_indices(op::CropRatio, img::AbstractMatrix)
     h, w = map(length, indices(img))
@@ -366,7 +372,7 @@ function applystepview(op::CropRatio, img)
     direct_view(img, map(StepRange, cropratio_indices(op, img)))
 end
 
-function _ratio2str(ratio)
+function ratio2str(ratio)
     high0 = if ratio >= 1
         ratio
     else
@@ -393,7 +399,7 @@ end
 
 function Base.show(io::IO, op::CropRatio)
     if get(io, :compact, false)
-        print(io, "Crop to ", _ratio2str(op.ratio), " aspect ratio")
+        print(io, "Crop to ", ratio2str(op.ratio), " aspect ratio")
     else
         print(io, "Augmentor.")
         showconstruction(io, op)
@@ -449,17 +455,17 @@ see also
 immutable RCropRatio <: ImageOperation
     ratio::Float64
 
-    function (::Type{RCropRatio})(ratio::Real)
+    function RCropRatio(ratio::Real)
         ratio > 0 || throw(ArgumentError("ratio has to be greater than 0"))
         new(Float64(ratio))
     end
 end
 RCropRatio(; ratio = 1.) = RCropRatio(ratio)
 
-@inline supports_eager{T<:RCropRatio}(::Type{T}) = false
-@inline supports_affine{T<:RCropRatio}(::Type{T}) = true
-@inline supports_view{T<:RCropRatio}(::Type{T}) = true
-@inline supports_stepview{T<:RCropRatio}(::Type{T}) = true
+@inline supports_eager(::Type{RCropRatio})    = false
+@inline supports_affine(::Type{RCropRatio})   = true
+@inline supports_view(::Type{RCropRatio})     = true
+@inline supports_stepview(::Type{RCropRatio}) = true
 
 function rcropratio_indices(op::RCropRatio, img::AbstractMatrix)
     h, w = map(length, indices(img))
@@ -505,7 +511,7 @@ end
 
 function Base.show(io::IO, op::RCropRatio)
     if get(io, :compact, false)
-        print(io, "Crop random window with ", _ratio2str(op.ratio), " aspect ratio")
+        print(io, "Crop random window with ", ratio2str(op.ratio), " aspect ratio")
     else
         print(io, "Augmentor.")
         showconstruction(io, op)

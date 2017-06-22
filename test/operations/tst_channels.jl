@@ -154,9 +154,9 @@ end
         @test typeof(PermuteDims((1,2))) <: PermuteDims{2} <: Augmentor.Operation
         @test typeof(PermuteDims((3,1,2))) <: PermuteDims{3} <: Augmentor.Operation
         @test str_show(PermuteDims((1,))) == "Augmentor.PermuteDims((1,))"
-        @test str_show(PermuteDims((1,2))) == "Augmentor.PermuteDims((1,$(SPACE)2))"
+        @test str_show(PermuteDims((1,2))) == "Augmentor.PermuteDims((1, 2))"
         @test str_showconst(PermuteDims((1,3,2))) == "PermuteDims(1, 3, 2)"
-        @test str_showcompact(PermuteDims((3,2,1))) == "Permute dimension order to (3,$(SPACE)2,$(SPACE)1)"
+        @test str_showcompact(PermuteDims((3,2,1))) == "Permute dimension order to (3, 2, 1)"
     end
     @testset "eager" begin
         @test @inferred(Augmentor.supports_eager(PermuteDims)) === true
@@ -210,7 +210,7 @@ end
         @test typeof(Reshape((1,2))) <: Reshape{2} <: Augmentor.Operation
         @test typeof(Reshape((3,1,2))) <: Reshape{3} <: Augmentor.Operation
         @test str_show(Reshape((1,))) == "Augmentor.Reshape{1}((1,))"
-        @test str_show(Reshape((1,2))) == "Augmentor.Reshape{2}((1,$(SPACE)2))"
+        @test str_show(Reshape((1,2))) == "Augmentor.Reshape{2}((1, 2))"
         @test str_showconst(Reshape((1,3,2))) == "Reshape(1, 3, 2)"
         @test str_showcompact(Reshape((3,2,1))) == "Reshape array to 3×2×1"
         @test str_showcompact(Reshape(10)) == "Reshape array to 10-element vector"

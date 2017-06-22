@@ -77,7 +77,7 @@ immutable CacheImageInto{T<:AbstractArray} <: ImageOperation
 end
 CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 
-@inline supports_lazy{T<:CacheImageInto}(::Type{T}) = true
+@inline supports_lazy(::Type{<:CacheImageInto}) = true
 
 @inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
 @inline match_idx{N}(buffer::Array, inds::NTuple{N,UnitRange}) =

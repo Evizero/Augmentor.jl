@@ -63,21 +63,19 @@ toaffine(::Rotate90, img::AbstractMatrix) = recenter(RotMatrix(pi/2), center(img
 applyeager(::Rotate90, img::AbstractMatrix) = plain_array(rotl90(img))
 applylazy_fallback(op::Rotate90, img::AbstractMatrix) = applypermute(op, img)
 
-function applypermute{T}(::Rotate90, img::AbstractMatrix{T})
+function applypermute(::Rotate90, img::AbstractMatrix{T}) where T
     idx = map(StepRange, indices(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, reverse(idx[2]), idx[1])
 end
 
-function applypermute{T,IT<:PermutedDimsArray}(::Rotate90, sub::SubArray{T,2,IT})
-    # this is just a sanity check that should never be violated
-    @assert IT <: PermutedDimsArray{T,2,(2,1)}
+function applypermute(::Rotate90, sub::SubArray{T,2,IT}) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
     idx = map(StepRange, sub.indexes)
     img = parent(parent(sub))
     view(img, reverse(idx[2]), idx[1])
 end
 
-function applypermute{T}(::Rotate90, sub::SubArray{T,2})
+function applypermute(::Rotate90, sub::SubArray{T,2}) where T
     idx = map(StepRange, sub.indexes)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
@@ -219,21 +217,19 @@ toaffine(::Rotate270, img::AbstractMatrix) = recenter(RotMatrix(-pi/2), center(i
 applyeager(::Rotate270, img::AbstractMatrix) = plain_array(rotr90(img))
 applylazy_fallback(op::Rotate270, img::AbstractMatrix) = applypermute(op, img)
 
-function applypermute{T}(::Rotate270, img::AbstractMatrix{T})
+function applypermute(::Rotate270, img::AbstractMatrix{T}) where T
     idx = map(StepRange, indices(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, idx[2], reverse(idx[1]))
 end
 
-function applypermute{T,IT<:PermutedDimsArray}(::Rotate270, sub::SubArray{T,2,IT})
-    # this is just a sanity check that should never be violated
-    @assert IT <: PermutedDimsArray{T,2,(2,1)}
+function applypermute(::Rotate270, sub::SubArray{T,2,IT}) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
     idx = map(StepRange, sub.indexes)
     img = parent(parent(sub))
     view(img, idx[2], reverse(idx[1]))
 end
 
-function applypermute{T}(::Rotate270, sub::SubArray{T,2})
+function applypermute(::Rotate270, sub::SubArray{T,2}) where T
     idx = map(StepRange, sub.indexes)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
@@ -314,14 +310,15 @@ see also
 immutable Rotate{T<:AbstractVector} <: AffineOperation
     degree::T
 
-    function (::Type{Rotate}){T<:Real}(degree::AbstractVector{T})
+    function Rotate{T}(degree::T) where {T<:AbstractVector{S} where S<:Real}
         length(degree) > 0 || throw(ArgumentError("The number of different angles passed to \"Rotate(...)\" must be non-zero"))
-        new{typeof(degree)}(degree)
+        new{T}(degree)
     end
 end
+Rotate(degree::T) where {T<:AbstractVector} = Rotate{T}(degree)
 Rotate(degree::Real) = Rotate(degree:degree)
 
-@inline supports_eager{T<:Rotate}(::Type{T}) = false
+@inline supports_eager(::Type{<:Rotate}) = false
 
 function toaffine(op::Rotate, img::AbstractMatrix)
     recenter(RotMatrix(deg2rad(Float64(rand(op.degree)))), center(img))
