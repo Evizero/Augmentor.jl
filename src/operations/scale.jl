@@ -62,7 +62,7 @@ see also
 immutable Scale{N,T<:AbstractVector} <: AffineOperation
     factors::NTuple{N,T}
 
-    function (::Type{Scale{N}}){N,T<:AbstractVector}(factors::NTuple{N,T})
+    function Scale{N}(factors::NTuple{N,T}) where {N,T<:AbstractVector}
         eltype(T) <: Real || throw(ArgumentError("The specified factors must be vectors of Real. Actual: $T"))
         n = length(factors[1])
         n > 0 || throw(ArgumentError("The specified factors must all have a length greater than 0"))
@@ -74,16 +74,16 @@ Scale() = throw(MethodError(Scale, ()))
 Scale(::Tuple{}) = throw(MethodError(Scale, ((),)))
 Scale(factors...) = Scale(factors)
 Scale(factor::Union{AbstractVector,Real}) = Scale((factor, factor))
-Scale{N}(factors::NTuple{N,Any}) = Scale(map(_vectorize, factors))
-Scale{N}(factors::NTuple{N,Range}) = Scale{N}(promote(factors...))
-function Scale{N}(factors::NTuple{N,AbstractVector})
+Scale(factors::NTuple{N,Any}) where {N} = Scale(map(_vectorize, factors))
+Scale(factors::NTuple{N,Range}) where {N} = Scale{N}(promote(factors...))
+function Scale(factors::NTuple{N,AbstractVector}) where N
     Scale{N}(map(Vector{Float64}, factors))
 end
-function (::Type{Scale{N}}){N}(factors::NTuple{N,Any})
+function (::Type{Scale{N}})(factors::NTuple{N,Any}) where N
     Scale(map(_vectorize, factors))
 end
 
-@inline supports_eager{T<:Scale}(::Type{T}) = false
+@inline supports_eager(::Type{<:Scale}) = false
 
 function toaffine(op::Scale{2}, img::AbstractMatrix)
     idx = rand(1:length(op.factors[1]))
@@ -96,7 +96,7 @@ function showconstruction(io::IO, op::Scale)
     print(io, typeof(op).name.name, '(', join(map(string, fct),", "), ')')
 end
 
-function Base.show{N}(io::IO, op::Scale{N})
+function Base.show(io::IO, op::Scale{N}) where N
     if get(io, :compact, false)
         str = join(map(t->join(t,"×"), collect(zip(op.factors...))), ", ")
         if length(op.factors[1]) == 1

@@ -103,7 +103,7 @@ immutable ElasticDistortion <: ImageOperation
     border::Bool
     normalize::Bool
 
-    function (::Type{ElasticDistortion})(
+    function ElasticDistortion(
             gridheight::Integer, gridwidth::Integer,
             scale, sigma, iterations = ED_DEFAULT_ITER,
             border::Bool = ED_DEFAULT_BORDER, normalize::Bool = ED_DEFAULT_NORM)
@@ -129,8 +129,8 @@ function ElasticDistortion(
     ElasticDistortion(gridheight, gridwidth, scale, sigma, iter, border, norm)::ElasticDistortion
 end
 
-@inline supports_eager{T<:ElasticDistortion}(::Type{T}) = false
-@inline supports_lazy{T<:ElasticDistortion}(::Type{T})  = true
+@inline supports_eager(::Type{<:ElasticDistortion}) = false
+@inline supports_lazy(::Type{<:ElasticDistortion})  = true
 
 function applylazy(op::ElasticDistortion, img)
     field = gaussian_field(op.gridheight, op.gridwidth, op.scale, op.sigma, op.iterations, op.border, op.normalize)

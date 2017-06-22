@@ -25,13 +25,13 @@
         @test str_showcompact(op) == "ShearX by ϕ ∈ -1:1 degree"
         op = @inferred(ShearX([2,30]))
         @test op.degree == [2,30]
-        @test str_show(op) == "Augmentor.ShearX([2,$(SPACE)30])"
-        @test str_showconst(op) == "ShearX([2,$(SPACE)30])"
-        @test str_showcompact(op) == "ShearX by ϕ ∈ [2,$(SPACE)30] degree"
+        @test str_show(op) == "Augmentor.ShearX([2, 30])"
+        @test str_showconst(op) == "ShearX([2, 30])"
+        @test str_showcompact(op) == "ShearX by ϕ ∈ [2, 30] degree"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(ShearX(10), nothing)
-        @test @inferred(Augmentor.supports_eager(ShearX)) === false
+        @test Augmentor.supports_eager(ShearX) === false
         # TODO: more tests
         for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
             wv = @inferred Augmentor.applyeager(ShearX(45), img)
@@ -43,8 +43,8 @@
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(ShearX)) === true
-        @test @inferred(Augmentor.supports_affine(ShearX)) === true
+        @test Augmentor.isaffine(ShearX) === true
+        @test Augmentor.supports_affine(ShearX) === true
         @test_throws MethodError Augmentor.applyaffine(ShearX(45), nothing)
         @test @inferred(Augmentor.toaffine(ShearX(45), rect)) ≈ AffineMap([1. 0.; -1. 1.], [0.,1.5])
         @test @inferred(Augmentor.toaffine(ShearX(-45), rect)) ≈ AffineMap([1. 0.; 1. 1.], [0.,-1.5])
@@ -58,7 +58,7 @@
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(ShearX(45))) === true
+        @test Augmentor.supports_lazy(ShearX(45)) === true
         wv = @inferred Augmentor.applylazy(ShearX(45), square)
         @test parent(wv).itp.coefs === square
         @test indices(wv) == (1:3,0:4)
@@ -69,13 +69,13 @@
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(ShearX)) === false
+        @test Augmentor.supports_view(ShearX) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(ShearX)) === false
+        @test Augmentor.supports_stepview(ShearX) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(ShearX)) === false
+        @test Augmentor.supports_permute(ShearX) === false
     end
 end
 
@@ -108,13 +108,13 @@ end
         @test str_showcompact(op) == "ShearY by ψ ∈ -1:1 degree"
         op = @inferred(ShearY([2,30]))
         @test op.degree == [2,30]
-        @test str_show(op) == "Augmentor.ShearY([2,$(SPACE)30])"
-        @test str_showconst(op) == "ShearY([2,$(SPACE)30])"
-        @test str_showcompact(op) == "ShearY by ψ ∈ [2,$(SPACE)30] degree"
+        @test str_show(op) == "Augmentor.ShearY([2, 30])"
+        @test str_showconst(op) == "ShearY([2, 30])"
+        @test str_showcompact(op) == "ShearY by ψ ∈ [2, 30] degree"
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(ShearY(10), nothing)
-        @test @inferred(Augmentor.supports_eager(ShearY)) === false
+        @test Augmentor.supports_eager(ShearY) === false
         # TODO: more tests
         for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
             wv = @inferred Augmentor.applyeager(ShearY(45), img)
@@ -126,8 +126,8 @@ end
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(ShearY)) === true
-        @test @inferred(Augmentor.supports_affine(ShearY)) === true
+        @test Augmentor.isaffine(ShearY) === true
+        @test Augmentor.supports_affine(ShearY) === true
         @test_throws MethodError Augmentor.applyaffine(ShearY(45), nothing)
         @test @inferred(Augmentor.toaffine(ShearY(45), rect)) ≈ AffineMap([1. -1.; 0. 1.], [2.,0.])
         @test @inferred(Augmentor.toaffine(ShearY(-45), rect)) ≈ AffineMap([1. 1.; 0. 1.], [-2.,0.])
@@ -141,7 +141,7 @@ end
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(ShearY(45))) === true
+        @test Augmentor.supports_lazy(ShearY(45)) === true
         wv = @inferred Augmentor.applylazy(ShearY(45), square)
         @test parent(wv).itp.coefs === square
         @test indices(wv) == (0:4,1:3)
@@ -152,12 +152,12 @@ end
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(ShearY)) === false
+        @test Augmentor.supports_view(ShearY) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(ShearY)) === false
+        @test Augmentor.supports_stepview(ShearY) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(ShearY)) === false
+        @test Augmentor.supports_permute(ShearY) === false
     end
 end

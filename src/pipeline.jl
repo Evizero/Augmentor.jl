@@ -1,20 +1,20 @@
 immutable ImmutablePipeline{N,T<:Tuple} <: Pipeline
     operations::T
 
-    function (::Type{ImmutablePipeline{N}}){N}(ops::NTuple{N,Operation})
+    function ImmutablePipeline{N}(ops::NTuple{N,Operation}) where N
         new{N,typeof(ops)}(ops)
     end
 end
 ImmutablePipeline() = throw(MethodError(ImmutablePipeline, ()))
 ImmutablePipeline(::Tuple{}) = throw(MethodError(ImmutablePipeline, ((),)))
-ImmutablePipeline{N}(ops::NTuple{N,Operation}) = ImmutablePipeline{N}(ops)
-ImmutablePipeline{N}(ops::Vararg{Operation,N}) = ImmutablePipeline{N}(ops)
-(::Type{Pipeline}){N}(ops::NTuple{N,Operation}) = ImmutablePipeline(ops)
-(::Type{Pipeline}){N}(ops::Vararg{Operation,N}) = ImmutablePipeline(ops)
+ImmutablePipeline(ops::NTuple{N,Operation}) where {N} = ImmutablePipeline{N}(ops)
+ImmutablePipeline(ops::Vararg{Operation,N}) where {N} = ImmutablePipeline{N}(ops)
+(::Type{Pipeline})(ops::NTuple{N,Operation}) where {N} = ImmutablePipeline(ops)
+(::Type{Pipeline})(ops::Vararg{Operation,N}) where {N} = ImmutablePipeline(ops)
 
-@inline Base.length{N}(p::ImmutablePipeline{N}) = N
+@inline Base.length(p::ImmutablePipeline{N}) where {N} = N
 @inline operations(p::ImmutablePipeline) = p.operations
-@inline operations{N}(tup::NTuple{N,Operation}) = tup
+@inline operations(tup::NTuple{N,Operation}) where {N} = tup
 
 Base.:(|>)(op1::Operation, op2::Operation) =
     ImmutablePipeline(op1, op2)

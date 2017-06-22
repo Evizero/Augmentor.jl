@@ -1,12 +1,12 @@
-@inline isaffine{T<:AffineOperation}(::Type{T}) = true
+@inline isaffine(::Type{<:AffineOperation}) = true
 @inline isaffine(::Type) = false
 
 @inline supports_eager(::Type) = true
-@inline supports_affine{T}(::Type{T}) = isaffine(T)
+@inline supports_affine(::Type{T}) where {T} = isaffine(T)
 @inline supports_permute(::Type) = false
 @inline supports_view(::Type) = false
 @inline supports_stepview(::Type) = false
-@inline supports_lazy{T}(::Type{T}) = supports_affine(T) || supports_stepview(T) || supports_view(T) || supports_permute(T)
+@inline supports_lazy(::Type{T}) where {T} = supports_affine(T) || supports_stepview(T) || supports_view(T) || supports_permute(T)
 
 @inline isaffine(A) = isaffine(typeof(A))
 @inline supports_eager(A)    = supports_eager(typeof(A))
@@ -32,7 +32,7 @@ can).
 """
 prepareaffine(img) = invwarpedview(img, toaffine(NoOp(), img), Flat())
 prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffine(NoOp(), img))
-@inline prepareaffine{T,N,A<:InvWarpedView}(img::SubArray{T,N,A}) = img
+@inline prepareaffine(img::SubArray{T,N,<:InvWarpedView}) where {T,N} = img
 @inline prepareaffine(img::InvWarpedView) = img
 
 # currently unused
@@ -60,7 +60,7 @@ function _applylazy(op::AffineOperation, img::InvWarpedView)
     applyaffine(op, img)
 end
 
-function _applylazy{T,N,IT<:InvWarpedView}(op::AffineOperation, img::SubArray{T,N,IT})
+function _applylazy(op::AffineOperation, img::SubArray{T,N,<:InvWarpedView}) where {T,N}
     applyaffine(op, img)
 end
 

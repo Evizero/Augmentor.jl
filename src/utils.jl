@@ -32,23 +32,23 @@ function indirect_indices(::Tuple{}, ::Tuple{})
     throw(MethodError(indirect_indices, ((),())))
 end
 
-@inline function indirect_indices{N}(O::NTuple{N,Base.OneTo}, I::NTuple{N,AbstractUnitRange})
+@inline function indirect_indices(O::NTuple{N,Base.OneTo}, I::NTuple{N,AbstractUnitRange}) where N
     map(IdentityRange, I)
 end
 
-@inline function indirect_indices{N}(O::NTuple{N,Base.OneTo}, I::NTuple{N,StepRange})
+@inline function indirect_indices(O::NTuple{N,Base.OneTo}, I::NTuple{N,StepRange}) where N
     I
 end
 
-@inline function indirect_indices{N}(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange})
+@inline function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange}) where N
     map((i1,i2) -> IdentityRange(UnitRange(i1)[i2]), O, I)
 end
 
-@inline function indirect_indices{N}(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange})
+@inline function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange}) where N
     map((i1,i2) -> UnitRange(i1)[i2], O, I)
 end
 
-@inline function indirect_indices{N}(O::NTuple{N,StepRange}, I::NTuple{N,Range})
+@inline function indirect_indices(O::NTuple{N,StepRange}, I::NTuple{N,Range}) where N
     map((i1,i2) -> i1[i2], O, I)
 end
 
@@ -68,25 +68,25 @@ function direct_indices(::Tuple{}, ::Tuple{})
     throw(MethodError(direct_indices, ((),())))
 end
 
-function direct_indices{N}(O::NTuple{N,IdentityRange}, I::NTuple{N,StepRange})
+function direct_indices(O::NTuple{N,IdentityRange}, I::NTuple{N,StepRange}) where N
     throw(MethodError(direct_indices, (O, I)))
 end
 
-@inline function direct_indices{N}(O::NTuple{N,Range}, I::NTuple{N,AbstractUnitRange})
+@inline function direct_indices(O::NTuple{N,Range}, I::NTuple{N,AbstractUnitRange}) where N
     map(IdentityRange, I)
 end
 
-@inline function direct_indices{N}(O::NTuple{N,Range}, I::NTuple{N,StepRange})
+@inline function direct_indices(O::NTuple{N,Range}, I::NTuple{N,StepRange}) where N
     I
 end
 
 # --------------------------------------------------------------------
 
-function direct_view{T,N}(A::AbstractArray{T,N}, I::NTuple{N,Range})
+function direct_view(A::AbstractArray{T,N}, I::NTuple{N,Range}) where {T,N}
     view(A, direct_indices(indices(A), I)...)
 end
 
-function direct_view{T,N}(A::SubArray{T,N}, I::NTuple{N,Range})
+function direct_view(A::SubArray{T,N}, I::NTuple{N,Range}) where {T,N}
     view(A, direct_indices(A.indexes, I)...)
 end
 
@@ -105,7 +105,7 @@ end
 
 # --------------------------------------------------------------------
 
-function _2dborder!{T}(A::AbstractArray{T,3}, val::T)
+function _2dborder!(A::AbstractArray{T,3}, val::T) where T
     ndims, h, w = size(A)
     @inbounds for i = 1:h, j = (1,w)
         for d = 1:ndims
