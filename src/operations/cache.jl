@@ -72,6 +72,11 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    CacheImageInto <: Augmentor.ImageOperation
+
+see [`CacheImage`](@ref)
+"""
 immutable CacheImageInto{T<:AbstractArray} <: ImageOperation
     buffer::T
 end

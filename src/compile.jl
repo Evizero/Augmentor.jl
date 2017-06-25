@@ -18,8 +18,8 @@ end
 
 @inline supports_lazy(head, tail::Tuple) = supports_lazy(head) && supports_lazy(first(tail))
 @inline supports_lazy(head, tail::Tuple{}) = false
-@inline supports_affine(head, tail::Tuple) = supports_affine(head) && supports_affine(first(tail))
-@inline supports_affine(head, tail::Tuple{}) = false
+@inline uses_affinemap(head, tail::Tuple) = uses_affinemap(head) && uses_affinemap(first(tail))
+@inline uses_affinemap(head, tail::Tuple{}) = false
 
 # --------------------------------------------------------------------
 
@@ -31,21 +31,21 @@ end
     :($(Symbol(:img_, var_offset)))
 end
 
-function build_pipeline(var_offset::Int, op_offset::Int, head, tail::Tuple)
+function build_pipeline(var_offset::Int, op_offset::Int, head, tail::NTuple{N,DataType}) where N
     var_in  = Symbol(:img_, var_offset)
     var_out = Symbol(:img_, var_offset+1)
     if supports_lazy(head, tail)
-        num_affine, rest_affine = supports_affine(head, tail) ? seek_connected(supports_affine, 0, head, tail) : (0, nothing)
+        num_affine, rest_affine = uses_affinemap(head, tail) ? seek_connected(uses_affinemap, 0, head, tail) : (0, nothing)
         num_special, _ = seek_connected(x->(supports_permute(x)||supports_view(x)||supports_stepview(x)), 0, head, tail)
         num_lazy, rest_lazy = seek_connected(supports_lazy, 0, head, tail)
         if num_special >= num_affine
             quote
-                $var_out = applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
+                $var_out = forcelazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
                 $(build_pipeline(var_offset+1, op_offset+num_lazy, rest_lazy))
             end
         else
             quote
-                $var_out = applyaffine($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_affine-1)...)), $var_in)
+                $var_out = forceaffine($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_affine-1)...)), $var_in)
                 $(build_pipeline(var_offset+1, op_offset+num_affine, rest_affine))
             end
         end
@@ -57,7 +57,7 @@ function build_pipeline(var_offset::Int, op_offset::Int, head, tail::Tuple)
             end
         else # use lazy because there is no special eager implementation
             quote
-                $var_out = applylazy(pipeline[$op_offset], $var_in)
+                $var_out = forcelazy(pipeline[$op_offset], $var_in)
                 $(build_pipeline(var_offset+1, op_offset+1, tail))
             end
         end

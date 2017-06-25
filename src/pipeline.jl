@@ -16,6 +16,7 @@ ImmutablePipeline(ops::Vararg{Operation,N}) where {N} = ImmutablePipeline{N}(ops
 @inline operations(p::ImmutablePipeline) = p.operations
 @inline operations(tup::NTuple{N,Operation}) where {N} = tup
 
+# Allow specifying pipelines using the "op1 |> op2 |> op3" syntax.
 Base.:(|>)(op1::Operation, op2::Operation) =
     ImmutablePipeline(op1, op2)
 Base.:(|>)(p1::ImmutablePipeline, op2::Operation) =
