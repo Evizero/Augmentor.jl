@@ -87,26 +87,26 @@ function (::Type{Zoom{N}})(factors::NTuple{N,Any}) where N
     Zoom(map(_vectorize, factors))
 end
 
-@inline supports_affine(::Type{<:Zoom}) = true
+@inline supports_affineview(::Type{<:Zoom}) = true
 @inline supports_eager(::Type{<:Zoom}) = false
 
-function toaffine(op::Zoom{2}, img::AbstractMatrix)
+function toaffinemap(op::Zoom{2}, img::AbstractMatrix)
     idx = rand(1:length(op.factors[1]))
     @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
     tfm
 end
 
 function applylazy(op::Zoom, img)
-    applyaffine(op, prepareaffine(img))
+    applyaffineview(op, prepareaffine(img))
 end
 
-function applyaffine(op::Zoom{N}, img::AbstractArray{T,N}) where {T,N}
-    wv = invwarpedview(img, toaffine(op, img), indices(img))
+function applyaffineview(op::Zoom{N}, img::AbstractArray{T,N}) where {T,N}
+    wv = invwarpedview(img, toaffinemap(op, img), indices(img))
     direct_view(wv, indices(img))
 end
 
-function applyaffine(op::Zoom{N}, v::SubArray{T,N,<:InvWarpedView}) where {T,N}
-    tinv = toaffine(op, v)
+function applyaffineview(op::Zoom{N}, v::SubArray{T,N,<:InvWarpedView}) where {T,N}
+    tinv = toaffinemap(op, v)
     img = parent(v)
     nidx = ImageTransformations.autorange(img, tinv)
     wv = InvWarpedView(img, tinv, map(unionrange, nidx, indices(img)))

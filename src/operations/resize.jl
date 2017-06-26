@@ -56,7 +56,7 @@ Resize(; width=64, height=64) = Resize((height,width))
 
 @inline supports_affine(::Type{<:Resize}) = true
 
-function toaffine(op::Resize{2}, img::AbstractMatrix)
+function toaffinemap(op::Resize{2}, img::AbstractMatrix)
     # emulate behaviour of ImageTransformations.imresize!
     Rin  = CartesianRange(indices(img))
     sf = map(/, op.size, (last(Rin)-first(Rin)+1).I)
@@ -81,7 +81,7 @@ function applyaffine(op::Resize{N}, img::AbstractArray{T,N}) where {T,N}
     sf = map(/, (last(Rout)-first(Rout)+1).I, (last(Rin)-first(Rin)+1).I)
     # We have to extrapolate if the image is upscaled,
     # otherwise the original border will only cause a single pixel
-    tinv = toaffine(op, img)
+    tinv = toaffinemap(op, img)
     inds = ImageTransformations.autorange(img, tinv)
     pad_inds = map((s,r)-> s>=1 ? padrange(r,ceil(Int,s/2)) : r, sf, inds)
     wv = invwarpedview(img, tinv, pad_inds)

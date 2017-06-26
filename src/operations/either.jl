@@ -93,15 +93,11 @@ end
 
 Either() = throw(ArgumentError("Must provide at least one operation in the constructor of \"Either\""))
 
-function Either(operations::NTuple{N,ImageOperation},
-                chances::NTuple{N,Real} = map(op -> 1/length(operations), operations)
-               ) where N
+function Either(operations::NTuple{N,ImageOperation}, chances::NTuple{N,Real} = map(op -> 1/length(operations), operations)) where N
     Either(operations, SVector{N}(chances))
 end
 
-function Either(operations::Vararg{ImageOperation,N};
-                chances = map(op -> 1/length(operations), operations)
-               ) where N
+function Either(operations::Vararg{ImageOperation,N}; chances = map(op -> 1/length(operations), operations)) where N
     Either(operations, SVector{N}(map(Float64, chances)))
 end
 
@@ -121,53 +117,57 @@ Base.:*(op1::Pair{<:Number,<:Operation}, ops::Pair...) =
     Either(op1, ops...)
 Base.:*(op1::Operation, ops::Operation...) = Either((op1, ops...))
 
-@inline supports_permute(::Type{Either{N,T}}) where {N,T} = all(map(supports_permute, T.types))
-@inline supports_view(::Type{Either{N,T}}) where {N,T} = all(map(supports_view, T.types))
-@inline supports_stepview(::Type{Either{N,T}}) where {N,T} = all(map(supports_stepview, T.types))
-# "Either" only supports affine if all its elements are affine
-@inline isaffine(::Type{Either{N,T}}) where {N,T} = all(map(isaffine, T.types))
+for FUN in (:supports_view,
+            :supports_stepview,
+            :supports_permute,
+            :supports_affine,
+            :supports_affineview)
+    # A predicate must be true for all the contained operations,
+    # in order for it to be true for the "Either" containing them.
+    @eval @inline ($FUN)(::Type{Either{N,T}}) where {N,T} =
+        all($FUN, T.types)
+end
 
-# choose lazy strategy based on shared qualities of elements
-@inline isaffine(::Type{SubArray{T,N,P,I,L}}) where {T,N,P<:InvWarpedView,I,L} = true
-@inline isaffine(::Type{<:InvWarpedView}) = true
+# Choose lazy strategy based on shared support of operations.
+# Note: We prefer "affine" only if "img" already is some
+#   "InvWarpedView", otherwise the preference is
+#   view > stepview > permute > affine > affineview
 @generated function applylazy(op::Either, img)
-    if isaffine(img) && supports_affine(op)
+    if isinvwarpedview(img) && supports_affine(op)
         :(applyaffine(op, img))
+    elseif isinvwarpedview(img) && supports_affineview(op)
+        :(applyaffineview(op, img))
     elseif supports_view(op)
-        :(applyview(op, prepareview(img)))
+        :(applyview(op, img))
     elseif supports_stepview(op)
-        :(applystepview(op, preparestepview(img)))
+        :(applystepview(op, img))
     elseif supports_permute(op)
-        :(applypermute(op, preparepermute(img)))
+        :(applypermute(op, img))
     elseif supports_affine(op)
         :(applyaffine(op, prepareaffine(img)))
+    elseif supports_affineview(op)
+        :(applyaffineview(op, prepareaffine(img)))
     else
         :(throw(MethodError(applylazy, (op, img))))
     end
 end
 
-# TODO: implement method for n-dim arrays
-function toaffine(op::Either, img::AbstractMatrix)
-    supports_affine(typeof(op)) || throw(MethodError(toaffine, (op, img)))
-    p = rand()
-    for (i, p_i) in enumerate(op.cum_chances)
-        if p <= p_i
-            tfm = toaffine(op.operations[i], img)
-            return AffineMap(SMatrix(tfm.m), SVector(tfm.v))::AffineMap{SMatrix{2,2,Float64,4},SVector{2,Float64}}
-        end
-    end
-    error("unreachable code reached")
-end
+@inline isinvwarpedview(::Type{SubArray{T,N,P,I,L}}) where {T,N,P<:InvWarpedView,I,L} = true
+@inline isinvwarpedview(::Type{<:InvWarpedView}) = true
+@inline isinvwarpedview(::Type) = false
 
-function applyaffine(op::Either, img)
-    invwarpedview(img, toaffine(op, img))
-end
-
-for KIND in (:eager, :permute, :view, :stepview)
-    APP = Symbol(:apply, KIND)
+# Sample a random operation and pass the function call along.
+# Note: "applyaffine" needs to map to "applyaffine_common" for
+#   type stability, because otherwise the concrete type of the
+#   "AffineMap" may differ from one operation to the next
+#   (e.g. "Rotate" uses a "RotMatrix" by default, while "Scale"
+#   for obvious reasons does not)
+for KIND in (:eager, :permute, :view, :stepview, :affine, :affineview)
+    FUN = Symbol(:apply, KIND)
     SUP = Symbol(:supports_, KIND)
-    @eval function ($APP)(op::Either, img)
-        ($SUP)(typeof(op)) || throw(MethodError($APP, (op, img)))
+    APP = startswith(String(KIND),"affine") ? Symbol(FUN, :_common) : FUN
+    @eval function ($FUN)(op::Either, img)
+        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
         p = rand()
         for (i, p_i) in enumerate(op.cum_chances)
             if p <= p_i

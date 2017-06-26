@@ -59,7 +59,7 @@ Rotate90(p::Number) = Either(Rotate90(), p)
 
 @inline supports_permute(::Type{Rotate90}) = true
 
-toaffine(::Rotate90, img::AbstractMatrix) = recenter(RotMatrix(pi/2), center(img))
+toaffinemap(::Rotate90, img::AbstractMatrix) = recenter(RotMatrix(pi/2), center(img))
 applyeager(::Rotate90, img::AbstractMatrix) = plain_array(rotl90(img))
 applylazy_fallback(op::Rotate90, img::AbstractMatrix) = applypermute(op, img)
 
@@ -142,7 +142,7 @@ Rotate180(p::Number) = Either(Rotate180(), p)
 
 @inline supports_stepview(::Type{Rotate180}) = true
 
-toaffine(::Rotate180, img::AbstractMatrix) = recenter(RotMatrix(pi), center(img))
+toaffinemap(::Rotate180, img::AbstractMatrix) = recenter(RotMatrix(pi), center(img))
 applyeager(::Rotate180, img::AbstractMatrix) = plain_array(rot180(img))
 applylazy_fallback(op::Rotate180, img::AbstractMatrix) = applystepview(op, img)
 
@@ -213,7 +213,7 @@ Rotate270(p::Number) = Either(Rotate270(), p)
 
 @inline supports_permute(::Type{Rotate270}) = true
 
-toaffine(::Rotate270, img::AbstractMatrix) = recenter(RotMatrix(-pi/2), center(img))
+toaffinemap(::Rotate270, img::AbstractMatrix) = recenter(RotMatrix(-pi/2), center(img))
 applyeager(::Rotate270, img::AbstractMatrix) = plain_array(rotr90(img))
 applylazy_fallback(op::Rotate270, img::AbstractMatrix) = applypermute(op, img)
 
@@ -320,7 +320,7 @@ Rotate(degree::Real) = Rotate(degree:degree)
 
 @inline supports_eager(::Type{<:Rotate}) = false
 
-function toaffine(op::Rotate, img::AbstractMatrix)
+function toaffinemap(op::Rotate, img::AbstractMatrix)
     recenter(RotMatrix(deg2rad(Float64(rand(op.degree)))), center(img))
 end
 

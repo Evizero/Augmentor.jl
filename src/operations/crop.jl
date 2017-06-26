@@ -63,17 +63,16 @@ Crop(indexes::Range...) = Crop(indexes)
 
 @deprecate Crop(x, y, width, height) Crop(y:y+height-1, x:x+width-1)
 
-@inline supports_eager(::Type{<:Crop})    = false
-@inline supports_affine(::Type{<:Crop})   = true
-@inline supports_view(::Type{<:Crop})     = true
-@inline supports_stepview(::Type{<:Crop}) = true
+@inline supports_eager(::Type{<:Crop})      = false
+@inline supports_affineview(::Type{<:Crop}) = true
+@inline supports_view(::Type{<:Crop})       = true
+@inline supports_stepview(::Type{<:Crop})   = true
 
-applyeager(op::Crop, img) = plain_array(indirect_view(img, op.indexes))
-
-applyaffine(op::Crop, img)   = indirect_view(img, op.indexes)
-applylazy(op::Crop, img)     = indirect_view(img, op.indexes)
-applyview(op::Crop, img)     = indirect_view(img, op.indexes)
-applystepview(op::Crop, img) = indirect_view(img, map(StepRange, op.indexes))
+applyeager(op::Crop, img) = plain_array(applyview(op, img))
+@inline applylazy(op::Crop, img) = applyview(op, img)
+applyaffineview(op::Crop, img) = applyview(op, prepareaffine(img))
+applyview(op::Crop, img)       = indirect_view(img, op.indexes)
+applystepview(op::Crop, img)   = indirect_view(img, map(StepRange, op.indexes))
 
 function Base.show(io::IO, op::Crop{N}) where N
     if get(io, :compact, false)
@@ -159,16 +158,16 @@ CropNative(indexes::Range...) = CropNative(indexes)
 
 @deprecate CropNative(x, y, width, height) CropNative(y:y+height-1, x:x+width-1)
 
-@inline supports_eager(::Type{<:CropNative})    = false
-@inline supports_affine(::Type{<:CropNative})   = true
-@inline supports_view(::Type{<:CropNative})     = true
-@inline supports_stepview(::Type{<:CropNative}) = true
+@inline supports_eager(::Type{<:CropNative})      = false
+@inline supports_affineview(::Type{<:CropNative}) = true
+@inline supports_view(::Type{<:CropNative})       = true
+@inline supports_stepview(::Type{<:CropNative})   = true
 
-applyeager(op::CropNative, img)    = plain_array(img[op.indexes...])
-applyaffine(op::CropNative, img)   = direct_view(img, op.indexes)
-applylazy(op::CropNative, img)     = direct_view(img, op.indexes)
-applyview(op::CropNative, img)     = direct_view(img, op.indexes)
-applystepview(op::CropNative, img) = direct_view(img, map(StepRange, op.indexes))
+applyeager(op::CropNative, img) = plain_array(img[op.indexes...])
+@inline applylazy(op::CropNative, img) = applyview(op, img)
+applyaffineview(op::CropNative, img) = applyview(op, prepareaffine(img))
+applyview(op::CropNative, img)       = direct_view(img, op.indexes)
+applystepview(op::CropNative, img)   = direct_view(img, map(StepRange, op.indexes))
 
 function showconstruction(io::IO, op::Union{Crop,CropNative})
     print(io, typeof(op).name.name, '(', join(map(string, op.indexes),", "), ')')
@@ -243,10 +242,10 @@ CropSize(size::NTuple{N,Int}) where {N} = CropSize{N}(size)
 CropSize(size::Int...) = CropSize(size)
 CropSize(; width=64, height=64) = CropSize((height,width))
 
-@inline supports_eager(::Type{<:CropSize})    = false
-@inline supports_affine(::Type{<:CropSize})   = true
-@inline supports_view(::Type{<:CropSize})     = true
-@inline supports_stepview(::Type{<:CropSize}) = true
+@inline supports_eager(::Type{<:CropSize})      = false
+@inline supports_affineview(::Type{<:CropSize}) = true
+@inline supports_view(::Type{<:CropSize})       = true
+@inline supports_stepview(::Type{<:CropSize})   = true
 
 function cropsize_indices(op::CropSize, img::AbstractArray)
     cntr = convert(Tuple, center(img))
@@ -255,9 +254,9 @@ function cropsize_indices(op::CropSize, img::AbstractArray)
     map((b,s)->b:(b+s-1), corner, sze)
 end
 
-applyeager(op::CropSize, img)  = plain_array(applyview(op, img))
-applylazy(op::CropSize, img)   = applyview(op, img)
-applyaffine(op::CropSize, img) = applyview(op, img)
+applyeager(op::CropSize, img) = plain_array(applyview(op, img))
+@inline applylazy(op::CropSize, img) = applyview(op, img)
+applyaffineview(op::CropSize, img) = applyview(op, prepareaffine(img))
 
 function applyview(op::CropSize, img)
     direct_view(img, cropsize_indices(op, img))
@@ -340,10 +339,10 @@ immutable CropRatio <: ImageOperation
 end
 CropRatio(; ratio = 1.) = CropRatio(ratio)
 
-@inline supports_eager(::Type{CropRatio})    = false
-@inline supports_affine(::Type{CropRatio})   = true
-@inline supports_view(::Type{CropRatio})     = true
-@inline supports_stepview(::Type{CropRatio}) = true
+@inline supports_eager(::Type{CropRatio})      = false
+@inline supports_affineview(::Type{CropRatio}) = true
+@inline supports_view(::Type{CropRatio})       = true
+@inline supports_stepview(::Type{CropRatio})   = true
 
 function cropratio_indices(op::CropRatio, img::AbstractMatrix)
     h, w = map(length, indices(img))
@@ -360,9 +359,9 @@ function cropratio_indices(op::CropRatio, img::AbstractMatrix)
     map((b,s)->b:(b+s-1), corner, sze)
 end
 
-applyeager(op::CropRatio, img)  = plain_array(applyview(op, img))
-applylazy(op::CropRatio, img)   = applyview(op, img)
-applyaffine(op::CropRatio, img) = applyview(op, img)
+applyeager(op::CropRatio, img) = plain_array(applyview(op, img))
+@inline applylazy(op::CropRatio, img) = applyview(op, img)
+applyaffineview(op::CropRatio, img) = applyview(op, prepareaffine(img))
 
 function applyview(op::CropRatio, img)
     direct_view(img, cropratio_indices(op, img))
@@ -462,10 +461,10 @@ immutable RCropRatio <: ImageOperation
 end
 RCropRatio(; ratio = 1.) = RCropRatio(ratio)
 
-@inline supports_eager(::Type{RCropRatio})    = false
-@inline supports_affine(::Type{RCropRatio})   = true
-@inline supports_view(::Type{RCropRatio})     = true
-@inline supports_stepview(::Type{RCropRatio}) = true
+@inline supports_eager(::Type{RCropRatio})      = false
+@inline supports_affineview(::Type{RCropRatio}) = true
+@inline supports_view(::Type{RCropRatio})       = true
+@inline supports_stepview(::Type{RCropRatio})   = true
 
 function rcropratio_indices(op::RCropRatio, img::AbstractMatrix)
     h, w = map(length, indices(img))
@@ -493,9 +492,9 @@ function rcropratio_indices(op::RCropRatio, img::AbstractMatrix)
     end
 end
 
-applyeager(op::RCropRatio, img)  = plain_array(applyview(op, img))
-applylazy(op::RCropRatio, img)   = applyview(op, img)
-applyaffine(op::RCropRatio, img) = applyview(op, img)
+applyeager(op::RCropRatio, img) = plain_array(applyview(op, img))
+@inline applylazy(op::RCropRatio, img) = applyview(op, img)
+applyaffineview(op::RCropRatio, img) = applyview(op, prepareaffine(img))
 
 function applyview(op::RCropRatio, img)
     indirect_view(img, rcropratio_indices(op, img))
