@@ -1,6 +1,12 @@
 # v0.2.0
 
-Dropped 0.5 support
+- `Either` can now lazily combine affine operations with operations
+  such as `Crop`, `Zoom`, and `Resize`. This is because a new kind
+  of support was introduced called `Augmentor.supports_affineview`,
+  which is true if an operation can represent itself as a `SubArray`
+  of a `InvWarpedView`.
+
+- Dropped 0.5 support
 
 # v0.1.0
 
