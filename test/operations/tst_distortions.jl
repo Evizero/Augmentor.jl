@@ -85,7 +85,7 @@
         end
     end
     @testset "eager" begin
-        @test @inferred(Augmentor.supports_eager(ElasticDistortion)) === false
+        @test Augmentor.supports_eager(ElasticDistortion) === false
         for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
             dv = @inferred Augmentor.applyeager(ElasticDistortion(4,4), img)
             # TODO: better tests
@@ -94,10 +94,13 @@
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.supports_affine(ElasticDistortion)) === false
+        @test Augmentor.supports_affine(ElasticDistortion) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(ElasticDistortion) === false
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(ElasticDistortion)) === true
+        @test Augmentor.supports_lazy(ElasticDistortion) === true
         for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
             dv = @inferred Augmentor.applylazy(ElasticDistortion(4,4), img)
             # TODO: better tests
@@ -107,12 +110,12 @@
         end
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(ElasticDistortion)) === false
+        @test Augmentor.supports_view(ElasticDistortion) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(ElasticDistortion)) === false
+        @test Augmentor.supports_stepview(ElasticDistortion) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(ElasticDistortion)) === false
+        @test Augmentor.supports_permute(ElasticDistortion) === false
     end
 end

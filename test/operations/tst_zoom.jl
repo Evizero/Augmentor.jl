@@ -65,12 +65,14 @@
         end
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(Zoom) === false
-        @test Augmentor.supports_affine(Zoom) === true
-        @test_throws MethodError Augmentor.applyaffine(Zoom(90), nothing)
-        @test @inferred(Augmentor.toaffine(Zoom(2,3), rect)) ≈ AffineMap([2. 0.; 0. 3.], [-1.5,-4.0])
-        @test @inferred(Augmentor.toaffine(Zoom([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.15,0.4])
-        wv = @inferred Augmentor.applyaffine(Zoom(2,3), Augmentor.prepareaffine(square))
+        @test Augmentor.supports_affine(Zoom) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Zoom) === true
+        @test_throws MethodError Augmentor.applyaffineview(Zoom(90), nothing)
+        @test @inferred(Augmentor.toaffinemap(Zoom(2,3), rect)) ≈ AffineMap([2. 0.; 0. 3.], [-1.5,-4.0])
+        @test @inferred(Augmentor.toaffinemap(Zoom([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.15,0.4])
+        wv = @inferred Augmentor.applyaffineview(Zoom(2,3), Augmentor.prepareaffine(square))
         # TODO: better tests
         @test eltype(wv) == eltype(square)
         @test typeof(wv) <: SubArray

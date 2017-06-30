@@ -5,9 +5,8 @@ Load and return the provided 300x400 test image.
 
 The returned image was specifically designed to be informative
 about the effects of the applied augmentation operations. It is
-thus well suited to prototype an augmentation pipeline, because
-it makes it easy to see what kind of effects one can achieve with
-it.
+thus well suited to prototype an augmentation pipeline, because it
+makes it easy to see what kind of effects one can achieve with it.
 """
 testpattern() = load(joinpath(dirname(@__FILE__()), "..", "resources", "testpattern.png"))
 
@@ -40,15 +39,15 @@ end
     I
 end
 
-@inline function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange}) where N
+function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange}) where N
     map((i1,i2) -> IdentityRange(UnitRange(i1)[i2]), O, I)
 end
 
-@inline function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange}) where N
+function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange}) where N
     map((i1,i2) -> UnitRange(i1)[i2], O, I)
 end
 
-@inline function indirect_indices(O::NTuple{N,StepRange}, I::NTuple{N,Range}) where N
+function indirect_indices(O::NTuple{N,StepRange}, I::NTuple{N,Range}) where N
     map((i1,i2) -> i1[i2], O, I)
 end
 

@@ -64,15 +64,23 @@
         end
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(Scale) === true
         @test Augmentor.supports_affine(Scale) === true
         @test_throws MethodError Augmentor.applyaffine(Scale(90), nothing)
-        @test @inferred(Augmentor.toaffine(Scale(2,3), rect)) ≈ AffineMap([2. 0.; 0. 3.], [-1.5,-4.0])
-        @test @inferred(Augmentor.toaffine(Scale([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.15,0.4])
+        @test @inferred(Augmentor.toaffinemap(Scale(2,3), rect)) ≈ AffineMap([2. 0.; 0. 3.], [-1.5,-4.0])
+        @test @inferred(Augmentor.toaffinemap(Scale([0.9,0.9],[0.8,0.8]), rect)) ≈ AffineMap([.9 0.; 0. .8], [0.15,0.4])
         wv = @inferred Augmentor.applyaffine(Scale(2,3), Augmentor.prepareaffine(square))
         # TODO: better tests
         @test parent(wv).itp.coefs === square
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Scale) === true
+        @test_throws MethodError Augmentor.applyaffineview(Scale(90), nothing)
+        wv = @inferred Augmentor.applyaffineview(Scale(2,3), Augmentor.prepareaffine(square))
+        # TODO: better tests
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Scale) === true

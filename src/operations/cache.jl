@@ -55,7 +55,9 @@ immutable CacheImage <: ImageOperation end
 
 applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
-applyeager(op::CacheImage, img) = copy(img) # FIXME: collect
+applyeager(op::CacheImage, img::SubArray) = copy(img)
+applyeager(op::CacheImage, img::InvWarpedView) = copy(img)
+applyeager(op::CacheImage, img) = collect(img)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
@@ -72,6 +74,11 @@ end
 
 # --------------------------------------------------------------------
 
+"""
+    CacheImageInto <: Augmentor.ImageOperation
+
+see [`CacheImage`](@ref)
+"""
 immutable CacheImageInto{T<:AbstractArray} <: ImageOperation
     buffer::T
 end
@@ -80,7 +87,7 @@ CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
 @inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
-@inline match_idx{N}(buffer::Array, inds::NTuple{N,UnitRange}) =
+@inline match_idx(buffer::Array, inds::NTuple{N,UnitRange}) where {N} =
     OffsetArray(buffer, inds)
 
 applyeager(op::CacheImageInto, img) = applylazy(op, img)

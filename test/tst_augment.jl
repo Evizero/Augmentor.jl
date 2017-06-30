@@ -84,7 +84,7 @@ end
 ops = Augmentor.ImmutablePipeline(Rotate(90),Rotate(-90)) # forces affine
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
-    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffinemap(NoOp(),rect), Flat()))
     @test wv == camera
 end
 
@@ -104,15 +104,22 @@ end
 ops = (ShearX(45),ShearX(-45)) # forces affine
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
-    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffinemap(NoOp(),rect), Flat()))
     @test view(wv,1:512,1:512) == camera
 end
 
 ops = (ShearY(45),ShearY(-45)) # forces affine
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
-    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffine(NoOp(),rect), Flat()))
+    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffinemap(NoOp(),rect), Flat()))
     @test view(wv,1:512,1:512) == camera
+end
+
+ops = (ShearY(45),ShearX(-2),CacheImage()) # forces affine then eager
+@testset "$(str_showcompact(ops))" begin
+    img = @inferred Augmentor._augment(camera, ops)
+    @test typeof(img) <: OffsetArray
+    @test indices(img) == (-255:768, 0:512)
 end
 
 ops = (Resize(2,2),Rotate90()) # forces affine
@@ -335,4 +342,4 @@ ops = (Rotate(45),Zoom(2))
 end
 
 # just for code coverage
-@test typeof(@inferred(Augmentor.build_pipeline(Rotate90()))) <: Expr
+@test typeof(@inferred(Augmentor.augment_impl(Rotate90()))) <: Expr

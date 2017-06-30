@@ -78,7 +78,7 @@ include("distortedview.jl")
 include("operations/distortion.jl")
 
 include("pipeline.jl")
-include("compile.jl")
+include("codegen.jl")
 include("augment.jl")
 
 end # module

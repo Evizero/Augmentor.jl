@@ -8,24 +8,32 @@
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate90(), nothing)
-        @test @inferred(Augmentor.supports_eager(Rotate90)) === true
+        @test Augmentor.supports_eager(Rotate90) === true
         for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate90(), img)) == rotl90(rect)
             @test typeof(Augmentor.applyeager(Rotate90(), img)) <: Array
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(Rotate90)) === true
-        @test @inferred(Augmentor.supports_affine(Rotate90)) === true
+        @test Augmentor.supports_affine(Rotate90) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate90(), nothing)
-        @test @inferred(Augmentor.toaffine(Rotate90(), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(Rotate90(), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(Rotate90(), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Rotate90) === true
+        @test_throws MethodError Augmentor.applyaffineview(Rotate90(), nothing)
+        wv = @inferred Augmentor.applyaffineview(Rotate90(), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == rotl90(square)
+    end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(Rotate90)) === true
+        @test Augmentor.supports_lazy(Rotate90) === true
         v = @inferred Augmentor.applylazy(Rotate90(), rect)
         @test v === view(permuteddimsview(rect, (2,1)), 3:-1:1, 1:1:2)
         @test v == rotl90(rect)
@@ -40,13 +48,13 @@
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(Rotate90)) === false
+        @test Augmentor.supports_view(Rotate90) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(Rotate90)) === false
+        @test Augmentor.supports_stepview(Rotate90) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(Rotate90)) === true
+        @test Augmentor.supports_permute(Rotate90) === true
         v = @inferred Augmentor.applypermute(Rotate90(), rect)
         @test v === view(permuteddimsview(rect, (2,1)), 3:-1:1, 1:1:2)
         @test v == rotl90(rect)
@@ -69,24 +77,32 @@ end
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate180(), nothing)
-        @test @inferred(Augmentor.supports_eager(Rotate180)) === true
+        @test Augmentor.supports_eager(Rotate180) === true
         for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate180(), img)) == rot180(rect)
             @test typeof(Augmentor.applyeager(Rotate180(), img)) <: Array
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(Rotate180)) === true
-        @test @inferred(Augmentor.supports_affine(Rotate180)) === true
+        @test Augmentor.supports_affine(Rotate180) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate180(), nothing)
-        @test @inferred(Augmentor.toaffine(Rotate180(), rect)) ≈ AffineMap([-1.0 -1.22465e-16; 1.22465e-16 -1.0], [3.0,4.0])
+        @test @inferred(Augmentor.toaffinemap(Rotate180(), rect)) ≈ AffineMap([-1.0 -1.22465e-16; 1.22465e-16 -1.0], [3.0,4.0])
         wv = @inferred Augmentor.applyaffine(Rotate180(), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv[1:3,1:3] == rot180(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Rotate180) === true
+        @test_throws MethodError Augmentor.applyaffineview(Rotate180(), nothing)
+        wv = @inferred Augmentor.applyaffineview(Rotate180(), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv[1:3,1:3] == rot180(square)
+    end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(Rotate180)) === true
+        @test Augmentor.supports_lazy(Rotate180) === true
         v = @inferred Augmentor.applylazy(Rotate180(), rect)
         @test v === view(rect, 2:-1:1, 3:-1:1)
         @test v == rot180(rect)
@@ -97,10 +113,10 @@ end
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(Rotate180)) === false
+        @test Augmentor.supports_view(Rotate180) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(Rotate180)) === true
+        @test Augmentor.supports_stepview(Rotate180) === true
         v = @inferred Augmentor.applylazy(Rotate180(), rect)
         @test v === view(rect, 2:-1:1, 3:-1:1)
         @test v == rot180(rect)
@@ -112,7 +128,7 @@ end
         @test typeof(v) <: SubArray
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(Rotate180)) === false
+        @test Augmentor.supports_permute(Rotate180) === false
     end
 end
 
@@ -128,24 +144,32 @@ end
     end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate270(), nothing)
-        @test @inferred(Augmentor.supports_eager(Rotate270)) === true
+        @test Augmentor.supports_eager(Rotate270) === true
         for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(Rotate270(), img)) == rotr90(rect)
             @test typeof(Augmentor.applyeager(Rotate270(), img)) <: Array
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(Rotate270)) === true
-        @test @inferred(Augmentor.supports_affine(Rotate270)) === true
+        @test Augmentor.supports_affine(Rotate270) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate270(), nothing)
-        @test @inferred(Augmentor.toaffine(Rotate270(), rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
+        @test @inferred(Augmentor.toaffinemap(Rotate270(), rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
         wv = @inferred Augmentor.applyaffine(Rotate270(), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Rotate270) === true
+        @test_throws MethodError Augmentor.applyaffineview(Rotate270(), nothing)
+        wv = @inferred Augmentor.applyaffineview(Rotate270(), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == rotr90(square)
+    end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(Rotate270)) === true
+        @test Augmentor.supports_lazy(Rotate270) === true
         v = @inferred Augmentor.applylazy(Rotate270(), rect)
         @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
         @test v == rotr90(rect)
@@ -160,13 +184,13 @@ end
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(Rotate270)) === false
+        @test Augmentor.supports_view(Rotate270) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(Rotate270)) === false
+        @test Augmentor.supports_stepview(Rotate270) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(Rotate270)) === true
+        @test Augmentor.supports_permute(Rotate270) === true
         v = @inferred Augmentor.applypermute(Rotate270(), rect)
         @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
         @test v == rotr90(rect)
@@ -216,12 +240,11 @@ end
         end
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(Rotate) === true
         @test Augmentor.supports_affine(Rotate) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate(90), nothing)
-        @test @inferred(Augmentor.toaffine(Rotate(45), rect)) ≈ AffineMap([0.70710678118 -0.70710678118; 0.70710678118 0.70710678118], [1.85355339059,-0.47487373415])
-        @test @inferred(Augmentor.toaffine(Rotate(90), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
-        @test @inferred(Augmentor.toaffine(Rotate(-90), rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
+        @test @inferred(Augmentor.toaffinemap(Rotate(45), rect)) ≈ AffineMap([0.70710678118 -0.70710678118; 0.70710678118 0.70710678118], [1.85355339059,-0.47487373415])
+        @test @inferred(Augmentor.toaffinemap(Rotate(90), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(Rotate(-90), rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
         wv = @inferred Augmentor.applyaffine(Rotate(90), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
@@ -230,6 +253,20 @@ end
         @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Rotate) === true
+        @test_throws MethodError Augmentor.applyaffineview(Rotate(90), nothing)
+        wv = @inferred Augmentor.applyaffineview(Rotate(90), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == rotl90(square)
+        wv = @inferred Augmentor.applyaffineview(Rotate(-90), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == rotr90(square)
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Rotate(90)) === true

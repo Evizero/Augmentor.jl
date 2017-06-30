@@ -46,5 +46,5 @@ end
 end
 
 @generated function _augment(img, pipeline::Vararg{Operation})
-    Expr(:block, Expr(:meta, :inline), build_pipeline(:img, pipeline))
+    Expr(:block, Expr(:meta, :inline), augment_impl(:img, pipeline))
 end

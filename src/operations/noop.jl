@@ -14,7 +14,7 @@ immutable NoOp <: AffineOperation end
 @inline supports_view(::Type{NoOp}) = true
 
 # TODO: implement method for n-dim arrays
-toaffine(::NoOp, img::AbstractMatrix) = AffineMap(@SMatrix([1. 0; 0 1.]), @SVector([0.,0.]))
+toaffinemap(::NoOp, img::AbstractMatrix) = AffineMap(@SMatrix([1. 0; 0 1.]), @SVector([0.,0.]))
 applyeager(::NoOp, img) = plain_array(img)
 applylazy(::NoOp, img) = img
 

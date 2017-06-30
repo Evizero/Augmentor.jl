@@ -18,18 +18,20 @@
     o = OffsetArray(square, (-1,2))
     @test @inferred(Augmentor.applyeager(CacheImage(),o)) === o
 
-    @test @inferred(Augmentor.supports_eager(CacheImage)) === true
-    @test @inferred(Augmentor.supports_lazy(CacheImage)) === false
-    @test @inferred(Augmentor.supports_view(CacheImage)) === false
-    @test @inferred(Augmentor.supports_stepview(CacheImage)) === false
-    @test @inferred(Augmentor.supports_permute(CacheImage)) === false
-    @test @inferred(Augmentor.supports_affine(CacheImage)) === false
+    @test Augmentor.supports_eager(CacheImage) === true
+    @test Augmentor.supports_lazy(CacheImage) === false
+    @test Augmentor.supports_view(CacheImage) === false
+    @test Augmentor.supports_stepview(CacheImage) === false
+    @test Augmentor.supports_permute(CacheImage) === false
+    @test Augmentor.supports_affine(CacheImage) === false
+    @test Augmentor.supports_affineview(CacheImage) === false
 
     @test_throws MethodError Augmentor.applylazy(CacheImage(), v)
     @test_throws MethodError Augmentor.applyview(CacheImage(), v)
     @test_throws MethodError Augmentor.applystepview(CacheImage(), v)
     @test_throws MethodError Augmentor.applypermute(CacheImage(), v)
     @test_throws MethodError Augmentor.applyaffine(CacheImage(), v)
+    @test_throws MethodError Augmentor.applyaffineview(CacheImage(), v)
 end
 
 # --------------------------------------------------------------------
@@ -73,15 +75,17 @@ end
 
     @test_throws BoundsError Augmentor.applyeager(op, camera)
 
-    @test @inferred(Augmentor.supports_eager(Augmentor.CacheImageInto)) === true
-    @test @inferred(Augmentor.supports_lazy(Augmentor.CacheImageInto)) === true
-    @test @inferred(Augmentor.supports_view(Augmentor.CacheImageInto)) === false
-    @test @inferred(Augmentor.supports_stepview(Augmentor.CacheImageInto)) === false
-    @test @inferred(Augmentor.supports_permute(Augmentor.CacheImageInto)) === false
-    @test @inferred(Augmentor.supports_affine(Augmentor.CacheImageInto)) === false
+    @test Augmentor.supports_eager(Augmentor.CacheImageInto) === true
+    @test Augmentor.supports_lazy(Augmentor.CacheImageInto) === true
+    @test Augmentor.supports_view(Augmentor.CacheImageInto) === false
+    @test Augmentor.supports_stepview(Augmentor.CacheImageInto) === false
+    @test Augmentor.supports_permute(Augmentor.CacheImageInto) === false
+    @test Augmentor.supports_affine(Augmentor.CacheImageInto) === false
+    @test Augmentor.supports_affineview(Augmentor.CacheImageInto) === false
 
     @test_throws MethodError Augmentor.applyview(CacheImage(buf), v)
     @test_throws MethodError Augmentor.applystepview(CacheImage(buf), v)
     @test_throws MethodError Augmentor.applypermute(CacheImage(buf), v)
     @test_throws MethodError Augmentor.applyaffine(CacheImage(buf), v)
+    @test_throws MethodError Augmentor.applyaffineview(CacheImage(buf), v)
 end
