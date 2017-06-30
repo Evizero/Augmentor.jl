@@ -28,10 +28,12 @@
         end
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(Crop) === false
-        @test Augmentor.supports_affine(Crop) === true
-        @test_throws MethodError Augmentor.applyaffine(Crop(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffine(Crop(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test Augmentor.supports_affine(Crop) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Crop) === true
+        @test_throws MethodError Augmentor.applyaffineview(Crop(1:2,2:3), nothing)
+        @test @inferred(Augmentor.applyaffineview(Crop(1:2,2:3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Crop) === true
@@ -85,10 +87,12 @@ end
         @test typeof(Augmentor.applyeager(CropNative(-1:0,1:2), img)) <: Array
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(CropNative) === false
-        @test Augmentor.supports_affine(CropNative) === true
-        @test_throws MethodError Augmentor.applyaffine(CropNative(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffine(CropNative(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test Augmentor.supports_affine(CropNative) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(CropNative) === true
+        @test_throws MethodError Augmentor.applyaffineview(CropNative(1:2,2:3), nothing)
+        @test @inferred(Augmentor.applyaffineview(CropNative(1:2,2:3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(CropNative) === true
@@ -149,11 +153,13 @@ end
         @test @inferred(Augmentor.applyeager(CropSize(4,4), square2)) == square2
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(CropSize) === false
-        @test Augmentor.supports_affine(CropSize) === true
-        @test_throws MethodError Augmentor.applyaffine(CropSize(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffine(CropSize(2,3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyaffine(CropSize(2,2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(2:3))
+        @test Augmentor.supports_affine(CropSize) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(CropSize) === true
+        @test_throws MethodError Augmentor.applyaffineview(CropSize(1:2,2:3), nothing)
+        @test @inferred(Augmentor.applyaffineview(CropSize(2,3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(CropSize(2,2), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(2:3), IdentityRange(2:3))
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(CropSize) === true
@@ -219,12 +225,14 @@ end
         @test @inferred(Augmentor.applyeager(CropRatio(1), square2)) == square2
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(CropRatio) === false
-        @test Augmentor.supports_affine(CropRatio) === true
-        @test_throws MethodError Augmentor.applyaffine(CropRatio(1), nothing)
-        @test @inferred(Augmentor.applyaffine(CropRatio(1), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:2))
-        @test @inferred(Augmentor.applyaffine(CropRatio(2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(1:4))
-        @test @inferred(Augmentor.applyaffine(CropRatio(.5), square2)) === view(square2, IdentityRange(1:4), IdentityRange(2:3))
+        @test Augmentor.supports_affine(CropRatio) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(CropRatio) === true
+        @test_throws MethodError Augmentor.applyaffineview(CropRatio(1), nothing)
+        @test @inferred(Augmentor.applyaffineview(CropRatio(1), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applyaffineview(CropRatio(2), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyaffineview(CropRatio(.5), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(2:3))
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(CropRatio) === true
@@ -294,20 +302,22 @@ end
         @test out == rect[1:2,1:2] || out == rect[1:2,2:3]
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(RCropRatio) === false
-        @test Augmentor.supports_affine(RCropRatio) === true
-        @test_throws MethodError Augmentor.applyaffine(RCropRatio(1), nothing)
+        @test Augmentor.supports_affine(RCropRatio) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(RCropRatio) === true
+        @test_throws MethodError Augmentor.applyaffineview(RCropRatio(1), nothing)
         # preserve aspect ratio (i.e. not random)
-        @test @inferred(Augmentor.applyaffine(RCropRatio(3/2), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyaffine(RCropRatio(1), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyaffine(RCropRatio(1), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyaffineview(RCropRatio(3/2), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(RCropRatio(1), square)) == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(RCropRatio(1), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(1:4))
         # randomly placed
-        out = @inferred Augmentor.applyaffine(RCropRatio(1), rect)
-        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
-        out = @inferred Augmentor.applyaffine(RCropRatio(2/3), square)
-        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out === view(square, IdentityRange(1:3), IdentityRange(2:3))
-        out = @inferred Augmentor.applyaffine(RCropRatio(3/2), square)
-        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out === view(square, IdentityRange(2:3), IdentityRange(1:3))
+        out = @inferred Augmentor.applyaffineview(RCropRatio(1), rect)
+        @test out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applyaffineview(RCropRatio(2/3), square)
+        @test out == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(2:3))
+        out = @inferred Augmentor.applyaffineview(RCropRatio(3/2), square)
+        @test out == view(Augmentor.prepareaffine(square), IdentityRange(1:2), IdentityRange(1:3)) || out == view(Augmentor.prepareaffine(square), IdentityRange(2:3), IdentityRange(1:3))
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(RCropRatio) === true

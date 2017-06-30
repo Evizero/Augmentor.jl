@@ -55,6 +55,8 @@ immutable CacheImage <: ImageOperation end
 
 applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
+applyeager(op::CacheImage, img::SubArray) = copy(img)
+applyeager(op::CacheImage, img::InvWarpedView) = copy(img)
 applyeager(op::CacheImage, img) = collect(img)
 
 function showconstruction(io::IO, op::CacheImage)

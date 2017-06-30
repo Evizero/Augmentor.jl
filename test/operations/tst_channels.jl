@@ -10,7 +10,7 @@
         @test str_showcompact(SplitChannels()) == "Split colorant into its color channels"
     end
     @testset "eager" begin
-        @test @inferred(Augmentor.supports_eager(SplitChannels)) === false
+        @test Augmentor.supports_eager(SplitChannels) === false
         @test_throws MethodError Augmentor.applyeager(SplitChannels(), rand(2,2))
         for img in (Augmentor.prepareaffine(rect), rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test @inferred(Augmentor.applyeager(SplitChannels(), img)) == reshape(rect, 1, 2, 3)
@@ -22,11 +22,13 @@
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(SplitChannels)) === false
-        @test @inferred(Augmentor.supports_affine(SplitChannels)) === false
+        @test Augmentor.supports_affine(SplitChannels) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(SplitChannels) === false
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(SplitChannels)) === true
+        @test Augmentor.supports_lazy(SplitChannels) === true
         @test @inferred(Augmentor.supports_lazy(typeof(SplitChannels()))) === true
         @test_throws MethodError Augmentor.applylazy(SplitChannels(), rand(2,2))
         for img in (Augmentor.prepareaffine(rect), rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
@@ -47,13 +49,13 @@
         end
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(SplitChannels)) === false
+        @test Augmentor.supports_view(SplitChannels) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(SplitChannels)) === false
+        @test Augmentor.supports_stepview(SplitChannels) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(SplitChannels)) === false
+        @test Augmentor.supports_permute(SplitChannels) === false
     end
 end
 
@@ -75,7 +77,7 @@ end
         @test str_showcompact(CombineChannels(Gray)) == "Combine color channels into colorant Gray{Any}"
     end
     @testset "eager" begin
-        @test @inferred(Augmentor.supports_eager(CombineChannels)) === false
+        @test Augmentor.supports_eager(CombineChannels) === false
         @test_throws MethodError Augmentor.applyeager(CombineChannels(RGB), rand(RGB{N0f8},4,4))
         @test_throws MethodError Augmentor.applyeager(CombineChannels(Gray), rand(Gray{N0f8},4,4))
         @test_throws ArgumentError Augmentor.applyeager(CombineChannels(Gray), rand(4,4))
@@ -95,11 +97,13 @@ end
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(CombineChannels)) === false
-        @test @inferred(Augmentor.supports_affine(CombineChannels)) === false
+        @test Augmentor.supports_affine(CombineChannels) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(CombineChannels) === false
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(CombineChannels)) === true
+        @test Augmentor.supports_lazy(CombineChannels) === true
         @test @inferred(Augmentor.supports_lazy(typeof(CombineChannels(Gray)))) === true
         @test_throws MethodError Augmentor.applylazy(CombineChannels(RGB), rand(RGB{N0f8},4,4))
         @test_throws MethodError Augmentor.applylazy(CombineChannels(Gray), rand(Gray{N0f8},4,4))
@@ -124,13 +128,13 @@ end
         end
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(CombineChannels)) === false
+        @test Augmentor.supports_view(CombineChannels) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(CombineChannels)) === false
+        @test Augmentor.supports_stepview(CombineChannels) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(CombineChannels)) === false
+        @test Augmentor.supports_permute(CombineChannels) === false
     end
 end
 
@@ -159,7 +163,7 @@ end
         @test str_showcompact(PermuteDims((3,2,1))) == "Permute dimension order to (3, 2, 1)"
     end
     @testset "eager" begin
-        @test @inferred(Augmentor.supports_eager(PermuteDims)) === true
+        @test Augmentor.supports_eager(PermuteDims) === true
         @test @inferred(Augmentor.supports_eager(typeof(PermuteDims(2,1)))) === true
         for img in (Augmentor.prepareaffine(rect), rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test_throws MethodError Augmentor.applyeager(PermuteDims(3,2,1), img)
@@ -168,11 +172,13 @@ end
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(PermuteDims)) === false
-        @test @inferred(Augmentor.supports_affine(PermuteDims)) === false
+        @test Augmentor.supports_affine(PermuteDims) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(PermuteDims) === false
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(PermuteDims)) === true
+        @test Augmentor.supports_lazy(PermuteDims) === true
         @test @inferred(Augmentor.supports_lazy(typeof(PermuteDims(2,1)))) === true
         for img in (Augmentor.prepareaffine(rect), rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
             @test_throws MethodError Augmentor.applylazy(PermuteDims(3,2,1), img)
@@ -180,13 +186,13 @@ end
         end
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(PermuteDims)) === false
+        @test Augmentor.supports_view(PermuteDims) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(PermuteDims)) === false
+        @test Augmentor.supports_stepview(PermuteDims) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(PermuteDims)) === false
+        @test Augmentor.supports_permute(PermuteDims) === false
     end
 end
 
@@ -216,7 +222,7 @@ end
         @test str_showcompact(Reshape(10)) == "Reshape array to 10-element vector"
     end
     @testset "eager" begin
-        @test @inferred(Augmentor.supports_eager(Reshape)) === false
+        @test Augmentor.supports_eager(Reshape) === false
         @test @inferred(Augmentor.supports_eager(typeof(Reshape(2,1)))) === false
         # FIXME: reintroduce Augmentor.prepareaffine(rect) in 0.6
         for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
@@ -225,11 +231,13 @@ end
         end
     end
     @testset "affine" begin
-        @test @inferred(Augmentor.isaffine(Reshape)) === false
-        @test @inferred(Augmentor.supports_affine(Reshape)) === false
+        @test Augmentor.supports_affine(Reshape) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(Reshape) === false
     end
     @testset "lazy" begin
-        @test @inferred(Augmentor.supports_lazy(Reshape)) === true
+        @test Augmentor.supports_lazy(Reshape) === true
         @test @inferred(Augmentor.supports_lazy(typeof(Reshape(2,1)))) === true
         # FIXME: reintroduce Augmentor.prepareaffine(rect) in 0.6
         for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
@@ -242,12 +250,12 @@ end
         end
     end
     @testset "view" begin
-        @test @inferred(Augmentor.supports_view(Reshape)) === false
+        @test Augmentor.supports_view(Reshape) === false
     end
     @testset "stepview" begin
-        @test @inferred(Augmentor.supports_stepview(Reshape)) === false
+        @test Augmentor.supports_stepview(Reshape) === false
     end
     @testset "permute" begin
-        @test @inferred(Augmentor.supports_permute(Reshape)) === false
+        @test Augmentor.supports_permute(Reshape) === false
     end
 end

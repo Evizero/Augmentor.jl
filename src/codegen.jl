@@ -32,15 +32,15 @@ end
 
 # --------------------------------------------------------------------
 
-function build_pipeline(var_offset::Int, op_offset::Int, pipeline::Tuple)
-    build_pipeline(var_offset, op_offset, first(pipeline), Base.tail(pipeline))
+function augment_impl(var_offset::Int, op_offset::Int, pipeline::Tuple)
+    augment_impl(var_offset, op_offset, first(pipeline), Base.tail(pipeline))
 end
 
-function build_pipeline(var_offset::Int, op_offset::Int, pipeline::Tuple{})
+function augment_impl(var_offset::Int, op_offset::Int, pipeline::Tuple{})
     :($(Symbol(:img_, var_offset)))
 end
 
-function build_pipeline(var_offset::Int, op_offset::Int, head, tail::NTuple{N,DataType}) where N
+function augment_impl(var_offset::Int, op_offset::Int, head, tail::NTuple{N,DataType}) where N
     var_in  = Symbol(:img_, var_offset)
     var_out = Symbol(:img_, var_offset+1)
     if supports_lazy(head, tail)
@@ -50,45 +50,44 @@ function build_pipeline(var_offset::Int, op_offset::Int, head, tail::NTuple{N,Da
         if num_special >= num_affine
             quote
                 $var_out = unroll_applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
-                $(build_pipeline(var_offset+1, op_offset+num_lazy, rest_lazy))
+                $(augment_impl(var_offset+1, op_offset+num_lazy, rest_lazy))
             end
         else
             quote
                 $var_out = unroll_applyaffine($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_affine-1)...)), $var_in)
-                $(build_pipeline(var_offset+1, op_offset+num_affine, rest_affine))
+                $(augment_impl(var_offset+1, op_offset+num_affine, rest_affine))
             end
         end
     else
         if length(tail) == 0 || supports_eager(head) || !supports_lazy(head)
             quote
                 $var_out = applyeager(pipeline[$op_offset], $var_in)
-                $(build_pipeline(var_offset+1, op_offset+1, tail))
+                $(augment_impl(var_offset+1, op_offset+1, tail))
             end
         else # use lazy because there is no special eager implementation
             quote
                 $var_out = unroll_applylazy(pipeline[$op_offset], $var_in)
-                $(build_pipeline(var_offset+1, op_offset+1, tail))
+                $(augment_impl(var_offset+1, op_offset+1, tail))
             end
         end
     end
 end
 
-function build_pipeline(varname, pipeline::Tuple)
+function augment_impl(varname, pipeline::NTuple{N,DataType}) where N
     quote
         img_1 = $varname
-        $(build_pipeline(1, 1, pipeline))
+        $(augment_impl(1, 1, pipeline))
     end
 end
 
 # --------------------------------------------------------------------
-
-# The following two methods are just for user inspection and debugging
-# purposes as they show what kind of code the pipeline generates.
-# They are not called internally by the package itself.
+# The following two methods are just for user inspection and
+# debugging purposes as they show what kind of code the pipeline
+# generates. They are not called internally by the package itself.
 #
 # Example:
 #
-#   julia> Augmentor.build_pipeline(Rotate(45) |> Scale(0.9) |> CacheImage() |> FlipX() |> FlipY())
+#   julia> Augmentor.augment_impl(Rotate(45) |> Scale(0.9) |> CacheImage() |> FlipX() |> FlipY())
 #   quote
 #       img_1 = input_image
 #       begin
@@ -103,8 +102,8 @@ end
 #       end
 #   end
 
-function build_pipeline(pipeline::AbstractPipeline)
-    build_pipeline(:input_image, map(typeof, operations(pipeline)))
+function augment_impl(pipeline::AbstractPipeline)
+    augment_impl(:input_image, map(typeof, operations(pipeline)))
 end
 
-build_pipeline(op::Operation) = build_pipeline((op,))
+augment_impl(op::Operation) = augment_impl((op,))

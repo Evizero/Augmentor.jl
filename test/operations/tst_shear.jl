@@ -43,11 +43,10 @@
         end
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(ShearX) === true
         @test Augmentor.supports_affine(ShearX) === true
         @test_throws MethodError Augmentor.applyaffine(ShearX(45), nothing)
-        @test @inferred(Augmentor.toaffine(ShearX(45), rect)) ≈ AffineMap([1. 0.; -1. 1.], [0.,1.5])
-        @test @inferred(Augmentor.toaffine(ShearX(-45), rect)) ≈ AffineMap([1. 0.; 1. 1.], [0.,-1.5])
+        @test @inferred(Augmentor.toaffinemap(ShearX(45), rect)) ≈ AffineMap([1. 0.; -1. 1.], [0.,1.5])
+        @test @inferred(Augmentor.toaffinemap(ShearX(-45), rect)) ≈ AffineMap([1. 0.; 1. 1.], [0.,-1.5])
         wv = @inferred Augmentor.applyaffine(ShearX(45), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test indices(wv) == (1:3,0:4)
@@ -56,6 +55,20 @@
         @test parent(wv).itp.coefs === square
         @test wv2[1:3,1:3] == square
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(ShearX) === true
+        @test_throws MethodError Augmentor.applyaffineview(ShearX(45), nothing)
+        wv = @inferred Augmentor.applyaffineview(ShearX(45), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test indices(wv) == (1:3,0:4)
+        wv2 = @inferred Augmentor.applyaffineview(ShearX(-45), wv)
+        @test wv2[1:3,1:3] == square
+        @test typeof(wv2) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv2)) <: InvWarpedView
+        @test parent(parent(wv2)).itp.coefs === square
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(ShearX(45)) === true
@@ -126,11 +139,10 @@ end
         end
     end
     @testset "affine" begin
-        @test Augmentor.isaffine(ShearY) === true
         @test Augmentor.supports_affine(ShearY) === true
         @test_throws MethodError Augmentor.applyaffine(ShearY(45), nothing)
-        @test @inferred(Augmentor.toaffine(ShearY(45), rect)) ≈ AffineMap([1. -1.; 0. 1.], [2.,0.])
-        @test @inferred(Augmentor.toaffine(ShearY(-45), rect)) ≈ AffineMap([1. 1.; 0. 1.], [-2.,0.])
+        @test @inferred(Augmentor.toaffinemap(ShearY(45), rect)) ≈ AffineMap([1. -1.; 0. 1.], [2.,0.])
+        @test @inferred(Augmentor.toaffinemap(ShearY(-45), rect)) ≈ AffineMap([1. 1.; 0. 1.], [-2.,0.])
         wv = @inferred Augmentor.applyaffine(ShearY(45), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test indices(wv) == (0:4,1:3)
@@ -139,6 +151,20 @@ end
         @test parent(wv).itp.coefs === square
         @test wv2[1:3,1:3] == square
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(ShearY) === true
+        @test_throws MethodError Augmentor.applyaffineview(ShearY(45), nothing)
+        wv = @inferred Augmentor.applyaffineview(ShearY(45), Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test indices(wv) == (0:4,1:3)
+        wv2 = @inferred Augmentor.applyaffineview(ShearY(-45), wv)
+        @test typeof(wv2) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv2)) <: InvWarpedView
+        @test parent(parent(wv2)).itp.coefs === square
+        @test wv2[1:3,1:3] == square
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(ShearY(45)) === true

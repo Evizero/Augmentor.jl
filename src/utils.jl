@@ -39,15 +39,15 @@ end
     I
 end
 
-@inline function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange}) where N
+function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,AbstractUnitRange}) where N
     map((i1,i2) -> IdentityRange(UnitRange(i1)[i2]), O, I)
 end
 
-@inline function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange}) where N
+function indirect_indices(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange}) where N
     map((i1,i2) -> UnitRange(i1)[i2], O, I)
 end
 
-@inline function indirect_indices(O::NTuple{N,StepRange}, I::NTuple{N,Range}) where N
+function indirect_indices(O::NTuple{N,StepRange}, I::NTuple{N,Range}) where N
     map((i1,i2) -> i1[i2], O, I)
 end
 

@@ -88,15 +88,15 @@ end
     @test_throws MethodError Augmentor.applyeager(Either(Rotate90(),NoOp()), nothing)
     for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
         op = @inferred Either((Rotate90(),Rotate270()), (1,0))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,1,0))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == rotr90(rect)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),Rotate270(),NoOp()), (0,0,1))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         if typeof(img) <: SubArray
             @test @inferred(Augmentor.applyeager(op, img)) == rect
             @test typeof(Augmentor.applyeager(op, img)) <: Array
@@ -104,35 +104,34 @@ end
             @test @inferred(Augmentor.applyeager(op, img)) === rect
         end
         op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,0,1))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == rect[1:2,2:3]
-        @test_throws MethodError Augmentor.applylazy(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, rect)
         @test_throws MethodError Augmentor.applyview(op, rect)
         @test_throws MethodError Augmentor.applystepview(op, rect)
         @test_throws MethodError Augmentor.applypermute(op, rect)
         op = @inferred Either((Rotate90(),Zoom(.8)), (1,0))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),FlipX()), (1,0))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),FlipX()), (0,1))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,2)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),FlipY()), (0,1))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,1)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Rotate90(),Resize(5,5)), (0,1))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
         op = @inferred Either((Crop(1:2,1:2),Resize(5,5)), (0,1))
-        @test @inferred(Augmentor.supports_eager(op)) === true
+        @test Augmentor.supports_eager(op) === true
         @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
         @test typeof(Augmentor.applyeager(op, img)) <: Array
     end
@@ -140,84 +139,84 @@ end
 
 @testset "affine" begin
     let op = @inferred Either((Rotate90(),Rotate(-90)), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     let op = @inferred Either((Rotate90(),Rotate270()), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === true
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === true
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     let op = @inferred Either((Rotate180(),FlipX(),FlipY()), (0,1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([1. 0.; 0. -1.], [0,4])
+        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([1. 0.; 0. -1.], [0,4])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == flipdim(square,2)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     let op = @inferred Either((Rotate90(),FlipY()), (0,1))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([-1. 0.; 0. 1.], [3,0])
+        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([-1. 0.; 0. 1.], [3,0])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == flipdim(square,1)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     let op = @inferred Either((Rotate90(),Rotate270()), (0,1))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === true
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === true
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
     for op = (@inferred(Rotate90(1)), @inferred(Either((Rotate90(),Scale(0.8)),(1,0))))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffine(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
@@ -227,104 +226,154 @@ end
         @test wv2 == rotl90(square)
         @test typeof(wv2) == typeof(wv)
     end
-    let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,1:2)))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === false
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
-        @test_throws MethodError Augmentor.toaffine(op, nothing)
-        @test_throws MethodError Augmentor.toaffine(op, rect)
+end
+
+@testset "affineview" begin
+    let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,1:2)),(1,0,0))
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
+        @test_throws MethodError Augmentor.toaffinemap(op, nothing)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+        wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == rotl90(square)
+        wv2 = @inferred Augmentor.applylazy(op, square)
+        @test typeof(wv) == typeof(wv2)
+        @test parent(parent(wv2)).itp.coefs === square
+        @test wv2 == wv
     end
-    let op = @inferred Either((Rotate90(),Rotate270(),CropSize(2,2)))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === false
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
-        @test_throws MethodError Augmentor.toaffine(op, nothing)
-        @test_throws MethodError Augmentor.toaffine(op, rect)
+    let op = @inferred Either((Rotate90(),Rotate270(),CropSize(2,2)),(0,0,1))
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
+        @test_throws MethodError Augmentor.toaffinemap(op, nothing)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+        wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == view(Augmentor.prepareaffine(square), IdentityRange(1:2), IdentityRange(1:2))
+        wv2 = @inferred Augmentor.applylazy(op, square)
+        @test typeof(wv) == typeof(wv2)
+        @test parent(parent(wv2)).itp.coefs === square
+        @test wv2 == wv
     end
-    let op = @inferred Either((Rotate90(),Zoom(.8)))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === false
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
-        @test_throws MethodError Augmentor.toaffine(op, nothing)
-        @test_throws MethodError Augmentor.toaffine(op, rect)
+    let op = @inferred Either((Rotate90(),Zoom(.8)), (0,1))
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
+        @test_throws MethodError Augmentor.toaffinemap(op, nothing)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+        wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        wv2 = @inferred Augmentor.applylazy(op, square)
+        @test typeof(wv) == typeof(wv2)
+        @test parent(parent(wv2)).itp.coefs === square
+        @test wv2 == wv
     end
-    let op = @inferred Either((Rotate90(),Resize(2,3)))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === false
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
-        @test_throws MethodError Augmentor.toaffine(op, nothing)
-        @test_throws MethodError Augmentor.toaffine(op, rect)
+    let op = @inferred Either((Rotate90(),Resize(2,3)), (0,1))
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
+        @test_throws MethodError Augmentor.toaffinemap(op, nothing)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+        wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == imresize(square, (2,3))
+        wv2 = @inferred Augmentor.applylazy(op, square)
+        @test typeof(wv) == typeof(wv2)
+        @test parent(parent(wv2)).itp.coefs === square
+        @test wv2 == wv
     end
-    let op = @inferred Either((Crop(1:2,1:2),Resize(2,3)))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === false
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === false
-        @test_throws MethodError Augmentor.toaffine(op, nothing)
-        @test_throws MethodError Augmentor.toaffine(op, rect)
+    let op = @inferred Either((Crop(1:2,1:2),Resize(2,3)), (1,0))
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
+        @test_throws MethodError Augmentor.toaffinemap(op, nothing)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
+        wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == square[1:2,1:2]
+        wv2 = @inferred Augmentor.applylazy(op, square)
+        @test typeof(wv) == typeof(wv2)
+        @test parent(parent(wv2)).itp.coefs === square
+        @test wv2 == wv
     end
 end
 
 @testset "view" begin
     let op = @inferred Either((NoOp(),Crop(1:2,2:3)), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === true
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === true
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
     end
     let op = @inferred Either((NoOp(),Crop(1:2,2:3)), (0,1))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === true
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === true
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
     end
     let op = @inferred Either((Crop(1:2,2:4),CropSize(2,3)), (0,1))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === true
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === true
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
     end
 end
 
 @testset "stepview" begin
     let op = @inferred Either((Rotate180(),FlipX()), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -334,12 +383,12 @@ end
         @test typeof(v) <: SubArray
     end
     let op = @inferred Either((Rotate180(),FlipX()), (0,1))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -349,12 +398,12 @@ end
         @test typeof(v) <: SubArray
     end
     let op = @inferred Either((FlipY(),FlipX()), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -364,12 +413,12 @@ end
         @test typeof(v) <: SubArray
     end
     let op = @inferred Either((Rotate180(),NoOp()), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -379,12 +428,12 @@ end
         @test typeof(v) <: SubArray
     end
     let op = @inferred Either((Rotate180(),NoOp(),Crop(1:2,2:3)),(0,1,0))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -392,14 +441,19 @@ end
         @test v === view(rect,1:1:2,1:1:3)
         @test v == rect
         @test typeof(v) <: SubArray
+        wv = @inferred Augmentor.applylazy(op, Augmentor.prepareaffine(square))
+        @test typeof(wv) <: SubArray{eltype(square),2}
+        @test typeof(parent(wv)) <: InvWarpedView
+        @test parent(parent(wv)).itp.coefs === square
+        @test wv == square
     end
     let op = @inferred Either((Rotate180(),NoOp(),Crop(1:2,2:3)),(0,0,1))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -408,12 +462,12 @@ end
         @test typeof(v) <: SubArray
     end
     let op = @inferred Either((Rotate180(),CropSize(2,3)),(0,1))
-        @test @inferred(Augmentor.isaffine(op)) === false
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === false
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === true
-        @test @inferred(Augmentor.supports_permute(op)) === false
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === true
+        @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
         v = @inferred Augmentor.applylazy(op, square)
@@ -425,12 +479,12 @@ end
 
 @testset "permute" begin
     let op = @inferred Either((Rotate90(),Rotate270()), (1,0))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === true
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === true
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applypermute(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
@@ -440,12 +494,12 @@ end
         @test typeof(v) <: SubArray
     end
     let op = @inferred Either((Rotate90(),Rotate270()), (0,1))
-        @test @inferred(Augmentor.isaffine(op)) === true
-        @test @inferred(Augmentor.supports_lazy(op)) === true
-        @test @inferred(Augmentor.supports_affine(op)) === true
-        @test @inferred(Augmentor.supports_view(op)) === false
-        @test @inferred(Augmentor.supports_stepview(op)) === false
-        @test @inferred(Augmentor.supports_permute(op)) === true
+        @test Augmentor.supports_affine(op) === true
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === true
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applypermute(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)

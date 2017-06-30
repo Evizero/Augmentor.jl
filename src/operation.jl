@@ -103,10 +103,13 @@ function applyaffine_common(op::AffineOperation, img)
     invwarpedview(img, toaffinemap_common(op, img))
 end
 
-function applyaffineview_common(op::Operation, img)
+function applyaffineview_common(op::AffineOperation, img)
     wv = applyaffine_common(op, img)
     direct_view(wv, indices(wv))
 end
+
+# We trust that non-affine operations use SArray-only AffineMap.
+applyaffineview_common(op::Operation, img) = applyaffineview(op, img)
 
 # --------------------------------------------------------------------
 # Functions to unroll sequences of Operation. These are called by

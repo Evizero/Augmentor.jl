@@ -156,6 +156,17 @@ end
 @inline isinvwarpedview(::Type{<:InvWarpedView}) = true
 @inline isinvwarpedview(::Type) = false
 
+function toaffinemap(op::Either, img)
+    supports_affine(typeof(op)) || throw(MethodError(toaffinemap, (op, img)))
+    p = rand()
+    for (i, p_i) in enumerate(op.cum_chances)
+        if p <= p_i
+            return toaffinemap_common(op.operations[i], img)
+        end
+    end
+    error("unreachable code reached")
+end
+
 # Sample a random operation and pass the function call along.
 # Note: "applyaffine" needs to map to "applyaffine_common" for
 #   type stability, because otherwise the concrete type of the
