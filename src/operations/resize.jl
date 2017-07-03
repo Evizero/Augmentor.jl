@@ -41,7 +41,7 @@ see also
 
 [`CropSize`](@ref), [`augment`](@ref)
 """
-immutable Resize{N} <: ImageOperation
+struct Resize{N} <: ImageOperation
     size::NTuple{N,Int}
 
     function Resize{N}(size::NTuple{N,Int}) where N

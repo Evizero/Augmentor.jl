@@ -94,7 +94,7 @@ see also
 
 [`RandomDistortion`](@ref), [`augment`](@ref)
 """ ->
-immutable ElasticDistortion <: ImageOperation
+struct ElasticDistortion <: ImageOperation
     gridheight::Int
     gridwidth::Int
     scale::Float64

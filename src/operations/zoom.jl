@@ -63,7 +63,7 @@ see also
 
 [`Scale`](@ref), [`Resize`](@ref), [`augment`](@ref)
 """
-immutable Zoom{N,T<:AbstractVector} <: ImageOperation
+struct Zoom{N,T<:AbstractVector} <: ImageOperation
     factors::NTuple{N,T}
 
     function Zoom{N}(factors::NTuple{N,T}) where {N,T<:AbstractVector}

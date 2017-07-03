@@ -1,4 +1,4 @@
-immutable ImmutablePipeline{N,T<:Tuple} <: Pipeline
+struct ImmutablePipeline{N,T<:Tuple} <: Pipeline
     operations::T
 
     function ImmutablePipeline{N}(ops::NTuple{N,Operation}) where N

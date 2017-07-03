@@ -48,7 +48,7 @@ see also
 
 [`ShearY`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable ShearX{T<:AbstractVector} <: AffineOperation
+struct ShearX{T<:AbstractVector} <: AffineOperation
     degree::T
 
     function ShearX{T}(degree::T) where {T<:AbstractVector{S} where S<:Real}
@@ -132,7 +132,7 @@ see also
 
 [`ShearX`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable ShearY{T<:AbstractVector} <: AffineOperation
+struct ShearY{T<:AbstractVector} <: AffineOperation
     degree::T
 
     function ShearY{T}(degree::T) where {T<:AbstractVector{S} where S<:Real}

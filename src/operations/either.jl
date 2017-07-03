@@ -75,7 +75,7 @@ see also
 
 [`augment`](@ref)
 """
-immutable Either{N,T<:Tuple} <: ImageOperation
+struct Either{N,T<:Tuple} <: ImageOperation
     operations::T
     chances::SVector{N,Float64}
     cum_chances::SVector{N,Float64}
