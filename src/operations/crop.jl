@@ -48,7 +48,7 @@ see also
 
 [`CropNative`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
-immutable Crop{N,I<:Tuple} <: ImageOperation
+struct Crop{N,I<:Tuple} <: ImageOperation
     indexes::I
 
     function Crop{N}(indexes::NTuple{N,UnitRange}) where N
@@ -143,7 +143,7 @@ see also
 
 [`Crop`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
-immutable CropNative{N,I<:Tuple} <: ImageOperation
+struct CropNative{N,I<:Tuple} <: ImageOperation
     indexes::I
 
     function CropNative{N}(indexes::NTuple{N,UnitRange}) where N
@@ -229,7 +229,7 @@ see also
 
 [`CropRatio`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable CropSize{N} <: ImageOperation
+struct CropSize{N} <: ImageOperation
     size::NTuple{N,Int}
 
     function CropSize{N}(size::NTuple{N,Int}) where N
@@ -329,7 +329,7 @@ see also
 
 [`RCropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable CropRatio <: ImageOperation
+struct CropRatio <: ImageOperation
     ratio::Float64
 
     function CropRatio(ratio::Real)
@@ -451,7 +451,7 @@ see also
 
 [`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable RCropRatio <: ImageOperation
+struct RCropRatio <: ImageOperation
     ratio::Float64
 
     function RCropRatio(ratio::Real)

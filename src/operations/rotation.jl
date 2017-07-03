@@ -54,7 +54,7 @@ see also
 [`Rotate180`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
 [`Either`](@ref), [`augment`](@ref)
 """
-immutable Rotate90 <: AffineOperation end
+struct Rotate90 <: AffineOperation end
 Rotate90(p::Number) = Either(Rotate90(), p)
 
 @inline supports_permute(::Type{Rotate90}) = true
@@ -137,7 +137,7 @@ see also
 [`Rotate90`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
 [`Either`](@ref), [`augment`](@ref)
 """
-immutable Rotate180 <: AffineOperation end
+struct Rotate180 <: AffineOperation end
 Rotate180(p::Number) = Either(Rotate180(), p)
 
 @inline supports_stepview(::Type{Rotate180}) = true
@@ -208,7 +208,7 @@ see also
 [`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate`](@ref),
 [`Either`](@ref), [`augment`](@ref)
 """
-immutable Rotate270 <: AffineOperation end
+struct Rotate270 <: AffineOperation end
 Rotate270(p::Number) = Either(Rotate270(), p)
 
 @inline supports_permute(::Type{Rotate270}) = true
@@ -307,7 +307,7 @@ see also
 [`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate270`](@ref),
 [`CropNative`](@ref), [`augment`](@ref)
 """
-immutable Rotate{T<:AbstractVector} <: AffineOperation
+struct Rotate{T<:AbstractVector} <: AffineOperation
     degree::T
 
     function Rotate{T}(degree::T) where {T<:AbstractVector{S} where S<:Real}

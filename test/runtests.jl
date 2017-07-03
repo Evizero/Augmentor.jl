@@ -1,4 +1,4 @@
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, Base.Test
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, Base.Test
 using ImageInTerminal
 
 # check for ambiguities
@@ -35,6 +35,7 @@ rgb_rect = rand(RGB{N0f8}, 2, 3)
 tests = [
     "tst_utils.jl",
     "operations/tst_channels.jl",
+    "operations/tst_convert.jl",
     "operations/tst_noop.jl",
     "operations/tst_cache.jl",
     "operations/tst_rotation.jl",

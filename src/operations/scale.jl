@@ -59,7 +59,7 @@ see also
 
 [`Zoom`](@ref), [`Resize`](@ref), [`augment`](@ref)
 """
-immutable Scale{N,T<:AbstractVector} <: AffineOperation
+struct Scale{N,T<:AbstractVector} <: AffineOperation
     factors::NTuple{N,T}
 
     function Scale{N}(factors::NTuple{N,T}) where {N,T<:AbstractVector}

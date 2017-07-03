@@ -51,7 +51,7 @@ see also
 
 [`FlipY`](@ref), [`Either`](@ref), [`augment`](@ref)
 """
-immutable FlipX <: AffineOperation end
+struct FlipX <: AffineOperation end
 FlipX(p::Number) = Either(FlipX(), p)
 
 @inline supports_stepview(::Type{FlipX}) = true
@@ -133,7 +133,7 @@ see also
 
 [`FlipX`](@ref), [`Either`](@ref), [`augment`](@ref)
 """
-immutable FlipY <: AffineOperation end
+struct FlipY <: AffineOperation end
 FlipY(p::Number) = Either(FlipY(), p)
 
 @inline supports_stepview(::Type{FlipY}) = true

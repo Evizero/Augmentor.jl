@@ -44,7 +44,7 @@ see also
 
 [`PermuteDims`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
 """
-immutable SplitChannels <: Operation end
+struct SplitChannels <: Operation end
 
 @inline supports_eager(::Type{SplitChannels}) = false
 @inline supports_lazy(::Type{SplitChannels}) = true
@@ -126,7 +126,7 @@ see also
 
 [`SplitChannels`](@ref), [`PermuteDims`](@ref), [`augment`](@ref)
 """
-immutable CombineChannels{T<:Colorant} <: Operation
+struct CombineChannels{T<:Colorant} <: Operation
     colortype::Type{T}
 end
 
@@ -221,7 +221,7 @@ see also
 
 [`SplitChannels`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
 """
-immutable PermuteDims{N,perm,iperm} <: Operation end
+struct PermuteDims{N,perm,iperm} <: Operation end
 PermuteDims() = throw(MethodError(PermuteDims, ()))
 PermuteDims(perm::Tuple{}) = throw(MethodError(PermuteDims, (perm,)))
 PermuteDims(perm::NTuple{N,Int}) where {N} = PermuteDims{N,perm,invperm(perm)}()
@@ -297,7 +297,7 @@ see also
 
 [`CombineChannels`](@ref), [`augment`](@ref)
 """
-immutable Reshape{N} <: Operation
+struct Reshape{N} <: Operation
     dims::NTuple{N,Int}
 end
 Reshape() = throw(MethodError(Reshape, ()))

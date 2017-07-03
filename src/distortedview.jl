@@ -1,4 +1,4 @@
-immutable DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: AbstractArray{T,2}
+struct DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: AbstractArray{T,2}
     parent::P
     etp::E
     grid::G

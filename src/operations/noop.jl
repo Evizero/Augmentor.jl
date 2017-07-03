@@ -7,7 +7,7 @@ image but instead passes it along unchanged (without copying).
 Usually used in combination with [`Either`](@ref) to denote a
 "branch" that does not perform any computation.
 """
-immutable NoOp <: AffineOperation end
+struct NoOp <: AffineOperation end
 
 @inline supports_eager(::Type{NoOp}) = false
 @inline supports_stepview(::Type{NoOp}) = true

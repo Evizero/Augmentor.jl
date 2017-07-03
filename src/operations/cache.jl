@@ -51,7 +51,7 @@ see also
 
 [`augment`](@ref)
 """
-immutable CacheImage <: ImageOperation end
+struct CacheImage <: ImageOperation end
 
 applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
@@ -79,7 +79,7 @@ end
 
 see [`CacheImage`](@ref)
 """
-immutable CacheImageInto{T<:AbstractArray} <: ImageOperation
+struct CacheImageInto{T<:AbstractArray} <: ImageOperation
     buffer::T
 end
 CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)

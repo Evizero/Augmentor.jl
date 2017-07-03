@@ -1,5 +1,11 @@
 # v0.2.0
 
+New operations:
+
+- `ConvertEltype`: Convert the array elements to the given type
+
+Other changes:
+
 - `Either` can now lazily combine affine operations with operations
   such as `Crop`, `Zoom`, and `Resize`. This is because a new kind
   of support was introduced called `Augmentor.supports_affineview`,
