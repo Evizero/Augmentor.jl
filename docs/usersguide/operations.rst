@@ -21,6 +21,8 @@ functionality.
 | Cropping              | :class:`Crop` :class:`CropNative` :class:`CropSize` :class:`CropRatio`     |
 |                       | :class:`RCropRatio`                                                        |
 +-----------------------+----------------------------------------------------------------------------+
+| Conversion            | :class:`ConvertEltype`                                                     |
++-----------------------+----------------------------------------------------------------------------+
 | Information Layout    | :class:`SplitChannels` :class:`CombineChannels` :class:`PermuteDims`       |
 |                       | :class:`Reshape`                                                           |
 +-----------------------+----------------------------------------------------------------------------+
@@ -553,6 +555,42 @@ Resizing
 +=========================================================================================================+=========================================================================================================+
 | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/Resize.png |
 +---------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------+
+
+Conversion
+--------------------
+
+.. class:: ConvertEltype
+
+   Convert the element type of the given array/image into the
+   given ``eltype``. This operation is especially useful for
+   converting color images to grayscale (or the other way
+   around). That said the operation is not specific to color
+   types and can also be used for numeric arrays (e.g. with
+   separated channels).
+
+   Note that this is an element-wise convert function. Thus it
+   can not be used to combine or separate color channels. Use
+   :class:`SplitChannels` or :class:`CombineChannels` for those
+   purposes.
+
+.. code-block:: jlcon
+
+   julia> op = ConvertEltype(Gray)
+   Convert eltype to Gray
+
+   julia> img = testpattern()
+   300×400 Array{RGBA{N0f8},2}:
+   [...]
+
+   julia> augment(img, op)
+   300×400 Array{Gray{N0f8},2}:
+   [...]
+
++----------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
+| Input                                                                                                          | Output for ``ConvertEltype(GrayA)``                                                                            |
++================================================================================================================+================================================================================================================+
+| .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/testpattern_small.png        | .. image:: https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/operations/ConvertEltype.png |
++----------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------+
 
 Information Layout
 --------------------

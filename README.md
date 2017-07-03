@@ -226,6 +226,7 @@ look at the corresponding section of the
 |               | `CropSize`          | Crop area around the center with specified size.
 |               | `CropRatio`         | Crop to specified aspect ratio.
 |               | `RCropRatio`        | Crop random window of specified aspect ratio.
+| *Conversion:* | `ConvertEltype`     | Convert the array elements to the given type.
 | *Layout:*     | `SplitChannels`     | Separate the color channels into a dedicated array dimension.
 |               | `CombineChannels`   | Collapse the first dimension into a specific colorant.
 |               | `PermuteDims`       | Reorganize the array dimensions into a specific order.

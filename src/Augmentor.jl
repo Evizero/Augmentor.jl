@@ -3,6 +3,7 @@ module Augmentor
 
 using ColorTypes
 using ColorTypes: AbstractGray
+using MappedArrays
 using ImageCore
 using ImageTransformations
 using ImageFiltering
@@ -19,10 +20,15 @@ using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
 
+    Gray,
+    RGB,
+
     SplitChannels,
     CombineChannels,
     PermuteDims,
     Reshape,
+
+    ConvertEltype,
 
     Rotate90,
     Rotate180,
@@ -61,6 +67,7 @@ include("types.jl")
 include("operation.jl")
 
 include("operations/channels.jl")
+include("operations/convert.jl")
 
 include("operations/noop.jl")
 include("operations/cache.jl")
