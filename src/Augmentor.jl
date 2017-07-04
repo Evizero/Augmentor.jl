@@ -13,6 +13,8 @@ using Interpolations
 using StaticArrays
 using OffsetArrays
 using IdentityRanges
+using MLDataPattern
+using ComputationalResources
 using FileIO
 using ShowItLikeYouBuildIt
 using Compat
@@ -59,6 +61,8 @@ export
     ElasticDistortion,
 
     augment,
+    augment!,
+    augmentbatch!,
 
     testpattern
 
@@ -87,5 +91,6 @@ include("operations/distortion.jl")
 include("pipeline.jl")
 include("codegen.jl")
 include("augment.jl")
+include("augmentbatch.jl")
 
 end # module

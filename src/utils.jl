@@ -27,6 +27,12 @@ end
 
 # --------------------------------------------------------------------
 
+@inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
+@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,UnitRange}) where {N} =
+    OffsetArray(buffer, inds)
+
+# --------------------------------------------------------------------
+
 function indirect_indices(::Tuple{}, ::Tuple{})
     throw(MethodError(indirect_indices, ((),())))
 end

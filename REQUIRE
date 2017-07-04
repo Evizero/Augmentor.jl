@@ -10,6 +10,8 @@ StaticArrays
 OffsetArrays
 IdentityRanges
 ColorTypes 0.4
+MLDataPattern 0.1.2
+ComputationalResources 0.0.2
 ShowItLikeYouBuildIt
 FileIO
 Compat 0.17
