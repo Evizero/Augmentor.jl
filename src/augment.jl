@@ -49,6 +49,8 @@ end
 
 # --------------------------------------------------------------------
 
+augment!(out, img, op::Operation) = augment!(out, img, (op,))
+
 function augment!(out, img, pipeline::AbstractPipeline)
     out_lazy = _augment_avoid_eager(img, pipeline)
     copy!(match_idx(out, indices(out_lazy)), out_lazy)
