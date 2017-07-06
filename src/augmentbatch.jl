@@ -8,7 +8,7 @@ imagesvector(imgs::AbstractArray) = obsview(imgs)
 function augmentbatch!(
         outs::AbstractArray,
         imgs::AbstractArray,
-        pipeline::AbstractPipeline)
+        pipeline)
     augmentbatch!(CPU1(), outs, imgs, pipeline)
 end
 
@@ -16,7 +16,7 @@ function augmentbatch!(
         r::AbstractResource,
         outs::AbstractArray,
         imgs::AbstractArray,
-        pipeline::AbstractPipeline)
+        pipeline)
     augmentbatch!(r, imagesvector(outs), imagesvector(imgs), pipeline)
     outs
 end
@@ -25,7 +25,7 @@ function augmentbatch!(
         ::CPU1,
         outs::AbstractVector{<:AbstractArray},
         imgs::AbstractVector{<:AbstractArray},
-        pipeline::AbstractPipeline)
+        pipeline)
     length(outs) == length(imgs) || _berror()
     for i in 1:length(outs)
         augment!(outs[i], imgs[i], pipeline)
@@ -37,7 +37,7 @@ function augmentbatch!(
         ::CPUThreads,
         outs::AbstractVector{<:AbstractArray},
         imgs::AbstractVector{<:AbstractArray},
-        pipeline::AbstractPipeline)
+        pipeline)
     length(outs) == length(imgs) || _berror()
     Threads.@threads for i in 1:length(outs)
         augment!(outs[i], imgs[i], pipeline)

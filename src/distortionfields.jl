@@ -18,10 +18,10 @@ end
 function uniform_field(gridheight::Int, gridwidth::Int, scale, border, normalize)
     A = if !border
         @assert gridwidth > 2 && gridheight > 2
-        _2dborder!(rand(2, gridheight, gridwidth), .5)
+        _2dborder!(safe_rand(2, gridheight, gridwidth), .5)
     else
         @assert gridwidth > 0 && gridheight > 0
-        rand(2, gridheight, gridwidth)
+        safe_rand(2, gridheight, gridwidth)
     end::Array{Float64,3}
     broadcast!(*, A, A, 2.)
     broadcast!(-, A, A, 1.)

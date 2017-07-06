@@ -321,7 +321,7 @@ Rotate(degree::Real) = Rotate(degree:degree)
 @inline supports_eager(::Type{<:Rotate}) = false
 
 function toaffinemap(op::Rotate, img::AbstractMatrix)
-    recenter(RotMatrix(deg2rad(Float64(rand(op.degree)))), center(img))
+    recenter(RotMatrix(deg2rad(Float64(safe_rand(op.degree)))), center(img))
 end
 
 function Base.show(io::IO, op::Rotate)

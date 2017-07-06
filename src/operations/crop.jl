@@ -480,12 +480,12 @@ function rcropratio_indices(op::RCropRatio, img::AbstractMatrix)
     elseif nw < w
         x_max = w - nw + 1
         @assert x_max > 0
-        x = rand(1:x_max)
+        x = safe_rand(1:x_max)
         1:h, x:(x+nw-1)
     elseif nh < h
         y_max = h - nh + 1
         @assert y_max > 0
-        y = rand(1:y_max)
+        y = safe_rand(1:y_max)
         y:(y+nh-1), 1:w
     else
         error("unreachable code reached")

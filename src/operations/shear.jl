@@ -63,7 +63,7 @@ ShearX(degree::Real) = ShearX(degree:degree)
 @inline supports_eager(::Type{<:ShearX}) = false
 
 function toaffinemap(op::ShearX, img::AbstractMatrix)
-    angle = deg2rad(Float64(rand(op.degree)))
+    angle = deg2rad(Float64(safe_rand(op.degree)))
     recenter(@SMatrix([1. 0.; tan(-angle) 1.]), center(img))
 end
 
@@ -147,7 +147,7 @@ ShearY(degree::Real) = ShearY(degree:degree)
 @inline supports_eager(::Type{<:ShearY}) = false
 
 function toaffinemap(op::ShearY, img::AbstractMatrix)
-    angle = deg2rad(Float64(rand(op.degree)))
+    angle = deg2rad(Float64(safe_rand(op.degree)))
     recenter(@SMatrix([1. tan(-angle); 0. 1.]), center(img))
 end
 

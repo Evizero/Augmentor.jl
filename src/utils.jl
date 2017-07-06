@@ -16,6 +16,26 @@ function use_testpattern()
 end
 
 # --------------------------------------------------------------------
+# rand() is not threadsafe (https://discourse.julialang.org/t/4683)
+
+# Because we only require random numbers to sample parameters
+# and not the actual expensive computation, this seems like a better
+# approach than using separate RNG per thread.
+const rand_mutex = Ref{Threads.Mutex}()
+
+function __init__()
+    rand_mutex[] = Threads.Mutex()
+end
+
+# constant overhead of about 80 ns compared to unsafe rand
+function safe_rand(args...)
+    lock(rand_mutex[])
+    result = rand(args...)
+    unlock(rand_mutex[])
+    result
+end
+
+# --------------------------------------------------------------------
 
 @inline _plain_array(A::OffsetArray) = parent(A)
 @inline _plain_array(A::Array) = A

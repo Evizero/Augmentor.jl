@@ -91,7 +91,7 @@ end
 @inline supports_eager(::Type{<:Zoom}) = false
 
 function toaffinemap(op::Zoom{2}, img::AbstractMatrix)
-    idx = rand(1:length(op.factors[1]))
+    idx = safe_rand(1:length(op.factors[1]))
     @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
     tfm
 end
