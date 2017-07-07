@@ -93,4 +93,8 @@ include("codegen.jl")
 include("augment.jl")
 include("augmentbatch.jl")
 
+function __init__()
+    rand_mutex[] = Threads.Mutex()
+end
+
 end # module

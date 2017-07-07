@@ -69,6 +69,7 @@ end
         img = @inferred Augmentor._augment(rect, pl)
         @test typeof(img) <: Array
         @test typeof(img) == typeof(@inferred(augment(rect, Rotate90())))
+        @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
         @test eltype(img) <: eltype(rect)
         @test img == rotl90(rect)
         out = similar(img)

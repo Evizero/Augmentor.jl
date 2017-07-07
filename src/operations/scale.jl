@@ -74,13 +74,13 @@ Scale() = throw(MethodError(Scale, ()))
 Scale(::Tuple{}) = throw(MethodError(Scale, ((),)))
 Scale(factors...) = Scale(factors)
 Scale(factor::Union{AbstractVector,Real}) = Scale((factor, factor))
-Scale(factors::NTuple{N,Any}) where {N} = Scale(map(_vectorize, factors))
+Scale(factors::NTuple{N,Any}) where {N} = Scale(map(vectorize, factors))
 Scale(factors::NTuple{N,Range}) where {N} = Scale{N}(promote(factors...))
 function Scale(factors::NTuple{N,AbstractVector}) where N
     Scale{N}(map(Vector{Float64}, factors))
 end
 function (::Type{Scale{N}})(factors::NTuple{N,Any}) where N
-    Scale(map(_vectorize, factors))
+    Scale(map(vectorize, factors))
 end
 
 @inline supports_eager(::Type{<:Scale}) = false

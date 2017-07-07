@@ -23,10 +23,6 @@ end
 # approach than using separate RNG per thread.
 const rand_mutex = Ref{Threads.Mutex}()
 
-function __init__()
-    rand_mutex[] = Threads.Mutex()
-end
-
 # constant overhead of about 80 ns compared to unsafe rand
 function safe_rand(args...)
     lock(rand_mutex[])
@@ -83,7 +79,7 @@ function indirect_view(A::AbstractArray, I::Tuple)
     view(A, indirect_indices(indices(A), I)...)
 end
 
-function indirect_view(A::SubArray, I::Tuple)
+function indirect_view(A::SubArray{T,N,TA,<:NTuple{N,Range}}, I::Tuple) where {T,N,TA}
     view(parent(A), indirect_indices(A.indexes, I)...)
 end
 
@@ -111,18 +107,18 @@ function direct_view(A::AbstractArray{T,N}, I::NTuple{N,Range}) where {T,N}
     view(A, direct_indices(indices(A), I)...)
 end
 
-function direct_view(A::SubArray{T,N}, I::NTuple{N,Range}) where {T,N}
+function direct_view(A::SubArray{T,N,TA,<:NTuple{N,Range}}, I::NTuple{N,Range}) where {T,N,TA}
     view(A, direct_indices(A.indexes, I)...)
 end
 
 # --------------------------------------------------------------------
 
-@inline _vectorize(A::AbstractVector) = A
-@inline _vectorize(A::Real) = A:A
+@inline vectorize(A::AbstractVector) = A
+@inline vectorize(A::Real) = A:A
 
-@inline _round(num::Integer, d) = num
-_round(num::AbstractFloat, d) = round(num,d)
-_round(nums::Tuple, d) = map(num->_round(num,d), nums)
+@inline round_if_float(num::Integer, d) = num
+round_if_float(num::AbstractFloat, d) = round(num,d)
+round_if_float(nums::Tuple, d) = map(num->round_if_float(num,d), nums)
 
 function unionrange(i1::AbstractUnitRange, i2::AbstractUnitRange)
     map(min, first(i1), first(i2)):map(max, last(i1), last(i2))
