@@ -1,3 +1,14 @@
+# Things that need to be tested
+# [x] testpattern and use_testpattern
+# [x] safe_rand and the mutex
+# [x] plain_array
+# [x] match_idx
+# [x] indirect_view
+# [x] direct_view
+# [x] vectorize
+# [x] round_if_float
+# [x] unionrange
+
 @testset "testpattern" begin
     tp = testpattern()
     @test typeof(tp) <: Matrix
@@ -7,31 +18,82 @@
     @test tp == tp2
 end
 
+@testset "rand_mutex" begin
+    mutex = Augmentor.rand_mutex[]
+    typeof(mutex) <: Threads.Mutex
+    # check that its not a null pointer
+    @test reinterpret(Int, mutex.handle) > 0
+end
+
+@testset "safe_rand" begin
+    num = @inferred Augmentor.safe_rand()
+    @test 0 <= num <= 1
+    @test typeof(num) <: Float64
+    num = @inferred Augmentor.safe_rand(2)
+    @test all(0 .<= num .<= 1)
+    @test typeof(num) <: Vector{Float64}
+end
+
 @testset "plain_array" begin
     A = [1 2 3; 4 5 6; 7 8 9]
-    As = sparse(A)
-    Ar = reshape(As, 3, 3, 1)
-    Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
-    @test @inferred(Augmentor.plain_array(As)) == A
-    @test typeof(Augmentor.plain_array(As)) == typeof(A)
-    @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
-    @test typeof(Augmentor.plain_array(Ar)) <: Array
-    @test @inferred(Augmentor.plain_array(Ast)) == A
-    @test typeof(Augmentor.plain_array(Ast)) == typeof(A)
     @test @inferred(Augmentor.plain_array(A)) === A
     @test @inferred(Augmentor.plain_array(OffsetArray(A, (-2,-1)))) === A
-    v = view(A, 2:3, 1:2)
-    @test typeof(Augmentor.plain_array(v)) <: Array
-    @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
-    v = view(A, IdentityRange(2:3), IdentityRange(1:2))
-    @test typeof(Augmentor.plain_array(v)) <: Array
-    @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
-    p = permuteddimsview(A, (2,1))
-    @test typeof(Augmentor.plain_array(p)) <: Array
-    @test @inferred(Augmentor.plain_array(p)) == A'
-    p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
-    @test typeof(Augmentor.plain_array(p)) <: Array
-    @test @inferred(Augmentor.plain_array(p)) == A'[2:3, 1:2]
+    let As = sparse(A)
+        @test @inferred(Augmentor.plain_array(As)) == A
+        @test typeof(Augmentor.plain_array(As)) == typeof(A)
+        Ar = reshape(As, 3, 3, 1)
+        @test typeof(Ar) <: Base.ReshapedArray
+        @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
+        @test typeof(Augmentor.plain_array(Ar)) <: Array
+    end
+    let Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
+        @test @inferred(Augmentor.plain_array(Ast)) == A
+        @test typeof(Augmentor.plain_array(Ast)) == typeof(A)
+    end
+    let v = view(A, 2:3, 1:2)
+        @test typeof(Augmentor.plain_array(v)) <: Array
+        @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
+    end
+    let v = view(OffsetArray(A, (-2,-1)), 0:1, 0:1)
+        @test typeof(Augmentor.plain_array(v)) <: Array
+        @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
+    end
+    let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
+        @test typeof(Augmentor.plain_array(v)) <: Array
+        @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
+    end
+    let p = permuteddimsview(A, (2,1))
+        @test typeof(Augmentor.plain_array(p)) <: Array
+        @test @inferred(Augmentor.plain_array(p)) == A'
+    end
+    let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
+        @test typeof(Augmentor.plain_array(p)) <: Array
+        @test @inferred(Augmentor.plain_array(p)) == A'[2:3, 1:2]
+    end
+end
+
+@testset "match_idx" begin
+    A = [1 2 3; 4 5 6; 7 8 9]
+    @test @inferred(Augmentor.match_idx(A, indices(A))) === A
+    let img = @inferred Augmentor.match_idx(A, (2:4, 2:4))
+        @test indices(img) === (2:4, 2:4)
+        @test typeof(img) <: OffsetArray
+    end
+    let B = view(A,1:3,1:3)
+        @test @inferred(Augmentor.match_idx(B, indices(B))) === B
+    end
+    let B = view(A,1:3,1:3)
+        img = @inferred(Augmentor.match_idx(B, B.indexes))
+        @test indices(img) === (1:3, 1:3)
+        @test typeof(img) <: OffsetArray
+    end
+    let img = @inferred Augmentor.match_idx(view(A,1:3,1:3), (2:4,2:4))
+        @test indices(img) === (2:4, 2:4)
+        @test typeof(img) <: OffsetArray
+    end
+    let C = Augmentor.prepareaffine(A)
+        @test @inferred(Augmentor.match_idx(C, (2:4, 2:4))) === C
+    end
 end
 
 @testset "direct_view" begin
@@ -53,6 +115,32 @@ end
     @test @inferred(Augmentor.indirect_view(Av, (IdentityRange(2:2),IdentityRange(1:2)))) === view(Av,3:3,1:2)
     @test_throws MethodError Augmentor.direct_view(Av, (3:-1:2,2:-1:1))
     @test @inferred(Augmentor.indirect_view(Av, (2:-1:1,2:-1:1))) === view(A,3:-1:2,2:-1:1)
+end
+
+@testset "vectorize" begin
+    @test @inferred(Augmentor.vectorize(2)) === 2:2
+    @test @inferred(Augmentor.vectorize(2.3)) === 2.3:2.3
+    @test @inferred(Augmentor.vectorize(3:4)) === 3:4
+    @test @inferred(Augmentor.vectorize(3:1:4)) === 3:1:4
+    @test @inferred(Augmentor.vectorize(3.0:4)) === 3.0:4
+    @test @inferred(Augmentor.vectorize(3.0:1:4)) === 3.0:1:4
+    @test @inferred(Augmentor.vectorize(Base.OneTo(4))) === Base.OneTo(4)
+end
+
+@testset "round_if_float" begin
+    @test @inferred(Augmentor.round_if_float(3,2)) === 3
+    @test @inferred(Augmentor.round_if_float(3.1111,2)) === 3.11
+    @test @inferred(Augmentor.round_if_float((3,3.1111),2)) === (3,3.11)
+end
+
+@testset "unionrange" begin
+    @test_throws MethodError Augmentor.unionrange(1:1:2, 4:5)
+    @test @inferred(Augmentor.unionrange(1:5, 2:6)) === 1:6
+    @test @inferred(Augmentor.unionrange(2:6, 1:5)) === 1:6
+    @test @inferred(Augmentor.unionrange(1:2, 4:5)) === 1:5
+    @test @inferred(Augmentor.unionrange(Base.OneTo(2), 4:5)) === 1:5
+    @test @inferred(Augmentor.unionrange(1:6, 2:3)) === 1:6
+    @test @inferred(Augmentor.unionrange(2:3, 1:6)) === 1:6
 end
 
 @testset "_2dborder!" begin

@@ -78,20 +78,20 @@ Zoom() = throw(MethodError(Zoom, ()))
 Zoom(::Tuple{}) = throw(MethodError(Zoom, ((),)))
 Zoom(factors...) = Zoom(factors)
 Zoom(factor::Union{AbstractVector,Real}) = Zoom((factor, factor))
-Zoom(factors::NTuple{N,Any}) where {N} = Zoom(map(_vectorize, factors))
+Zoom(factors::NTuple{N,Any}) where {N} = Zoom(map(vectorize, factors))
 Zoom(factors::NTuple{N,Range}) where {N} = Zoom{N}(promote(factors...))
 function Zoom(factors::NTuple{N,AbstractVector}) where N
     Zoom{N}(map(Vector{Float64}, factors))
 end
 function (::Type{Zoom{N}})(factors::NTuple{N,Any}) where N
-    Zoom(map(_vectorize, factors))
+    Zoom(map(vectorize, factors))
 end
 
 @inline supports_affineview(::Type{<:Zoom}) = true
 @inline supports_eager(::Type{<:Zoom}) = false
 
 function toaffinemap(op::Zoom{2}, img::AbstractMatrix)
-    idx = rand(1:length(op.factors[1]))
+    idx = safe_rand(1:length(op.factors[1]))
     @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
     tfm
 end
@@ -120,7 +120,7 @@ end
 
 function Base.show(io::IO, op::Zoom{N}) where N
     if get(io, :compact, false)
-        str = join(map(t->join(_round(t,2),"×"), collect(zip(op.factors...))), ", ")
+        str = join(map(t->join(round_if_float(t,2),"×"), collect(zip(op.factors...))), ", ")
         if length(op.factors[1]) == 1
             print(io, "Zoom by $(str)")
         else

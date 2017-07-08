@@ -64,21 +64,20 @@ end
 # --------------------------------------------------------------------
 
 @testset "single op" begin
-    img = @inferred Augmentor._augment(rect, Augmentor.ImmutablePipeline(Rotate90()))
-    @test typeof(img) <: Array
-    @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
-    @test eltype(img) <: eltype(rect)
-    @test img == rotl90(rect)
-    img = @inferred Augmentor._augment(rect, (Rotate90(),))
-    @test typeof(img) <: Array
-    @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
-    @test eltype(img) <: eltype(rect)
-    @test img == rotl90(rect)
-    img = @inferred Augmentor._augment(square, (Rotate(90),))
-    @test typeof(img) <: Array
-    @test typeof(img) == typeof(@inferred(augment(square, (Rotate(90),))))
-    @test eltype(img) <: eltype(square)
-    @test img == rotl90(square)
+    @test_throws BoundsError augment!(rand(2,2), rect, Rotate90())
+    for pl in (Augmentor.ImmutablePipeline(Rotate90()), (Rotate90(),))
+        img = @inferred Augmentor._augment(rect, pl)
+        @test typeof(img) <: Array
+        @test typeof(img) == typeof(@inferred(augment(rect, Rotate90())))
+        @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
+        @test eltype(img) <: eltype(rect)
+        @test img == rotl90(rect)
+        out = similar(img)
+        @test @inferred(augment!(out, rect, pl)) == img
+        out = similar(img)
+        @test @inferred(augment!(out, rect, Rotate90())) == img
+        @test_throws BoundsError augment!(rand(2,2), rect, pl)
+    end
 end
 
 ops = Augmentor.ImmutablePipeline(Rotate(90),Rotate(-90)) # forces affine
@@ -162,6 +161,10 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "rot_crop_either_crop" img
+    out = similar(img)
+    @test @inferred(augment!(out, camera, ops)) === out
+    @test_reference "rot_crop_either_crop" out
+    @test @allocated(augment!(out, camera, ops)) < @allocated(augment(camera, ops))
 end
 
 ops = Augmentor.ImmutablePipeline(Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195))
@@ -175,6 +178,10 @@ ops = Augmentor.ImmutablePipeline(Rotate180(),Crop(5:200,200:500),Rotate90(),Cro
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "rot_crop_rot_crop" img
+    out = similar(img)
+    @test @inferred(augment!(out, camera, ops)) === out
+    @test_reference "rot_crop_rot_crop" out
+    @test @allocated(augment!(out, camera, ops)) < @allocated(augment(camera, ops))
 end
 
 ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195),Resize(25,15))
@@ -191,6 +198,10 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195),Resize(25
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "rot_crop_rot_crop_resize" img
+    out = similar(img)
+    @test @inferred(augment!(out, camera, ops)) === out
+    @test_reference "rot_crop_rot_crop_resize" out
+    @test @allocated(augment!(out, camera, ops)) < @allocated(augment(camera, ops))
 end
 
 ops = (Rotate(45),CropNative(1:512,1:512))

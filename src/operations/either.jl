@@ -158,7 +158,7 @@ end
 
 function toaffinemap(op::Either, img)
     supports_affine(typeof(op)) || throw(MethodError(toaffinemap, (op, img)))
-    p = rand()
+    p = safe_rand()
     for (i, p_i) in enumerate(op.cum_chances)
         if p <= p_i
             return toaffinemap_common(op.operations[i], img)
@@ -179,7 +179,7 @@ for KIND in (:eager, :permute, :view, :stepview, :affine, :affineview)
     APP = startswith(String(KIND),"affine") ? Symbol(FUN, :_common) : FUN
     @eval function ($FUN)(op::Either, img)
         ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
-        p = rand()
+        p = safe_rand()
         for (i, p_i) in enumerate(op.cum_chances)
             if p <= p_i
                 return ($APP)(op.operations[i], img)

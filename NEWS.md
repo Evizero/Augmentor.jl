@@ -1,5 +1,12 @@
 # v0.2.0
 
+New functionality:
+
+- `augment!`: Use preallocated storage for the output
+
+- `augmentbatch!`: Augment a whole batch of images. Optionally
+  using multiple threads.
+
 New operations:
 
 - `ConvertEltype`: Convert the array elements to the given type

@@ -1,4 +1,11 @@
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, Base.Test
+# Things that needs to be tested
+# [x] Utility functions work properly and type stable
+# [x] Individual operations do what they should
+# [x] Individual operations are always type stable
+# [x] Lazy Either works correctly and type stable
+# [x] Operations accept AbstractArray as input (esp. Array and SubArray)
+
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, Base.Test
 using ImageInTerminal
 
 # check for ambiguities
@@ -26,6 +33,9 @@ function str_showconst(obj)
 end
 
 camera = testimage("cameraman")
+cameras = similar(camera, size(camera)..., 2)
+copy!(view(cameras,:,:,1), camera)
+copy!(view(cameras,:,:,2), camera)
 square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]
 square2 = rand(Gray{N0f8}, 4, 4)
 rect = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6]
@@ -50,6 +60,7 @@ tests = [
     "tst_operations.jl",
     "tst_pipeline.jl",
     "tst_augment.jl",
+    "tst_augmentbatch.jl",
     "tst_distortedview.jl",
 ]
 

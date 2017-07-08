@@ -36,6 +36,9 @@ ops = (FlipX(), FlipY())
     v = @inferred Augmentor.unroll_applylazy(ops, rect)
     @test v === view(rect, 2:-1:1, 3:-1:1)
     @test v == rot180(rect)
+    v = @inferred Augmentor.unroll_applylazy(ops, view(cameras,:,:,1))
+    @test v === view(cameras, 512:-1:1, 512:-1:1, 1)
+    @test v == rot180(camera)
 end
 
 ops = (Rotate90(), Rotate270())
@@ -48,6 +51,9 @@ ops = (Rotate90(), Rotate270())
     @test wv == rect
     img = @inferred Augmentor.applyeager(Resize(4,4), wv)
     @test img == imresize(rect, (4,4))
+    v = @inferred Augmentor.unroll_applylazy(ops, view(cameras,:,:,1))
+    @test v === view(cameras, 1:1:512, 1:1:512, 1)
+    @test v == camera
     v = @inferred Augmentor.unroll_applylazy(ops, rect)
     @test v === view(rect, 1:1:2, 1:1:3)
     @test v == rect
@@ -159,6 +165,14 @@ ops = (Rotate180(), CropNative(1:2,2:3))
     v = @inferred Augmentor.unroll_applylazy(ops, square)
     @test v === view(square, 3:-1:2, 2:-1:1)
     @test v == view(rot180(square), 1:2, 2:3)
+end
+
+ops = (Rotate180(), ElasticDistortion(5))
+@testset "$(str_showcompact(ops))" begin
+    @test_throws MethodError Augmentor.unroll_applyaffine(ops, square)
+    v = @inferred Augmentor.unroll_applylazy(ops, square)
+    @test v isa Augmentor.DistortedView
+    @test parent(v) === view(square, 3:-1:1, 3:-1:1)
 end
 
 ops = (Rotate180(), CropSize(2,2))

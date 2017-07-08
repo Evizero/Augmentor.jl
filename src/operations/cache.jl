@@ -86,10 +86,6 @@ CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
-@inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
-@inline match_idx(buffer::Array, inds::NTuple{N,UnitRange}) where {N} =
-    OffsetArray(buffer, inds)
-
 applyeager(op::CacheImageInto, img) = applylazy(op, img)
 
 function applylazy(op::CacheImageInto, img)

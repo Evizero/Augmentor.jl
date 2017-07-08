@@ -74,19 +74,19 @@ Scale() = throw(MethodError(Scale, ()))
 Scale(::Tuple{}) = throw(MethodError(Scale, ((),)))
 Scale(factors...) = Scale(factors)
 Scale(factor::Union{AbstractVector,Real}) = Scale((factor, factor))
-Scale(factors::NTuple{N,Any}) where {N} = Scale(map(_vectorize, factors))
+Scale(factors::NTuple{N,Any}) where {N} = Scale(map(vectorize, factors))
 Scale(factors::NTuple{N,Range}) where {N} = Scale{N}(promote(factors...))
 function Scale(factors::NTuple{N,AbstractVector}) where N
     Scale{N}(map(Vector{Float64}, factors))
 end
 function (::Type{Scale{N}})(factors::NTuple{N,Any}) where N
-    Scale(map(_vectorize, factors))
+    Scale(map(vectorize, factors))
 end
 
 @inline supports_eager(::Type{<:Scale}) = false
 
 function toaffinemap(op::Scale{2}, img::AbstractMatrix)
-    idx = rand(1:length(op.factors[1]))
+    idx = safe_rand(1:length(op.factors[1]))
     @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
     tfm
 end

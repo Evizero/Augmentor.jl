@@ -1,3 +1,7 @@
+# Things to test
+# [x] Construction limited to ImageOperation
+# [x] Construction also works for ops like ElasticDistortion
+
 @test (Either <: Augmentor.AffineOperation) == false
 @test Either <: Augmentor.ImageOperation
 
@@ -20,38 +24,48 @@
         @test op.chances === @SVector([0.5,0.5])
         @test op.cum_chances === @SVector([0.5,1.0])
     end
-    let op = @inferred Either(1 => Rotate90(), 2 => Rotate180(), 1 => Rotate270())
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = @inferred Either(1 => Rotate90(), 2 => Rotate180(), 1 => Crop(1:10,1:10))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances === @SVector([0.25,0.5,0.25])
         @test op.cum_chances === @SVector([0.25,0.75,1.])
     end
-    let op = @inferred Either((Rotate90(),Rotate180(),Rotate270()), (0.1,0.7,0.2))
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = @inferred Either(1 => Rotate90(), 2 => Rotate180(), 1 => Crop(1:10,1:10))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
+        @test op.chances === @SVector([0.25,0.5,0.25])
+        @test op.cum_chances === @SVector([0.25,0.75,1.])
+    end
+    let op = @inferred Either((Rotate90(),Rotate180(),Crop(1:10,1:10)), (0.1,0.7,0.2))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances === @SVector([0.1,0.7,0.2])
         @test op.cum_chances ≈ @SVector([0.1,0.8,1.])
     end
-    let op = @inferred Either((Rotate90(),Rotate180(),Rotate270()))
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = @inferred Either((Rotate90(),Rotate180(),Crop(1:10,1:10)))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances ≈ @SVector([1/3,1/3,1/3])
         @test op.cum_chances ≈ @SVector([1/3,2/3,3/3])
     end
-    let op = Either(Rotate90(), Rotate180(), Rotate270(), chances = [1,7,2])
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = Either(Rotate90(), Rotate180(), Crop(1:10,1:10), chances = [1,7,2])
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances === @SVector([0.1,0.7,0.2])
         @test op.cum_chances ≈ @SVector([0.1,0.8,1.])
     end
-    let op = @inferred Either(Rotate90(),Rotate180(),Rotate270())
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = @inferred Either(Rotate90(),Rotate180(),Crop(1:10,1:10))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances ≈ @SVector([1/3,1/3,1/3])
         @test op.cum_chances ≈ @SVector([1/3,2/3,3/3])
     end
-    let op = @inferred(Rotate90()*Rotate180()*Rotate270())
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = @inferred(Rotate90()*Rotate180()*Crop(1:10,1:10))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances ≈ @SVector([1/3,1/3,1/3])
         @test op.cum_chances ≈ @SVector([1/3,2/3,3/3])
     end
-    let op = @inferred((1=>Rotate90())*(2=>Rotate180())*(1=>Rotate270()))
-        @test op.operations === (Rotate90(),Rotate180(),Rotate270())
+    let op = @inferred(Rotate90()*Rotate180()*ElasticDistortion(5))
+        @test op.operations === (Rotate90(),Rotate180(),ElasticDistortion(5))
+        @test op.chances ≈ @SVector([1/3,1/3,1/3])
+        @test op.cum_chances ≈ @SVector([1/3,2/3,3/3])
+    end
+    let op = @inferred((1=>Rotate90())*(2=>Rotate180())*(1=>Crop(1:10,1:10)))
+        @test op.operations === (Rotate90(),Rotate180(),Crop(1:10,1:10))
         @test op.chances ≈ @SVector([1/4,2/4,1/4])
         @test op.cum_chances ≈ @SVector([1/4,3/4,4/4])
     end
@@ -87,53 +101,75 @@ end
 @testset "eager" begin
     @test_throws MethodError Augmentor.applyeager(Either(Rotate90(),NoOp()), nothing)
     for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
-        op = @inferred Either((Rotate90(),Rotate270()), (1,0))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,1,0))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == rotr90(rect)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Rotate90(),Rotate270(),NoOp()), (0,0,1))
-        @test Augmentor.supports_eager(op) === true
-        if typeof(img) <: SubArray
-            @test @inferred(Augmentor.applyeager(op, img)) == rect
+        let op = @inferred Either((Rotate90(),ElasticDistortion(5)), (1,0))
+            @test_throws MethodError Augmentor.applylazy(op, img)
+            @test Augmentor.supports_eager(op) === true
+            @test Augmentor.supports_affine(op) === false
+            @test Augmentor.supports_lazy(op) === false
+            @test Augmentor.supports_affineview(op) === false
+            @test Augmentor.supports_view(op) === false
+            @test Augmentor.supports_stepview(op) === false
+            @test Augmentor.supports_permute(op) === false
+            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
             @test typeof(Augmentor.applyeager(op, img)) <: Array
-        else
-            @test @inferred(Augmentor.applyeager(op, img)) === rect
         end
-        op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,0,1))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == rect[1:2,2:3]
-        @test_throws MethodError Augmentor.applyaffine(op, rect)
-        @test_throws MethodError Augmentor.applyview(op, rect)
-        @test_throws MethodError Augmentor.applystepview(op, rect)
-        @test_throws MethodError Augmentor.applypermute(op, rect)
-        op = @inferred Either((Rotate90(),Zoom(.8)), (1,0))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Rotate90(),FlipX()), (1,0))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Rotate90(),FlipX()), (0,1))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,2)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Rotate90(),FlipY()), (0,1))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,1)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Rotate90(),Resize(5,5)), (0,1))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
-        op = @inferred Either((Crop(1:2,1:2),Resize(5,5)), (0,1))
-        @test Augmentor.supports_eager(op) === true
-        @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
-        @test typeof(Augmentor.applyeager(op, img)) <: Array
+        let op = @inferred Either((Rotate90(),Rotate270()), (1,0))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,1,0))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == rotr90(rect)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Rotate90(),Rotate270(),NoOp()), (0,0,1))
+            @test Augmentor.supports_eager(op) === true
+            if typeof(img) <: SubArray
+                @test @inferred(Augmentor.applyeager(op, img)) == rect
+                @test typeof(Augmentor.applyeager(op, img)) <: Array
+            else
+                @test @inferred(Augmentor.applyeager(op, img)) === rect
+            end
+        end
+        let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,0,1))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == rect[1:2,2:3]
+            @test_throws MethodError Augmentor.applyaffine(op, rect)
+            @test_throws MethodError Augmentor.applyview(op, rect)
+            @test_throws MethodError Augmentor.applystepview(op, rect)
+            @test_throws MethodError Augmentor.applypermute(op, rect)
+        end
+        let op = @inferred Either((Rotate90(),Zoom(.8)), (1,0))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Rotate90(),FlipX()), (1,0))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Rotate90(),FlipX()), (0,1))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,2)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Rotate90(),FlipY()), (0,1))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,1)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Rotate90(),Resize(5,5)), (0,1))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
+        let op = @inferred Either((Crop(1:2,1:2),Resize(5,5)), (0,1))
+            @test Augmentor.supports_eager(op) === true
+            @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
+            @test typeof(Augmentor.applyeager(op, img)) <: Array
+        end
     end
 end
 
