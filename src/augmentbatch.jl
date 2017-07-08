@@ -5,6 +5,28 @@ imagesvector(imgs::AbstractArray) = obsview(imgs)
 
 # --------------------------------------------------------------------
 
+"""
+    augmentbatch!([resource], outs, imgs, pipeline) -> outs
+
+Apply the operations of the given `pipeline` to the images in
+`imgs` and write the resulting images into `outs`.
+
+Both `outs` and `imgs` have to contain the same number of images.
+Each of the two variables can either be in the form of a higher
+dimensional array for which the last dimension enumerates the
+individual images, or alternatively in the form of a vector of
+arrays, for which each vector element denotes an image.
+
+The parameter `pipeline` can be a subtype of
+`Augmentor.Pipeline`, a tuple of `Augmentor.Operation`, or a
+single `Augmentor.Operation`.
+
+The optional first parameter `resource` can either be `CPU1()`
+(default) or `CPUThreads()`. In the case of the later the images
+will be augmented in parallel. For this to make sense make sure
+that the environment variable `JULIA_NUM_THREADS` is set to a
+reasonable number so that `Threads.nthreads()` is greater than 1.
+"""
 function augmentbatch!(
         outs::AbstractArray,
         imgs::AbstractArray,
