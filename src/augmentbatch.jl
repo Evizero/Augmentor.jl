@@ -1,7 +1,7 @@
 _berror() = throw(ArgumentError("Number of output images must be equal to the number of input images"))
 
-imagesvector(imgs::AbstractArray) = obsview(imgs)
-@inline imagesvector(imgs::AbstractVector{<:AbstractArray}) = imgs
+imagesvector(imgs::AbstractArray, args...) = obsview(imgs, args...)
+@inline imagesvector(imgs::AbstractVector{<:AbstractArray}, args...) = imgs
 
 # --------------------------------------------------------------------
 
@@ -30,16 +30,18 @@ reasonable number so that `Threads.nthreads()` is greater than 1.
 function augmentbatch!(
         outs::AbstractArray,
         imgs::AbstractArray,
-        pipeline)
-    augmentbatch!(CPU1(), outs, imgs, pipeline)
+        pipeline,
+        args...)
+    augmentbatch!(CPU1(), outs, imgs, pipeline, args...)
 end
 
 function augmentbatch!(
         r::AbstractResource,
         outs::AbstractArray,
         imgs::AbstractArray,
-        pipeline)
-    augmentbatch!(r, imagesvector(outs), imagesvector(imgs), pipeline)
+        pipeline,
+        obsdim = MLDataPattern.default_obsdim(outs))
+    augmentbatch!(r, imagesvector(outs, obsdim), imagesvector(imgs, obsdim), pipeline)
     outs
 end
 
