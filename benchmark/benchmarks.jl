@@ -95,3 +95,14 @@ end
         @bench "$(shortname(op))" Augmentor.plain_array(Augmentor.applyaffineview($op, $affpattern))
     end
 end
+
+@benchgroup "augment" ["-"] begin
+    pl = ShearX(10)
+    @bench "affine1" augment($pattern, $pl)
+    pl = ShearX(10) |> ShearX(-10)
+    @bench "affine2" augment($pattern, $pl)
+    pl = ShearX(10) |> ShearX(-10) |> ShearY(10) |> ShearY(-10)
+    @bench "affine4" augment($pattern, $pl)
+    pl = Rotate180() |> Crop(5:200,100:400) |> Rotate90(1) |> Crop(1:250, 1:150)
+    @bench "lazycrop" augment($pattern, $pl)
+end
