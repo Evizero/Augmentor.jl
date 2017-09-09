@@ -103,6 +103,19 @@ end
     @bench "affine2" augment($pattern, $pl)
     pl = ShearX(10) |> ShearX(-10) |> ShearY(10) |> ShearY(-10)
     @bench "affine4" augment($pattern, $pl)
-    pl = Rotate180() |> Crop(5:200,100:400) |> Rotate90(1) |> Crop(1:250, 1:150)
+    pl = Rotate180() |> Rotate90(1)
+    @bench "lazyrotate" augment($pattern, $pl)
+    pl = Rotate180() |> Crop(5:200,100:400) |> Rotate90(1) |> Crop(1:250,1:150)
     @bench "lazycrop" augment($pattern, $pl)
+    pl = Resize(100,100) |> Resize(200,400) |> Resize(20,20) |> Resize(100,100)
+    @bench "resize" augment($pattern, $pl)
+end
+
+@benchgroup "augment!" ["-"] begin
+    pl = Rotate180() |> Rotate90()
+    out = similar(pattern, 400, 300)
+    @bench "lazyrotate" augment!($out, $pattern, $pl)
+    pl = Resize(100,100) |> Resize(200,400) |> Resize(20,20) |> Resize(100,100)
+    out = similar(pattern, 100, 100)
+    @bench "resize" augment!($out, $pattern, $pl)
 end
