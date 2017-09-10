@@ -56,15 +56,20 @@ transformation [`Rotate180`](@ref) in our augmentation pipeline
 for this type of images, we could end up with the situation
 depicted by the image on the right side.
 
-```julia
-using Augmentor, Images, MNIST
-input_img  = MNIST.trainimage(19)
+```@example
+using Augmentor, MLDatasets
+input_img  = MNIST.convert2image(MNIST.traintensor(19))
 output_img = augment(input_img, Rotate180())
+using Images, FileIO; # hide
+upsize(A) = repeat(A, inner=(4,4)); # hide
+save("bg_mnist_in.png", upsize(input_img)); # hide
+save("bg_mnist_out.png", upsize(output_img)); # hide
+nothing # hide
 ```
 
-Input | Output
-------|-------
-![input_img](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readthedocs/background_mnist_in.png) | ![output_img](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readthedocs/background_mnist_out.png)
+Input (`input_img`)       | Output (`output_img`)
+--------------------------|-----------------------------
+![input](bg_mnist_in.png) | ![output](bg_mnist_out.png)
 
 To a human, this newly transformed image clearly represents the
 label "9", and not "6" like the original image did. In image
@@ -103,9 +108,19 @@ input_img  = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
 output_img = augment(input_img, Rotate180())
 ```
 
-Input | Output
-------|-------
-![input_img](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readthedocs/background_isic_in.png) | ![output_img](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readthedocs/background_isic_out.png)
+```@eval
+using Augmentor, ISICArchive
+input_img  = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
+output_img = augment(input_img, Rotate180())
+using FileIO; # hide
+save("bg_isic_in.png", input_img); # hide
+save("bg_isic_out.png", output_img); # hide
+nothing # hide
+```
+
+Input (`input_img`)      | Output (`output_img`)
+-------------------------|----------------------------
+![input](bg_isic_in.png) | ![output](bg_isic_out.png)
 
 After looking at both images, one could argue that the
 orientation of the camera is somewhat arbitrary as long as it
