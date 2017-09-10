@@ -5,7 +5,7 @@
 # [x] Lazy Either works correctly and type stable
 # [x] Operations accept AbstractArray as input (esp. Array and SubArray)
 
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, Base.Test
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ReferenceTests, Base.Test
 using ImageInTerminal
 
 # check for ambiguities

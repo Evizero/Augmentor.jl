@@ -1,68 +1,3 @@
-reference_path(filename) = joinpath(dirname(@__FILE__), "reference", "$(filename).txt")
-
-function test_reference_impl{T<:Colorant}(filename, img::AbstractArray{T})
-    old_color = Base.have_color
-    res = try
-        eval(Base, :(have_color = true))
-        ImageInTerminal.encodeimg(ImageInTerminal.SmallBlocks(), ImageInTerminal.TermColor256(), img, 20, 40)[1]
-    finally
-        eval(Base, :(have_color = $old_color))
-    end
-    test_reference_impl(filename, res)
-end
-
-function test_reference_impl{T<:String}(filename, actual::AbstractArray{T})
-    try
-        reference = replace.(readlines(reference_path(filename)), ["\n"], [""])
-        try
-            @assert reference == actual # to throw error
-            @test true # to increase test counter if reached
-        catch # test failed
-            println("Test for \"$filename\" failed.")
-            println("- REFERENCE -------------------")
-            println.(reference)
-            println("-------------------------------")
-            println("- ACTUAL ----------------------")
-            println.(actual)
-            println("-------------------------------")
-            if isinteractive()
-                print("Replace reference with actual result? [y/n] ")
-                answer = first(readline())
-                if answer == 'y'
-                    write(reference_path(filename), join(actual, "\n"))
-                end
-            else
-                error("You need to run the tests interactively with 'include(\"test/runtests.jl\")' to update reference images")
-            end
-        end
-    catch ex
-        if isa(ex, SystemError) # File doesn't exist
-            println("Reference file for \"$filename\" does not exist.")
-            println("- NEW CONTENT -----------------")
-            println.(actual)
-            println("-------------------------------")
-            if isinteractive()
-                print("Create reference file with above content? [y/n] ")
-                answer = first(readline())
-                if answer == 'y'
-                    write(reference_path(filename), join(actual, "\n"))
-                end
-            else
-                error("You need to run the tests interactively with 'include(\"test/runtests.jl\")' to create new reference images")
-            end
-        else
-            throw(ex)
-        end
-    end
-end
-
-# using a macro looks more consistent
-macro test_reference(filename, expr)
-    esc(:(test_reference_impl($filename, $expr)))
-end
-
-# --------------------------------------------------------------------
-
 @testset "single op" begin
     @test_throws BoundsError augment!(rand(2,2), rect, Rotate90())
     for pl in (Augmentor.ImmutablePipeline(Rotate90()), (Rotate90(),))
@@ -155,15 +90,15 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "rot_crop_either_crop" wv
+    @test_reference "reference/rot_crop_either_crop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rot_crop_either_crop" img
+    @test_reference "reference/rot_crop_either_crop.txt" img
     out = similar(img)
     @test @inferred(augment!(out, camera, ops)) === out
-    @test_reference "rot_crop_either_crop" out
+    @test_reference "reference/rot_crop_either_crop.txt" out
     @test @allocated(augment!(out, camera, ops)) < @allocated(augment(camera, ops))
 end
 
@@ -172,15 +107,15 @@ ops = Augmentor.ImmutablePipeline(Rotate180(),Crop(5:200,200:500),Rotate90(),Cro
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test typeof(parent(wv)) <: Base.PermutedDimsArrays.PermutedDimsArray
-    @test_reference "rot_crop_rot_crop" wv
+    @test_reference "reference/rot_crop_rot_crop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rot_crop_rot_crop" img
+    @test_reference "reference/rot_crop_rot_crop.txt" img
     out = similar(img)
     @test @inferred(augment!(out, camera, ops)) === out
-    @test_reference "rot_crop_rot_crop" out
+    @test_reference "reference/rot_crop_rot_crop.txt" out
     @test @allocated(augment!(out, camera, ops)) < @allocated(augment(camera, ops))
 end
 
@@ -192,15 +127,15 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195),Resize(25
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "rot_crop_rot_crop_resize" wv
+    @test_reference "reference/rot_crop_rot_crop_resize.txt" wv
     img = @inferred Augmentor.augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rot_crop_rot_crop_resize" img
+    @test_reference "reference/rot_crop_rot_crop_resize.txt" img
     out = similar(img)
     @test @inferred(augment!(out, camera, ops)) === out
-    @test_reference "rot_crop_rot_crop_resize" out
+    @test_reference "reference/rot_crop_rot_crop_resize.txt" out
     @test @allocated(augment!(out, camera, ops)) < @allocated(augment(camera, ops))
 end
 
@@ -211,12 +146,12 @@ ops = (Rotate(45),CropNative(1:512,1:512))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "rot45_crop" wv
+    @test_reference "reference/rot45_crop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rot45_crop" img
+    @test_reference "reference/rot45_crop.txt" img
 end
 
 ops = (Rotate(45),CropSize(512,512))
@@ -226,12 +161,12 @@ ops = (Rotate(45),CropSize(512,512))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "rot45_crop" wv
+    @test_reference "reference/rot45_crop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rot45_crop" img
+    @test_reference "reference/rot45_crop.txt" img
 end
 
 ops = (Rotate(-45),CropSize(256,256))
@@ -241,12 +176,12 @@ ops = (Rotate(-45),CropSize(256,256))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "rotr45_cropsize" wv
+    @test_reference "reference/rotr45_cropsize.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rotr45_cropsize" img
+    @test_reference "reference/rotr45_cropsize.txt" img
 end
 
 ops = (Scale(.1,.2),NoOp())
@@ -254,12 +189,12 @@ ops = (Scale(.1,.2),NoOp())
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: InvWarpedView
     @test parent(wv).itp.coefs === camera
-    @test_reference "scale_noop" wv
+    @test_reference "reference/scale_noop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "scale_noop" img
+    @test_reference "reference/scale_noop.txt" img
 end
 
 ops = (Scale(.1,.2),CropRatio())
@@ -269,12 +204,12 @@ ops = (Scale(.1,.2),CropRatio())
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "scale_cropratio" wv
+    @test_reference "reference/scale_cropratio.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "scale_cropratio" img
+    @test_reference "reference/scale_cropratio.txt" img
 end
 
 ops = (ShearX(45),NoOp())
@@ -282,12 +217,12 @@ ops = (ShearX(45),NoOp())
     wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: InvWarpedView
     @test parent(wv).itp.coefs === camera
-    @test_reference "shearx_noop" wv
+    @test_reference "reference/shearx_noop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "shearx_noop" img
+    @test_reference "reference/shearx_noop.txt" img
 end
 
 ops = (ShearY(45),CropNative(1:512,1:512))
@@ -297,12 +232,12 @@ ops = (ShearY(45),CropNative(1:512,1:512))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "sheary_crop" wv
+    @test_reference "reference/sheary_crop.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "sheary_crop" img
+    @test_reference "reference/sheary_crop.txt" img
 end
 
 ops = (Crop(101:200,201:350),Scale(.2,.4))
@@ -312,12 +247,12 @@ ops = (Crop(101:200,201:350),Scale(.2,.4))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "crop_scale" wv
+    @test_reference "reference/crop_scale.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "crop_scale" img
+    @test_reference "reference/crop_scale.txt" img
 end
 
 ops = (Crop(101:200,201:350),Zoom(1.3))
@@ -327,12 +262,12 @@ ops = (Crop(101:200,201:350),Zoom(1.3))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "crop_zoom" wv
+    @test_reference "reference/crop_zoom.txt" wv
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "crop_zoom" img
+    @test_reference "reference/crop_zoom.txt" img
 end
 
 ops = (Rotate(45),Zoom(2))
@@ -342,14 +277,14 @@ ops = (Rotate(45),Zoom(2))
     @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "rot45_zoom" wv
+    @test_reference "reference/rot45_zoom.txt" wv
     wv2 = Augmentor._augment(camera, (ops..., NoOp()))
-    @test_reference "rot45_zoom" wv2
+    @test_reference "reference/rot45_zoom.txt" wv2
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
-    @test_reference "rot45_zoom" img
+    @test_reference "reference/rot45_zoom.txt" img
 end
 
 # just for code coverage
