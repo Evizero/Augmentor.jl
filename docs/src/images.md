@@ -153,7 +153,7 @@ If for some reason that is not the case there are two possible
 ways to convert the image to that format.
 
 ```jldoctest 1
-julia> At = reinterpret(UInt8, memory, (3, 2))' # "row-major" layout
+julia> At = reinterpret(UInt8, memory, (3,2))' # "row-major" layout
 2×3 Array{UInt8,2}:
  0x01  0x02  0x03
  0x04  0x05  0x06
@@ -165,7 +165,7 @@ julia> At = reinterpret(UInt8, memory, (3, 2))' # "row-major" layout
    values in the appropriate manner.
 
    ```jldoctest 1
-   julia> B = permutedims(At, (2, 1))
+   julia> B = permutedims(At, (2,1))
    3×2 Array{UInt8,2}:
     0x01  0x04
     0x02  0x05
@@ -180,7 +180,7 @@ julia> At = reinterpret(UInt8, memory, (3, 2))' # "row-major" layout
    ```jldoctest 1
    julia> using ImageCore
 
-   julia> C = permuteddimsview(At, (2, 1))
+   julia> C = permuteddimsview(At, (2,1))
    3×2 permuteddimsview(::Array{UInt8,2}, (2, 1)) with element type UInt8:
     0x01  0x04
     0x02  0x05

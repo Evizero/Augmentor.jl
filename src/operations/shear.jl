@@ -26,6 +26,11 @@ Arguments
     then a random element will be sampled each time the operation
     is applied.
 
+See also
+--------------
+
+[`ShearY`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -42,11 +47,6 @@ augment(img, ShearX(10:20))
 # shear horizontally one of the five specified degrees
 augment(img, ShearX([-10, -5, 0, 5, 10]))
 ```
-
-see also
---------------
-
-[`ShearY`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 struct ShearX{T<:AbstractVector} <: AffineOperation
     degree::T
@@ -110,6 +110,11 @@ Arguments
     then a random element will be sampled each time the operation
     is applied.
 
+See also
+--------------
+
+[`ShearX`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -126,11 +131,6 @@ augment(img, ShearY(10:20))
 # shear vertically one of the five specified degrees
 augment(img, ShearY([-10, -5, 0, 5, 10]))
 ```
-
-see also
---------------
-
-[`ShearX`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 struct ShearY{T<:AbstractVector} <: AffineOperation
     degree::T

@@ -16,6 +16,7 @@ makedocs(
         "gettingstarted.md",
         "background.md",
         "images.md",
+        "operations.md",
         "LICENSE.md",
     ],
     html_prettyurls = !("local" in ARGS),

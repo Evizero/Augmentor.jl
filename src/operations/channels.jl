@@ -20,6 +20,11 @@ Usage
 
     SplitChannels()
 
+See also
+--------------
+
+[`PermuteDims`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -38,11 +43,6 @@ julia> augment(img, SplitChannels() |> PermuteDims(3,2,1))
 400×300×4 Array{N0f8,3}:
 [...]
 ```
-
-see also
---------------
-
-[`PermuteDims`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
 """
 struct SplitChannels <: Operation end
 
@@ -98,6 +98,11 @@ Arguments
     be a subtype of `ColorTypes.Colorant` and match the color
     channel of the given image.
 
+See also
+--------------
+
+[`SplitChannels`](@ref), [`PermuteDims`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -120,11 +125,6 @@ julia> augment(B, CombineChannels(Gray))
 10×10 Array{Gray{Float64},2}:
 [...]
 ```
-
-see also
---------------
-
-[`SplitChannels`](@ref), [`PermuteDims`](@ref), [`augment`](@ref)
 """
 struct CombineChannels{T<:Colorant} <: Operation
     colortype::Type{T}
@@ -193,6 +193,11 @@ Arguments
     of `Int`. The length of `perm` has to match the number of
     dimensions of the expected input image to that operation.
 
+See also
+--------------
+
+[`SplitChannels`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -215,11 +220,6 @@ julia> B = augment(img2, SplitChannels() |> PermuteDims(3,2,1))
 400×300×4 Array{N0f8,3}:
 [...]
 ```
-
-see also
---------------
-
-[`SplitChannels`](@ref), [`CombineChannels`](@ref), [`augment`](@ref)
 """
 struct PermuteDims{N,perm,iperm} <: Operation end
 PermuteDims() = throw(MethodError(PermuteDims, ()))
@@ -277,6 +277,11 @@ Arguments
     image. Has to be specified as a `Vararg{Int}` or as a
     `NTuple` of `Int`.
 
+See also
+--------------
+
+[`CombineChannels`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -291,11 +296,6 @@ julia> augment(A, Reshape(10,10,1)) # add trailing singleton dimension
 10×10×1 Array{Float64,3}:
 [...]
 ```
-
-see also
---------------
-
-[`CombineChannels`](@ref), [`augment`](@ref)
 """
 struct Reshape{N} <: Operation
     dims::NTuple{N,Int}

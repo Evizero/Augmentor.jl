@@ -43,7 +43,7 @@ Depth = 3
 for Augmentor. You can find the Python version
 [here](https://github.com/mdbloice/Augmentor).
 
-## Image Augmentation
+## Introduction and Motivation
 
 If you are new to image augmentation in general, or are simply
 interested in some background information, feel free to take a
@@ -70,6 +70,11 @@ Depth = 3
 Augmentor provides a number of already implemented functionality.
 The following section provides a complete list of all the
 exported operations and their documentation.
+
+```@contents
+Pages = ["operations.md"]
+Depth = 2
+```
 
 ## Indices and tables
 

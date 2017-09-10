@@ -28,13 +28,19 @@ Usage
 Arguments
 --------------
 
-- **`p`** : Optional. Probability of applying the operation. Must
-    be in the interval [0,1].
+- **`p::Number`** : Optional. Probability of applying the
+    operation. Must be in the interval [0,1].
+
+See also
+--------------
+
+[`Rotate180`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
+[`Either`](@ref), [`augment`](@ref)
 
 Examples
 --------------
 
-```julia
+```jldoctest
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
@@ -47,12 +53,6 @@ julia> img_new = augment(img, Rotate90())
  150   1
  200  50
 ```
-
-see also
---------------
-
-[`Rotate180`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
-[`Either`](@ref), [`augment`](@ref)
 """
 struct Rotate90 <: AffineOperation end
 Rotate90(p::Number) = Either(Rotate90(), p)
@@ -111,13 +111,19 @@ Usage
 Arguments
 --------------
 
-- **`p`** : Optional. Probability of applying the operation. Must
-    be in the interval [0,1].
+- **`p::Number`** : Optional. Probability of applying the
+    operation. Must be in the interval [0,1].
+
+See also
+--------------
+
+[`Rotate90`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
+[`Either`](@ref), [`augment`](@ref)
 
 Examples
 --------------
 
-```julia
+```jldoctest
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
@@ -130,12 +136,6 @@ julia> img_new = augment(img, Rotate180())
    1   50
  150  200
 ```
-
-see also
---------------
-
-[`Rotate90`](@ref), [`Rotate270`](@ref), [`Rotate`](@ref),
-[`Either`](@ref), [`augment`](@ref)
 """
 struct Rotate180 <: AffineOperation end
 Rotate180(p::Number) = Either(Rotate180(), p)
@@ -182,13 +182,19 @@ Usage
 Arguments
 --------------
 
-- **`p`** : Optional. Probability of applying the operation. Must
-    be in the interval [0,1].
+- **`p::Number`** : Optional. Probability of applying the
+    operation. Must be in the interval [0,1].
+
+See also
+--------------
+
+[`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate`](@ref),
+[`Either`](@ref), [`augment`](@ref)
 
 Examples
 --------------
 
-```julia
+```jldoctest
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
@@ -201,12 +207,6 @@ julia> img_new = augment(img, Rotate270())
  50  200
   1  150
 ```
-
-see also
---------------
-
-[`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate`](@ref),
-[`Either`](@ref), [`augment`](@ref)
 """
 struct Rotate270 <: AffineOperation end
 Rotate270(p::Number) = Either(Rotate270(), p)
@@ -284,6 +284,12 @@ Arguments
     then a random element will be sampled each time the operation
     is applied.
 
+See also
+--------------
+
+[`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate270`](@ref),
+[`CropNative`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -300,12 +306,6 @@ augment(img, Rotate(10:20))
 # rotate one of the five specified degrees
 augment(img, Rotate([-10, -5, 0, 5, 10]))
 ```
-
-see also
---------------
-
-[`Rotate90`](@ref), [`Rotate180`](@ref), [`Rotate270`](@ref),
-[`CropNative`](@ref), [`augment`](@ref)
 """
 struct Rotate{T<:AbstractVector} <: AffineOperation
     degree::T
