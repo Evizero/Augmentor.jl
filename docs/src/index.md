@@ -1,5 +1,11 @@
 ![header](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/header.png)
 
+```@eval
+using Augmentor, Images
+pattern = imresize(testpattern(), (240, 320))
+save("assets/testpattern.png", pattern)
+```
+
 A **fast** library for increasing the number of training images
 by applying various transformations.
 
@@ -73,6 +79,13 @@ exported operations and their documentation.
 
 ```@contents
 Pages = ["operations.md"]
+Depth = 2
+```
+
+## Tutorials
+
+```@contents
+Pages = [joinpath("generated", fname) for fname in readdir("generated") if splitext(fname)[2] == ".md"]
 Depth = 2
 ```
 

@@ -1,12 +1,35 @@
 using Documenter, Augmentor
 
+using Weave
+input_dir = joinpath(@__DIR__, "..", "examples")
+output_dir = joinpath(@__DIR__, "src", "generated")
+mkpath(output_dir)
+new_md_files = []
+for fname in readdir(input_dir)
+    splitext(fname)[2] == ".jl" || continue;
+    name = splitext(fname)[1]
+    inpath = joinpath(input_dir, fname)
+    doc_inpath = joinpath(output_dir, name * ".jl")
+    str_md = replace(readstring(inpath), r"\n(#jp ).*\n", "\n")
+    str_md = replace(str_md, "\n#md ", "\n")
+    write(doc_inpath, str_md)
+    outpath_jmd = joinpath(output_dir, name * ".jmd")
+    outpath_md = joinpath(output_dir, name * ".md")
+    convert_doc(doc_inpath, outpath_jmd)
+    str_md = replace(readstring(outpath_jmd), "```julia", "```@example $name")
+    rm(doc_inpath)
+    rm(outpath_jmd)
+    write(outpath_md, str_md)
+    push!(new_md_files, joinpath("generated", name * ".md"))
+end
+
 makedocs(
     modules = [Augmentor],
     clean = false,
     format = :html,
     assets = [
-        "assets/favicon.ico",
-        "assets/style.css",
+        joinpath("assets", "favicon.ico"),
+        joinpath("assets", "style.css"),
     ],
     sitename = "Augmentor.jl",
     authors = "Christof Stocker",
@@ -16,7 +39,8 @@ makedocs(
         "gettingstarted.md",
         "background.md",
         "images.md",
-        "operations.md",
+        hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations"))) if splitext(fname)[2] == ".md"]),
+        new_md_files...,
         "LICENSE.md",
     ],
     html_prettyurls = !("local" in ARGS),

@@ -12,10 +12,5 @@ article section.docstring {
     margin: 0;
     border: 0;
     padding: 0;
-    margin-top: 2em;
+    margin-top: 1em;
 }
-.docstring-header {
-    margin-top: 0.6em;
-    font-size: x-large;
-}
-

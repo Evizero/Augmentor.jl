@@ -2,7 +2,14 @@ using Augmentor, Images, Colors
 using Reel, PaddedViews, OffsetArrays
 Reel.set_output_type("gif")
 
-pattern = load("assets/testpattern.png")
+srand(1337)
+
+if !isfile("../assets/testpattern.png")
+    pattern = imresize(testpattern(), (240, 320))
+    save("../assets/testpattern.png", pattern)
+end
+
+pattern = load("../assets/testpattern.png")
 pattern_noalpha = ((1 .- alpha.(pattern)) .* colorant"#F3F6F6") .+ (alpha.(pattern) .* color.(pattern))
 
 function drawborder!(img, col)
@@ -35,10 +42,10 @@ macro optable(expr)
 end
 
 function optable(op, name, descr)
-    fname = joinpath("assets", string(name, ".png"))
+    fname = joinpath("..", "assets", string(name, ".png"))
     i = 2
     while isfile(fname)
-        fname = joinpath("assets", string(name, i, ".png"))
+        fname = joinpath("..", "assets", string(name, i, ".png"))
         i = i + 1
     end
     out = augment(pattern, op)
@@ -47,16 +54,16 @@ function optable(op, name, descr)
     tbl = string(
         "Input | $header\n",
         "------|--------\n",
-        "![input](assets/testpattern.png) | ![output]($fname)\n"
+        "![input](../assets/testpattern.png) | ![output]($fname)\n"
     )
     Markdown.parse(tbl)
 end
 
 function optable(op, name, descr, n)
-    fname = joinpath("assets", string(name, ".gif"))
+    fname = joinpath("..", "assets", string(name, ".gif"))
     i = 2
     while isfile(fname)
-        fname = joinpath("assets", string(name, i, ".gif"))
+        fname = joinpath("..", "assets", string(name, i, ".gif"))
         i = i + 1
     end
     raw_imgs = [centered(drawborder!(augment(pattern_noalpha, op), colorant"pink")) for i in 1:n]
@@ -68,7 +75,7 @@ function optable(op, name, descr, n)
     tbl = string(
         "Input | $header\n",
         "------|--------\n",
-        "![input](assets/testpattern.png) | ![output]($fname)\n"
+        "![input](../assets/testpattern.png) | ![output]($fname)\n"
     )
     Markdown.parse(tbl)
 end
