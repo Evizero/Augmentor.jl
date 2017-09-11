@@ -1,0 +1,539 @@
+var documenterSearchIndex = {"docs": [
+
+{
+    "location": "#",
+    "page": "Home",
+    "title": "Home",
+    "category": "page",
+    "text": "(Image: header)A fast library for increasing the number of training images by applying various transformations."
+},
+
+{
+    "location": "#Augmentor.jl's-documentation-1",
+    "page": "Home",
+    "title": "Augmentor.jl's documentation",
+    "category": "section",
+    "text": "Augmentor is a real-time image augmentation library designed to render the process of artificial dataset enlargement more convenient, less error prone, and easier to reproduce. It offers the user the ability to build a stochastic augmentation pipeline using simple building blocks. In other words, a stochastic augmentation pipeline is simply a sequence of operations for which the parameters can (but need not) be random variables as the following code snippet demonstrates.using Augmentor\npipeline = Rotate([-5, -3, 0, 3, 5]) |> CropSize(64, 64) |> Zoom(1:0.1:1.2)The Julia version of Augmentor is engineered specifically for high performance applications. It makes use of multiple heuristics to generate efficient tailor-made code for the concrete user-specified augmentation pipeline. In particular Augmentor tries to avoid the need for any intermediate images, but instead aims to compute the output image directly from the input in one single pass."
+},
+
+{
+    "location": "#Where-to-begin?-1",
+    "page": "Home",
+    "title": "Where to begin?",
+    "category": "section",
+    "text": "If this is the first time you consider using Augmentor.jl for your machine learning related experiments or packages, make sure to check out the \"Getting Started\" section. There we list the installation instructions and some simple hello world examples.Pages = [\"gettingstarted.md\"]\nDepth = 3Augmentor.jl is the Julia package for Augmentor. You can find the Python version here."
+},
+
+{
+    "location": "#Introduction-and-Motivation-1",
+    "page": "Home",
+    "title": "Introduction and Motivation",
+    "category": "section",
+    "text": "If you are new to image augmentation in general, or are simply interested in some background information, feel free to take a look at the following sections. There we discuss the concepts involved and outline the most important terms and definitions.Pages = [\"background.md\"]\nDepth = 3In case you have not worked with image data in Julia before, feel free to browse the following documents for a crash course on how image data is represented in the Julia language, as well as how to visualize it.Pages = [\"images.md\"]\nDepth = 3"
+},
+
+{
+    "location": "#User's-Guide-1",
+    "page": "Home",
+    "title": "User's Guide",
+    "category": "section",
+    "text": "Augmentor provides a number of already implemented functionality. The following section provides a complete list of all the exported operations and their documentation.Pages = [\"operations.md\"]\nDepth = 2"
+},
+
+{
+    "location": "#Tutorials-1",
+    "page": "Home",
+    "title": "Tutorials",
+    "category": "section",
+    "text": "Pages = [joinpath(\"generated\", fname) for fname in readdir(\"generated\") if splitext(fname)[2] == \".md\"]\nDepth = 2"
+},
+
+{
+    "location": "#Indices-and-tables-1",
+    "page": "Home",
+    "title": "Indices and tables",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "gettingstarted/#",
+    "page": "Getting Started",
+    "title": "Getting Started",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "gettingstarted/#Getting-Started-1",
+    "page": "Getting Started",
+    "title": "Getting Started",
+    "category": "section",
+    "text": "In this section we will provide a condensed overview of the package. In order to keep this overview concise, we will not discuss any background information or theory on the losses here in detail."
+},
+
+{
+    "location": "gettingstarted/#Installation-1",
+    "page": "Getting Started",
+    "title": "Installation",
+    "category": "section",
+    "text": "To install Augmentor.jl, start up Julia and type the following code-snipped into the REPL. It makes use of the native Julia package manger.Pkg.add(\"Augmentor\")Additionally, for example if you encounter any sudden issues, or in the case you would like to contribute to the package, you can manually choose to be on the latest (untagged) version.Pkg.checkout(\"Augmentor\")"
+},
+
+{
+    "location": "gettingstarted/#Example-1",
+    "page": "Getting Started",
+    "title": "Example",
+    "category": "section",
+    "text": "The following code snippet shows how a stochastic augmentation pipeline can be specified using simple building blocks that we call \"operations\". In order to give the example some meaning, we will use a real medical image from the publicly available ISIC archive as input. The concrete image can be downloaded here using their Web API.julia> using Augmentor, ISICArchive\n\njulia> img = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\n169×256 Array{RGB{N0f8},2}:\n[...]\n\njulia> pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n            Rotate(0:360) |>\n            ShearX(-5:5) * ShearY(-5:5) |>\n            CropSize(165, 165) |>\n            Zoom(1:0.05:1.2) |>\n            Resize(64, 64)\n6-step Augmentor.ImmutablePipeline:\n 1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.\n 2.) Rotate by θ ∈ 0:360 degree\n 3.) Either: (50%) ShearX by ϕ ∈ -5:5 degree. (50%) ShearY by ψ ∈ -5:5 degree.\n 4.) Crop a 165×165 window around the center\n 5.) Zoom by I ∈ {1.0×1.0, 1.05×1.05, 1.1×1.1, 1.15×1.15, 1.2×1.2}\n 6.) Resize to 64×64\n\njulia> img_new = augment(img, pl)\n64×64 Array{RGB{N0f8},2}:\n[...]using Augmentor, ISICArchive;\n\nimg = get(ImageThumbnailRequest(id =\n\"5592ac599fc3c13155a57a85\"))\n\npl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n     Rotate(0:360) |>\n     ShearX(-5:5) * ShearY(-5:5) |>\n     CropSize(165, 165) |>\n     Zoom(1:0.05:1.2) |>\n     Resize(64, 64)\n\nimg_new = augment(img, pl)\n\nusing Plots\npyplot(reuse = true)\ndefault(bg_outside=colorant\"#F3F6F6\")\nsrand(123)\n\n# Create image that shows the input\nplot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)\nPlots.png(\"isic_in.png\")\n\n# create animate gif that shows 10 outputs\nanim = @animate for i=1:10\n    plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)\nend\nPlots.gif(anim, \"isic_out.gif\", fps = 2)\n\nnothingThe function augment will generate a single augmented image from the given input image and pipeline. To visualize the effect we compiled a few resulting output images into a GIF using the plotting library Plots.jl with the PyPlot.jl back-end. You can inspect the full code by clicking on \"Edit on Github\" in the top right corner of this page.Input (img)  Output (img_new)\n(Image: input) → (Image: output)"
+},
+
+{
+    "location": "gettingstarted/#Getting-Help-1",
+    "page": "Getting Started",
+    "title": "Getting Help",
+    "category": "section",
+    "text": "To get help on specific functionality you can either look up the information here, or if you prefer you can make use of Julia's native doc-system. The following example shows how to get additional information on augment within Julia's REPL:?augment"
+},
+
+{
+    "location": "background/#",
+    "page": "Background and Motivation",
+    "title": "Background and Motivation",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "background/#Background-and-Motivation-1",
+    "page": "Background and Motivation",
+    "title": "Background and Motivation",
+    "category": "section",
+    "text": "In this section we will discuss the concept of image augmentation in general. In particular we will introduce some terminology and useful definitions."
+},
+
+{
+    "location": "background/#What-is-Image-Augmentation?-1",
+    "page": "Background and Motivation",
+    "title": "What is Image Augmentation?",
+    "category": "section",
+    "text": "The term data augmentation is commonly used to describe the process of repeatedly applying various transformations to some dataset, with the hope that the output (i.e. the newly generated observations) bias the model towards learning better features. Depending on the structure and semantics of the data, coming up with such transformations can be a challenge by itself.Images are a special class of data that exhibit some interesting properties in respect to their structure. For example do the dimensions of an image (i.e. the pixel) exhibit a spatial relationship to each other. As such, a lot of commonly used augmentation strategies for image data revolve around affine transformations, such as translations or rotations. Because images are such a popular and special case of data, they deserve their own sub-category of data augmentation, which we will unsurprisingly refer to as image augmentation.The general idea is the following: if we want our model to generalize well, then we should design the learning process in such a way as to bias the model into learning such transformation-equivariant properties. One way to do this is via the design of the model itself, which for example was idea behind convolutional neural networks. An orthogonal approach to bias the model to learn about this equivariance - and the focus of this package - is by using label-preserving transformations."
+},
+
+{
+    "location": "background/#Label-preserving-Transformations-1",
+    "page": "Background and Motivation",
+    "title": "Label-preserving Transformations",
+    "category": "section",
+    "text": "Before attempting to train a model using some augmentation pipeline, it's a good idea to invest some time in deciding on an appropriate set of transformations to choose from. Some of these transformations also have parameters to tune, and we should also make sure that we settle on a decent set of values for those.What constitutes as \"decent\" depends on the dataset. In general we want the augmented images to be fairly dissimilar to the originals. However, we need to be careful that the augmented images still visually represent the same concept (and thus label). If a pipeline only produces output images that have this property we call this pipeline label-preserving."
+},
+
+{
+    "location": "background/#Example:-MNIST-Handwritten-Digits-1",
+    "page": "Background and Motivation",
+    "title": "Example: MNIST Handwritten Digits",
+    "category": "section",
+    "text": "Consider the following example from the MNIST database of handwritten digits [MNIST1998]. Our input image clearly represents its associated label \"6\". If we were to use the transformation Rotate180 in our augmentation pipeline for this type of images, we could end up with the situation depicted by the image on the right side.using Augmentor, MLDatasets\ninput_img  = MNIST.convert2image(MNIST.traintensor(19))\noutput_img = augment(input_img, Rotate180())\nusing Images, FileIO; # hide\nupsize(A) = repeat(A, inner=(4,4)); # hide\nsave(\"bg_mnist_in.png\", upsize(input_img)); # hide\nsave(\"bg_mnist_out.png\", upsize(output_img)); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)To a human, this newly transformed image clearly represents the label \"9\", and not \"6\" like the original image did. In image augmentation, however, the assumption is that the output of the pipeline has the same label as the input. That means that in this example we would tell our model that the correct answer for the image on the right side is \"6\", which is clearly undesirable for obvious reasons.Thus, for the MNIST dataset, the transformation Rotate180 is not label-preserving and should not be used for augmentation.[MNIST1998]: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. \"The MNIST database of handwritten digits\" Website. 1998."
+},
+
+{
+    "location": "background/#Example:-ISIC-Skin-Lesions-1",
+    "page": "Background and Motivation",
+    "title": "Example: ISIC Skin Lesions",
+    "category": "section",
+    "text": "On the other hand, the exact same transformation could very well be label-preserving for other types of images. Let us take a look at a different set of image data; this time from the medical domain.The International Skin Imaging Collaboration [ISIC] hosts a large collection of publicly available and labeled skin lesion images. A subset of that data was used in 2016's ISBI challenge [ISBI2016] where a subtask was lesion classification.Let's consider the following input image on the left side. It shows a photo of a skin lesion that was taken from above. By applying the Rotate180 operation to the input image, we end up with a transformed version shown on the right side.using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())\nusing FileIO; # hide\nsave(\"bg_isic_in.png\", input_img); # hide\nsave(\"bg_isic_out.png\", output_img); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)After looking at both images, one could argue that the orientation of the camera is somewhat arbitrary as long as it points to the lesion at an approximately orthogonal angle. Thus, for the ISIC dataset, the transformation Rotate180 could be considered as label-preserving and very well be tried for augmentation. Of course this does not guarantee that it will improve training time or model accuracy, but the point is that it is unlikely to hurt.[ISIC]: https://isic-archive.com/[ISBI2016]: Gutman, David; Codella, Noel C. F.; Celebi, Emre; Helba, Brian; Marchetti, Michael; Mishra, Nabin; Halpern, Allan. \"Skin Lesion Analysis toward Melanoma Detection: A Challenge at the International Symposium on Biomedical Imaging (ISBI) 2016, hosted by the International Skin Imaging Collaboration (ISIC)\". eprint arXiv:1605.01397. 2016."
+},
+
+{
+    "location": "images/#",
+    "page": "Working with Images in Julia",
+    "title": "Working with Images in Julia",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "images/#Working-with-Images-in-Julia-1",
+    "page": "Working with Images in Julia",
+    "title": "Working with Images in Julia",
+    "category": "section",
+    "text": "The Julia language provides a rich syntax as well as large set of highly-optimized functionality for working with (multi-dimensional) arrays of what is known as \"bit types\" or compositions of such. Because of this, the language lends itself particularly well to the fairly simple idea of treating images as just plain arrays. Even though this may sound as a rather tedious low-level approach, Julia makes it possible to still allow for powerful abstraction layers without the loss of generality that usually comes with that. This is accomplished with help of Julia's flexible type system and multiple dispatch (both of which are beyond the scope of this tutorial).While the images-are-arrays-approach makes working with images in Julia very performant, it has also been source of confusion to new community members. This beginner's guide is an attempt to provide a step-by-step overview of how pixel data is handled in Julia. To get a more detailed explanation on some particular concept involved, please take a look at the documentation of the JuliaImages ecosystem."
+},
+
+{
+    "location": "images/#Multi-dimensional-Arrays-1",
+    "page": "Working with Images in Julia",
+    "title": "Multi-dimensional Arrays",
+    "category": "section",
+    "text": "To wrap our heads around Julia's array-based treatment of images, we first need to understand what Julia arrays are and how we can work with them.note: Note\nThis section is only intended provide a simplified and thus partial overview of Julia's arrays capabilities in order to gain some intuition about pixel data. For a more detailed treatment of the topic please have a look at the official documentationWhenever we work with an Array in which the elements are bit-types (e.g. Int64, Float32, UInt8, etc), we can think of the array as a continuous block of memory. This is useful for many different reasons, such as cache locality and interacting with external libraries.The same block of memory can be interpreted in a number of ways. Consider the following example in which we allocate a vector (i.e. a one dimensional array) of UInt8 (i.e. bytes) with some ordered example values ranging from 1 to 6. We will think of this as our physical memory block, since it is a pretty close representation.julia> memory = [0x1, 0x2, 0x3, 0x4, 0x5, 0x6]\n6-element Array{UInt8,1}:\n 0x01\n 0x02\n 0x03\n 0x04\n 0x05\n 0x06The same block of memory could also be interpreted differently. For example we could think of this as a matrix with 3 rows and 2 columns instead (or even the other way around). The function reinterpret allows us to do just thatjulia> A = reinterpret(UInt8, memory, (3,2))\n3×2 Array{UInt8,2}:\n 0x01  0x04\n 0x02  0x05\n 0x03  0x06Note how we specified the number of rows first. This is because the Julia language follows the column-major convention for multi dimensional arrays. What this means can be observed when we compare our new matrix A with the initial vector memory and look at the element layout. Both variables are using the same underlying memory (i.e the value 0x01 is physically stored right next to the value 0x02 in our example, while 0x01 and 0x04 are quite far apart even though the matrix interpretation makes it look like they are neighbors; which they are not).tip: Tip\nA quick and dirty way to check if two variables are representing the same block of memory is by comparing the output of pointer(myvariable). Note, however, that technically this only tells you where a variable starts in memory and thus has its limitations.This idea can also be generalized for higher dimensions. For example we can think of this as a 3D array as well.julia> reinterpret(UInt8, memory, (3,1,2))\n3×1×2 Array{UInt8,3}:\n[:, :, 1] =\n 0x01\n 0x02\n 0x03\n\n[:, :, 2] =\n 0x04\n 0x05\n 0x06If you take a closer look at the dimension sizes, you can see that all we did in that example was add a new dimension of size 1, while not changing the other numbers. In fact we can add any number of practically empty dimensions, otherwise known as singleton dimensions.julia> reinterpret(UInt8, memory, (3,1,1,1,2))\n3×1×1×1×2 Array{UInt8,5}:\n[:, :, 1, 1, 1] =\n 0x01\n 0x02\n 0x03\n\n[:, :, 1, 1, 2] =\n 0x04\n 0x05\n 0x06This is a useful property to have when we are confronted with greyscale datasets that do not have a color channel, yet we still want to work with a library that expects the images to have one."
+},
+
+{
+    "location": "images/#Vertical-Major-vs-Horizontal-Major-1",
+    "page": "Working with Images in Julia",
+    "title": "Vertical-Major vs Horizontal-Major",
+    "category": "section",
+    "text": "There are a number of different conventions for how to store image data into a binary format. The first question one has to address is the order in which the image dimensions are transcribed.We have seen before that Julia follows the column-major convention for its arrays, which for images would lead to the corresponding convention of being vertical-major. In the image domain, however, it is fairly common to store the pixels in a horizontal-major layout. In other words, horizontal-major means that images are stored in memory (or file) one pixel row after the other.In most cases, when working within the JuliaImages ecosystem, the images should already be in the Julia-native column major layout. If for some reason that is not the case there are two possible ways to convert the image to that format.julia> At = reinterpret(UInt8, memory, (3,2))' # \"row-major\" layout\n2×3 Array{UInt8,2}:\n 0x01  0x02  0x03\n 0x04  0x05  0x06The first way to alter the pixel order is by using the function Base.permutedims. In contrast to what we have seen before, this function will allocate a new array and copy the values in the appropriate manner.\njulia> B = permutedims(At, (2,1))\n3×2 Array{UInt8,2}:\n 0x01  0x04\n 0x02  0x05\n 0x03  0x06\nThe second way is using the function ImageCore.permuteddimsview which results in a lazy view that does not allocate a new array but instead only computes the correct values when queried.\njulia> using ImageCore\n\njulia> C = permuteddimsview(At, (2,1))\n3×2 permuteddimsview(::Array{UInt8,2}, (2, 1)) with element type UInt8:\n 0x01  0x04\n 0x02  0x05\n 0x03  0x06Either way, it is in general a good idea to make sure that the array one is working with ends up in a column-major layout."
+},
+
+{
+    "location": "images/#Reinterpreting-Elements-1",
+    "page": "Working with Images in Julia",
+    "title": "Reinterpreting Elements",
+    "category": "section",
+    "text": "Up to this point, all we talked about was how to reinterpreting or permuting the dimensional layout of some continuous memory block. If you look at the examples above you will see that all the arrays have elements of type UInt8, which just means that each element is represented by a single byte in memory.Knowing all this, we can now take the idea a step further and think about reinterpreting the element types of the array. Let us consider our original vector memory again.julia> memory = [0x1, 0x2, 0x3, 0x4, 0x5, 0x6]\n6-element Array{UInt8,1}:\n 0x01\n 0x02\n 0x03\n 0x04\n 0x05\n 0x06Note how each byte is thought of as an individual element. One thing we could do instead, is think of this memory block as a vector of 3 UInt16 elements.julia> reinterpret(UInt16, memory)\n3-element Array{UInt16,1}:\n 0x0201\n 0x0403\n 0x0605Pay attention to where our original bytes ended up. In contrast to just rearranging elements as we did before, we ended up with significantly different element values. One may ask why it would ever be practical to reinterpret a memory block like this. The one word answer to this is Colors! As we will see in the remainder of this tutorial, it turns out to be a very useful thing to do when your arrays represent pixel data."
+},
+
+{
+    "location": "images/#Introduction-to-Color-Models-1",
+    "page": "Working with Images in Julia",
+    "title": "Introduction to Color Models",
+    "category": "section",
+    "text": "As we discussed before, there are a various number of conventions on how to store pixel data into a binary format. That is not only true for dimension priority, but also for color information.One way color information can differ is in the color model in which they are described in. Two famous examples for color models are RGB and HSV. They essentially define how colors are conceptually made up in terms of some components. Additionally, one can decide on how many bits to use to describe each color component. By doing so one defines the available color depth.Before we look into using the actual implementation of Julia's color models, let us prototype our own imperfect toy model in order to get a better understanding of what is happening under the hood.# define our toy color model\nstruct MyRGB\n    r::UInt8\n    b::UInt8\n    g::UInt8\nendNote how we defined our new toy color model as struct. Because of this and the fact that all its components are bit types (in this case UInt8), any instantiation of our new type will be represented as a continuous block of memory as well.We can now apply our color model to our memory vector from above, and interpret the underlying memory as a vector of to MyRGB values instead.julia> reinterpret(MyRGB, memory)\n2-element Array{MyRGB,1}:\n MyRGB(0x01,0x02,0x03)\n MyRGB(0x04,0x05,0x06)Similar to the UInt16 example, we now group neighboring bytes into larger units (namely MyRGB). In contrast to the UInt16 example we are still able to access the individual components underneath. This simple toy color model already allows us to do a lot of useful things. We could define functions that work on MyRGB values in a color-space appropriate fashion. We could also define other color models and implement function to convert between them.However, our little toy color model is not yet optimal. For example it hard-codes a predefined color depth of 24 bit. We may have use-cases where we need a richer color space. One thing we could do to achieve that would be to introduce a new type in similar fashion. Still, because they have a different range of available numbers per channel (because they have a different amount of bits per channel), we would have to write a lot of specialized code to be able to appropriately handle all color models and depth.Luckily, the creators of ColorTypes.jl went a with a more generic strategy: Using parameterized types and fixed point numbers.tip: Tip\nIf you are interested in how various color models are actually designed and/or implemented in Julia, you can take a look at the ColorTypes.jl package."
+},
+
+{
+    "location": "images/#Fixed-Point-Numbers-1",
+    "page": "Working with Images in Julia",
+    "title": "Fixed Point Numbers",
+    "category": "section",
+    "text": "The idea behind using fixed point numbers for each color component is fairly simple. No matter how many bits a component is made up of, we always want the largest possible value of the component to be equal to 1.0 and the smallest possible value to be equal to 0. Of course, the amount of possible intermediate numbers still depends on the number of underlying bits in the memory, but that is not much of an issue.julia> using FixedPointNumbers;\n\njulia> reinterpret(N0f8, 0xFF)\n1.0N0f8\n\njulia> reinterpret(N0f16, 0xFFFF)\n1.0N0f16Not only does this allow for simple conversion between different color depths, it also allows us to implement generic algorithms, that are completely agnostic to the utilized color depth.It is worth pointing out again, that we get all these goodies without actually changing or copying the original memory block. Remember how during this whole tutorial we have only changed the interpretation of some underlying memory, and have not had the need to copy any data so far.tip: Tip\nFor pixel data we are mainly interested in unsigned fixed point numbers, but there are others too. Check out the package FixedPointNumbers.jl for more information on fixed point numbers in general.Let us now leave our toy model behind and use the actual implementation of RGB on our example vector memory. With the first command we will interpret our data as two pixels with 8 bit per color channel, and with the second command as a single pixel of 16 bit per color channeljulia> using Colors, FixedPointNumbers;\n\njulia> reinterpret(RGB{N0f8}, memory)\n2-element Array{RGB{N0f8},1}:\n RGB{N0f8}(0.004,0.008,0.012)\n RGB{N0f8}(0.016,0.02,0.024)\n\njulia> reinterpret(RGB{N0f16}, memory)\n1-element Array{RGB{N0f16},1}:\n RGB{N0f16}(0.00783,0.01567,0.02351)Note how the values are now interpreted as floating point numbers."
+},
+
+{
+    "location": "operations/#",
+    "page": "Supported Operations",
+    "title": "Supported Operations",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "operations/#Supported-Operations-1",
+    "page": "Supported Operations",
+    "title": "Supported Operations",
+    "category": "section",
+    "text": "This page lists and describes all supported image operations in great detail. The operations are organized based on their categories and subcategories.A sizeable amount of the provided operations fall under the category of affine transformations. As such, they can be described using what is known as an affine map, which are inherently compose-able if chained together. However, utilizing such a affine formulation requires (costly) interpolation, which may not always be needed to achieve the desired effect. For that reason do some of the operations below also provide a special purpose implementation to produce their specified result. Those are usually preferred over the affine formulation if sensible considering the complete pipeline.Category Available Operations\nMirroring FlipX, FlipY\nRotating Rotate90, Rotate270, Rotate180, Rotate\nShearing ShearX, ShearY\nScaling Scale, Zoom, ResizeAside from affine transformations, Augmentor also provides functionality for performing a variety of distortions. These types of operations usually provide a much larger distribution of possible output images.Category Available Operations\nDistorting ElasticDistortionThe input images from a given dataset can be of various shapes and sizes. Yet, it is often required by the algorithm that the data must be of uniform structure. To that end Augmentor provides a number of ways to alter or subset given images.Category Available Operations\nCropping Crop, CropNative, CropSize, CropRatio, RCropRatio\nResizing ResizeIt is not uncommon that machine learning frameworks require the data in a specific form and layout. For example many deep learning frameworks expect the colorchannel of the images to be encoded in the third dimension of a 4-dimensional array. Augmentor allows to convert from (and to) these different layouts using special operations that are mainly useful in the beginning or end of a augmentation pipeline.Category Available Operations\nConversion ConvertEltype\nInformation Layout SplitChannels, CombineChannels, PermuteDims, ReshapeAside from \"true\" operations that specify some kind of transformation, there are also a couple of special utility operations used for functionality such as stochastic branching.Category Available Operations\nUtility Operations NoOp, CacheImage, Eitherusing Augmentor, Images\npattern = imresize(testpattern(), (240, 320))\nsave(\"assets/testpattern.png\", pattern)"
+},
+
+{
+    "location": "operations/#Augmentor.FlipX",
+    "page": "Supported Operations",
+    "title": "Augmentor.FlipX",
+    "category": "Type",
+    "text": "FlipX <: Augmentor.AffineOperation\n\nDescription\n\nReverses the x-order of each pixel row. Another way of describing it would be to mirror the image on the y-axis, or to mirror the image horizontally.\n\nIf created using the parameter p, the operation will be lifted into Either(p=>FlipX(), 1-p=>NoOp()), where p denotes the probability of applying FlipX and 1-p the probability for applying NoOp. See the documentation of Either for more information.\n\nUsage\n\nFlipX()\n\nFlipX(p)\n\nArguments\n\np::Number : Optional. Probability of applying the   operation. Must be in the interval [0,1].\n\nSee also\n\nFlipY, Either, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = [200 150; 50 1]\n2×2 Array{Int64,2}:\n 200  150\n  50    1\n\njulia> img_new = augment(img, FlipX())\n2×2 Array{Int64,2}:\n 150  200\n   1   50\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.FlipY",
+    "page": "Supported Operations",
+    "title": "Augmentor.FlipY",
+    "category": "Type",
+    "text": "FlipY <: Augmentor.AffineOperation\n\nDescription\n\nReverses the y-order of each pixel column. Another way of describing it would be to mirror the image on the x-axis, or to mirror the image vertically.\n\nIf created using the parameter p, the operation will be lifted into Either(p=>FlipY(), 1-p=>NoOp()), where p denotes the probability of applying FlipY and 1-p the probability for applying NoOp. See the documentation of Either for more information.\n\nUsage\n\nFlipY()\n\nFlipY(p)\n\nArguments\n\np::Number : Optional. Probability of applying the   operation. Must be in the interval [0,1].\n\nSee also\n\nFlipX, Either, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = [200 150; 50 1]\n2×2 Array{Int64,2}:\n 200  150\n  50    1\n\njulia> img_new = augment(img, FlipY())\n2×2 Array{Int64,2}:\n  50    1\n 200  150\n\n\n\n"
+},
+
+{
+    "location": "operations/#Mirroring-1",
+    "page": "Supported Operations",
+    "title": "Mirroring",
+    "category": "section",
+    "text": "FlipXinclude(\"optable.jl\")\n@optable FlipX()FlipYinclude(\"optable.jl\")\n@optable FlipY()"
+},
+
+{
+    "location": "operations/#Augmentor.Rotate90",
+    "page": "Supported Operations",
+    "title": "Augmentor.Rotate90",
+    "category": "Type",
+    "text": "Rotate90 <: Augmentor.AffineOperation\n\nDescription\n\nRotates the image upwards 90 degrees. This is a special case rotation because it can be performed very efficiently by simply rearranging the existing pixels. However, it is generally not the case that the output image will have the same size as the input image, which is something to be aware of.\n\nIf created using the parameter p, the operation will be lifted into Either(p=>Rotate90(), 1-p=>NoOp()), where p denotes the probability of applying Rotate90 and 1-p the probability for applying NoOp. See the documentation of Either for more information.\n\nUsage\n\nRotate90()\n\nRotate90(p)\n\nArguments\n\np::Number : Optional. Probability of applying the   operation. Must be in the interval [0,1].\n\nSee also\n\nRotate180, Rotate270, Rotate, Either, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = [200 150; 50 1]\n2×2 Array{Int64,2}:\n 200  150\n  50    1\n\njulia> img_new = augment(img, Rotate90())\n2×2 Array{Int64,2}:\n 150   1\n 200  50\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.Rotate180",
+    "page": "Supported Operations",
+    "title": "Augmentor.Rotate180",
+    "category": "Type",
+    "text": "Rotate180 <: Augmentor.AffineOperation\n\nDescription\n\nRotates the image 180 degrees. This is a special case rotation because it can be performed very efficiently by simply rearranging the existing pixels. Furthermore, the output image will have the same dimensions as the input image.\n\nIf created using the parameter p, the operation will be lifted into Either(p=>Rotate180(), 1-p=>NoOp()), where p denotes the probability of applying Rotate180 and 1-p the probability for applying NoOp. See the documentation of Either for more information.\n\nUsage\n\nRotate180()\n\nRotate180(p)\n\nArguments\n\np::Number : Optional. Probability of applying the   operation. Must be in the interval [0,1].\n\nSee also\n\nRotate90, Rotate270, Rotate, Either, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = [200 150; 50 1]\n2×2 Array{Int64,2}:\n 200  150\n  50    1\n\njulia> img_new = augment(img, Rotate180())\n2×2 Array{Int64,2}:\n   1   50\n 150  200\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.Rotate270",
+    "page": "Supported Operations",
+    "title": "Augmentor.Rotate270",
+    "category": "Type",
+    "text": "Rotate270 <: Augmentor.AffineOperation\n\nDescription\n\nRotates the image upwards 270 degrees, which can also be described as rotating the image downwards 90 degrees. This is a special case rotation, because it can be performed very efficiently by simply rearranging the existing pixels. However, it is generally not the case that the output image will have the same size as the input image, which is something to be aware of.\n\nIf created using the parameter p, the operation will be lifted into Either(p=>Rotate270(), 1-p=>NoOp()), where p denotes the probability of applying Rotate270 and 1-p the probability for applying NoOp. See the documentation of Either for more information.\n\nUsage\n\nRotate270()\n\nRotate270(p)\n\nArguments\n\np::Number : Optional. Probability of applying the   operation. Must be in the interval [0,1].\n\nSee also\n\nRotate90, Rotate180, Rotate, Either, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = [200 150; 50 1]\n2×2 Array{Int64,2}:\n 200  150\n  50    1\n\njulia> img_new = augment(img, Rotate270())\n2×2 Array{Int64,2}:\n 50  200\n  1  150\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.Rotate",
+    "page": "Supported Operations",
+    "title": "Augmentor.Rotate",
+    "category": "Type",
+    "text": "Rotate <: Augmentor.AffineOperation\n\nDescription\n\nRotate the image upwards for the given degree. This operation can only be described as an affine transformation and will in general cause other operations of the pipeline to use their affine formulation as well (if they have one).\n\nIn contrast to the special case rotations outlined above, the type Rotate can describe any arbitrary number of degrees. It will always perform the rotation around the center of the image. This can be particularly useful when combining the operation with CropNative.\n\nUsage\n\nRotate(degree)\n\nArguments\n\ndegree : Real or AbstractVector of Real that denote   the rotation angle(s) in degree. If a vector is provided,   then a random element will be sampled each time the operation   is applied.\n\nSee also\n\nRotate90, Rotate180, Rotate270, CropNative, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# rotate exactly 45 degree\naugment(img, Rotate(45))\n\n# rotate between 10 and 20 degree upwards\naugment(img, Rotate(10:20))\n\n# rotate one of the five specified degrees\naugment(img, Rotate([-10, -5, 0, 5, 10]))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Rotating-1",
+    "page": "Supported Operations",
+    "title": "Rotating",
+    "category": "section",
+    "text": "Rotate90include(\"optable.jl\")\n@optable Rotate90()Rotate180include(\"optable.jl\")\n@optable Rotate180()Rotate270include(\"optable.jl\")\n@optable Rotate270()RotateIn contrast to the special case rotations outlined above, the type Rotate can describe any arbitrary number of degrees. It will always perform the rotation around the center of the image. This can be particularly useful when combining the operation with CropNative.include(\"optable.jl\")\n@optable Rotate(15)It is also possible to pass some abstract vector to the constructor, in which case Augmentor will randomly sample one of its elements every time the operation is applied.include(\"optable.jl\")\n@optable 10 => Rotate(-10:10)"
+},
+
+{
+    "location": "operations/#Augmentor.ShearX",
+    "page": "Supported Operations",
+    "title": "Augmentor.ShearX",
+    "category": "Type",
+    "text": "ShearX <: Augmentor.AffineOperation\n\nDescription\n\nShear the image horizontally for the given degree. This operation can only be described as an affine transformation and will in general cause other operations of the pipeline to use their affine formulation as well (if they have one).\n\nIt will always perform the transformation around the center of the image. This can be particularly useful when combining the operation with CropNative.\n\nUsage\n\nShearX(degree)\n\nArguments\n\ndegree : Real or AbstractVector of Real that denote   the shearing angle(s) in degree. If a vector is provided,   then a random element will be sampled each time the operation   is applied.\n\nSee also\n\nShearY, CropNative, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# shear horizontally exactly 5 degree\naugment(img, ShearX(5))\n\n# shear horizontally between 10 and 20 degree to the right\naugment(img, ShearX(10:20))\n\n# shear horizontally one of the five specified degrees\naugment(img, ShearX([-10, -5, 0, 5, 10]))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.ShearY",
+    "page": "Supported Operations",
+    "title": "Augmentor.ShearY",
+    "category": "Type",
+    "text": "ShearY <: Augmentor.AffineOperation\n\nDescription\n\nShear the image vertically for the given degree. This operation can only be described as an affine transformation and will in general cause other operations of the pipeline to use their affine formulation as well (if they have one).\n\nIt will always perform the transformation around the center of the image. This can be particularly useful when combining the operation with CropNative.\n\nUsage\n\nShearY(degree)\n\nArguments\n\ndegree : Real or AbstractVector of Real that denote   the shearing angle(s) in degree. If a vector is provided,   then a random element will be sampled each time the operation   is applied.\n\nSee also\n\nShearX, CropNative, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# shear vertically exactly 5 degree\naugment(img, ShearY(5))\n\n# shear vertically between 10 and 20 degree upwards\naugment(img, ShearY(10:20))\n\n# shear vertically one of the five specified degrees\naugment(img, ShearY([-10, -5, 0, 5, 10]))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Shearing-1",
+    "page": "Supported Operations",
+    "title": "Shearing",
+    "category": "section",
+    "text": "ShearXIt will always perform the transformation around the center of the image. This can be particularly useful when combining the operation with CropNative.include(\"optable.jl\")\n@optable ShearX(10)It is also possible to pass some abstract vector to the constructor, in which case Augmentor will randomly sample one of its elements every time the operation is applied.include(\"optable.jl\")\n@optable 10 => ShearX(-10:10)ShearYIt will always perform the transformation around the center of the image. This can be particularly useful when combining the operation with CropNative.include(\"optable.jl\")\n@optable ShearY(10)It is also possible to pass some abstract vector to the constructor, in which case Augmentor will randomly sample one of its elements every time the operation is applied.include(\"optable.jl\")\n@optable 10 => ShearY(-10:10)"
+},
+
+{
+    "location": "operations/#Augmentor.Scale",
+    "page": "Supported Operations",
+    "title": "Augmentor.Scale",
+    "category": "Type",
+    "text": "Scale <: Augmentor.AffineOperation\n\nDescription\n\nMultiplies the image height and image width by the specified factors. This means that the size of the output image depends on the size of the input image.\n\nThe provided factors can either be numbers or vectors of numbers.\n\nIf numbers are provided, then the operation is deterministic and will always scale the input image with the same factors.\nIn the case vectors are provided, then each time the operation is applied a valid index is sampled and the elements corresponding to that index are used as scaling factors.\n\nThe scaling is performed relative to the image center, which can be useful when following the operation with CropNative.\n\nUsage\n\nScale(factors)\n\nScale(factors...)\n\nArguments\n\nfactors : NTuple or Vararg of Real or   AbstractVector that denote the scale factor(s) for each   array dimension. If only one variable is specified it is   assumed that height and width should be scaled by the same   factor(s).\n\nSee also\n\nZoom, Resize, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# half the image size\naugment(img, Scale(0.5))\n\n# uniformly scale by a random factor from 1.2, 1.3, or 1.4\naugment(img, Scale([1.2, 1.3, 1.4]))\n\n# scale by either 0.5x0.7 or by 0.6x0.8\naugment(img, Scale([0.5, 0.6], [0.7, 0.8]))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.Zoom",
+    "page": "Supported Operations",
+    "title": "Augmentor.Zoom",
+    "category": "Type",
+    "text": "Zoom <: Augmentor.ImageOperation\n\nDescription\n\nScales the image height and image width by the specified factors, but crops the image such that the original size is preserved.\n\nThe provided factors can either be numbers or vectors of numbers.\n\nIf numbers are provided, then the operation is deterministic and will always scale the input image with the same factors.\nIn the case vectors are provided, then each time the operation is applied a valid index is sampled and the elements corresponding to that index are used as scaling factors.\n\nIn contrast to Scale the size of the output image is the same as the size of the input image, while the content is scaled the same way. The same effect could be achieved by following a Scale with a CropSize, with the caveat that one would need to know the exact size of the input image before-hand.\n\nUsage\n\nZoom(factors)\n\nZoom(factors...)\n\nArguments\n\nfactors : NTuple or Vararg of Real or   AbstractVector that denote the scale factor(s) for each   array dimension. If only one variable is specified it is   assumed that height and width should be scaled by the same   factor(s).\n\nSee also\n\nScale, Resize, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# half the image size\naugment(img, Zoom(0.5))\n\n# uniformly scale by a random factor from 1.2, 1.3, or 1.4\naugment(img, Zoom([1.2, 1.3, 1.4]))\n\n# scale by either 0.5x0.7 or by 0.6x0.8\naugment(img, Zoom([0.5, 0.6], [0.7, 0.8]))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Scaling-1",
+    "page": "Supported Operations",
+    "title": "Scaling",
+    "category": "section",
+    "text": "Scaleinclude(\"optable.jl\")\n@optable Scale(0.9,0.5)In the case that only a single scale factor is specified, the operation will assume that the intention is to scale all dimensions uniformly by that factor.include(\"optable.jl\")\n@optable Scale(1.2)It is also possible to pass some abstract vector(s) to the constructor, in which case Augmentor will randomly sample one of its elements every time the operation is applied.include(\"optable.jl\")\n@optable 10 => Scale(0.9:0.05:1.2)Zoominclude(\"optable.jl\")\n@optable Zoom(1.2)It is also possible to pass some abstract vector to the constructor, in which case Augmentor will randomly sample one of its elements every time the operation is applied.include(\"optable.jl\")\n@optable 10 => Zoom(0.9:0.05:1.3)"
+},
+
+{
+    "location": "operations/#Augmentor.Resize",
+    "page": "Supported Operations",
+    "title": "Augmentor.Resize",
+    "category": "Type",
+    "text": "Resize <: Augmentor.ImageOperation\n\nDescription\n\nTransforms the image into a fixed specified pixel size.\n\nThis operation does not take any measures to preserve aspect ratio of the source image. Instead, the original image will simply be resized to the given dimensions. This is useful when one needs a set of images to all be of the exact same size.\n\nUsage\n\nResize(; height=64, width=64)\n\nResize(size)\n\nResize(size...)\n\nArguments\n\nsize : NTuple or Vararg of Int that denote the   output size in pixel for each dimension.\n\nSee also\n\nCropSize, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\naugment(img, Resize(30, 40))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Resizing-1",
+    "page": "Supported Operations",
+    "title": "Resizing",
+    "category": "section",
+    "text": "Resizeinclude(\"optable.jl\")\n@optable Resize(100,150)"
+},
+
+{
+    "location": "operations/#Augmentor.ElasticDistortion",
+    "page": "Supported Operations",
+    "title": "Augmentor.ElasticDistortion",
+    "category": "Type",
+    "text": "ElasticDistortion <: Augmentor.ImageOperation\n\nDescription\n\nDistorts the given image using a randomly (uniform) generated vector field of the given grid size. This field will be stretched over the given image when applied, which in turn will morph the original image into a new image using a linear interpolation of both the image and the vector field.\n\nIn contrast to RandomDistortion, the resulting vector field is also smoothed using a Gaussian filter with of parameter sigma. This will result in a less chaotic vector field and thus resemble a more natural distortion.\n\nUsage\n\nElasticDistortion(gridheight, gridwidth, scale, sigma, [iter=1], [border=false], [norm=true])\n\nElasticDistortion(gridheight, gridwidth, scale; [sigma=2], [iter=1], [border=false], [norm=true])\n\nElasticDistortion(gridheight, [gridwidth]; [scale=0.2], [sigma=2], [iter=1], [border=false], [norm=true])\n\nArguments\n\ngridheight : The grid height of the displacement vector   field. This effectively specifies the number of vertices   along the Y dimension used as landmarks, where all the   positions between the grid points are interpolated.\ngridwidth : The grid width of the displacement vector   field. This effectively specifies the number of vertices   along the Y dimension used as landmarks, where all the   positions between the grid points are interpolated.\nscale : Optional. The scaling factor applied to all   displacement vectors in the field. This effectively defines   the \"strength\" of the deformation. There is no theoretical   upper limit to this factor, but a value somewhere between   0.01 and 1.0 seem to be the most reasonable choices.   Default to 0.2.\nsigma : Optional. Sigma parameter of the Gaussian filter.   This parameter effectively controls the strength of the   smoothing. Defaults to 2.\niter : Optional. The number of times the smoothing   operation is applied to the displacement vector field. This   is especially useful if border = false because the border   will be reset to zero after each pass. Thus the displacement   is a little less aggressive towards the borders of the image   than it is towards its center. Defaults to   1.\nborder : Optional. Specifies if the borders should be   distorted as well. If false, the borders of the image will   be preserved. This effectively pins the outermost vertices on   their original position and the operation thus only distorts   the inner content of the image. Defaults to   false.\nnorm : Optional. If true, the displacement vectors of   the field will be normalized by the norm of the field. This   will have the effect that the scale factor should be more   or less independent of the grid size. Defaults to   true.\n\nSee also\n\nRandomDistortion, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# distort with pinned borders\naugment(img, ElasticDistortion(15, 15; scale = 0.1))\n\n# distort everything more smoothly.\naugment(img, ElasticDistortion(10, 10; sigma = 4, iter=3, border=true))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Distorting-1",
+    "page": "Supported Operations",
+    "title": "Distorting",
+    "category": "section",
+    "text": "ElasticDistortioninclude(\"optable.jl\")\n@optable 10 => ElasticDistortion(15,15,0.1)include(\"optable.jl\")\n@optable 10 => ElasticDistortion(10,10,0.2,4,3,true)"
+},
+
+{
+    "location": "operations/#Augmentor.Crop",
+    "page": "Supported Operations",
+    "title": "Augmentor.Crop",
+    "category": "Type",
+    "text": "Crop <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the area denoted by the specified pixel ranges.\n\nFor example the operation Crop(5:100, 2:10) would denote a crop for the rectangle that starts at x=2 and y=5 in the top left corner and ends at x=10 and y=100 in the bottom right corner. As we can see the y-axis is specified first, because that is how the image is stored in an array. Thus the order of the provided indices ranges needs to reflect the order of the array dimensions.\n\nUsage\n\nCrop(indices)\n\nCrop(indices...)\n\nArguments\n\nindices : NTuple or Vararg of UnitRange that denote   the cropping range for each array dimension. This is very   similar to how the indices for view are specified.\n\nSee also\n\nCropNative, CropSize, CropRatio, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = testpattern()\n300×400 Array{RGBA{N0f8},2}:\n[...]\n\njulia> augment(img, Crop(1:30, 361:400)) # crop upper right corner\n30×40 Array{RGBA{N0f8},2}:\n[...]\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.CropNative",
+    "page": "Supported Operations",
+    "title": "Augmentor.CropNative",
+    "category": "Type",
+    "text": "CropNative <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the area denoted by the specified pixel ranges.\n\nFor example the operation CropNative(5:100, 2:10) would denote a crop for the rectangle that starts at x=2 and y=5 in the top left corner of native space and ends at x=10 and y=100 in the bottom right corner of native space.\n\nIn contrast to Crop, the position x=1 y=1 is not necessarily located at the top left of the current image, but instead depends on the cumulative effect of the previous transformations. The reason for this is because affine transformations are usually performed around the center of the image, which is reflected in \"native space\". This is useful for combining transformations such as Rotation or ShearX with a crop around the center area.\n\nUsage\n\nCropNative(indices)\n\nCropNative(indices...)\n\nArguments\n\nindices : NTuple or Vararg of UnitRange that denote   the cropping range for each array dimension. This is very   similar to how the indices for view are specified.\n\nSee also\n\nCrop, CropSize, CropRatio, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# cropped at top left corner\naugment(img, Rotate(45) |> Crop(1:300, 1:400))\n\n# cropped around center of rotated image\naugment(img, Rotate(45) |> CropNative(1:300, 1:400))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.CropSize",
+    "page": "Supported Operations",
+    "title": "Augmentor.CropSize",
+    "category": "Type",
+    "text": "CropSize <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the area of the specified pixel size around the center of the input image.\n\nFor example the operation CropSize(10, 50) would denote a crop for a rectangle of height 10 and width 50 around the center of the input image.\n\nUsage\n\nCropSize(size)\n\nCropSize(size...)\n\nArguments\n\nsize : NTuple or Vararg of Int that denote the   output size in pixel for each dimension.\n\nSee also\n\nCropRatio, Crop, CropNative, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# cropped around center of rotated image\naugment(img, Rotate(45) |> CropSize(300, 400))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.CropRatio",
+    "page": "Supported Operations",
+    "title": "Augmentor.CropRatio",
+    "category": "Type",
+    "text": "CropRatio <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the biggest area around the center of the given image such that the output image satisfies the specified aspect ratio (i.e. width divided by height).\n\nFor example the operation CropRatio(1) would denote a crop for the biggest square around the center of the image.\n\nFor randomly placed crops take a look at RCropRatio.\n\nUsage\n\nCropRatio(ratio)\n\nCropRatio(; ratio = 1)\n\nArguments\n\nratio::Number : Optional. A number denoting the aspect   ratio. For example specifying ratio=16/9 would denote a 16:9   aspect ratio. Defaults to 1, which describes a square crop.\n\nSee also\n\nRCropRatio, CropSize, Crop, CropNative, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# crop biggest square around the image center\naugment(img, CropRatio(1))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.RCropRatio",
+    "page": "Supported Operations",
+    "title": "Augmentor.RCropRatio",
+    "category": "Type",
+    "text": "RCropRatio <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the biggest possible area at some random position of the given image, such that the output image satisfies the specified aspect ratio (i.e. width divided by height).\n\nFor example the operation RCropRatio(1) would denote a crop for the biggest possible square. If there is more than one such square, then one will be selected at random.\n\nUsage\n\nRCropRatio(ratio)\n\nRCropRatio(; ratio = 1)\n\nArguments\n\nratio::Number : Optional. A number denoting the aspect   ratio. For example specifying ratio=16/9 would denote a 16:9   aspect ratio. Defaults to 1, which describes a square crop.\n\nSee also\n\nCropRatio, CropSize, Crop, CropNative, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# crop a randomly placed square of maxmimum size\naugment(img, RCropRatio(1))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Cropping-1",
+    "page": "Supported Operations",
+    "title": "Cropping",
+    "category": "section",
+    "text": "The process of cropping is useful to discard parts of the input image. To provide this functionality lazily, applying a crop introduces a layer of representation called a \"view\" or SubArray. This is different yet compatible with how affine operations or other special purpose implementations work. This means that chaining a crop with some affine operation is perfectly fine if done sequentially. However, it is generally not advised to combine affine operations with crop operations within an Either block. Doing that would force the Either to trigger the eager computation of its branches in order to preserve type-stability.Cropinclude(\"optable.jl\")\n@optable Crop(70:140,25:155)CropNativeinclude(\"optable.jl\")\n@optable \"cropn1\" => (Rotate(45),Crop(1:210,1:280))\n@optable \"cropn2\" => (Rotate(45),CropNative(1:210,1:280))\ntbl = string(\n    \"`(Rotate(45), Crop(1:210,1:280))` | `(Rotate(45), CropNative(1:210,1:280))`\\n\",\n    \"-----|-----\\n\",\n    \"![input](assets/cropn1.png) | ![output](assets/cropn2.png)\\n\"\n)\nMarkdown.parse(tbl)CropSizeinclude(\"optable.jl\")\n@optable CropSize(45,225)CropRatioinclude(\"optable.jl\")\n@optable CropRatio(1)RCropRatioinclude(\"optable.jl\")\n@optable 10 => RCropRatio(1)"
+},
+
+{
+    "location": "operations/#Augmentor.ConvertEltype",
+    "page": "Supported Operations",
+    "title": "Augmentor.ConvertEltype",
+    "category": "Type",
+    "text": "ConvertEltype <: Augmentor.Operation\n\nDescription\n\nConvert the element type of the given array/image into the given eltype. This operation is especially useful for converting color images to grayscale (or the other way around). That said the operation is not specific to color types and can also be used for numeric arrays (e.g. with separated channels).\n\nNote that this is an element-wise convert function. Thus it can not be used to combine or separate color channels. Use SplitChannels or CombineChannels for those purposes.\n\nUsage\n\nConvertEltype(eltype)\n\nArguments\n\neltype : The eltype of the resulting array/image.\n\nSee also\n\nCombineChannels, SplitChannels, augment\n\nExamples\n\njulia> using Augmentor, Colors\n\njulia> A = rand(RGB, 10, 10) # three color channels\n10×10 Array{RGB{Float64},2}:\n[...]\n\njulia> augment(A, ConvertEltype(Gray)) # convert to grayscale\n10×10 Array{Gray{Float64},2}:\n[...]\n\njulia> augment(A, ConvertEltype(Gray{Float32})) # more specific\n10×10 Array{Gray{Float32},2}:\n[...]\n\n\n\n"
+},
+
+{
+    "location": "operations/#Conversion-1",
+    "page": "Supported Operations",
+    "title": "Conversion",
+    "category": "section",
+    "text": "ConvertEltypeinclude(\"optable.jl\")\n@optable ConvertEltype(GrayA)"
+},
+
+{
+    "location": "operations/#Augmentor.SplitChannels",
+    "page": "Supported Operations",
+    "title": "Augmentor.SplitChannels",
+    "category": "Type",
+    "text": "SplitChannels <: Augmentor.Operation\n\nDescription\n\nSplits out the color channels of the given image using the function ImageCore.channelview. This will effectively create a new array dimension for the colors in the front. In contrast to ImageCore.channelview it will also result in a new dimension for Gray images.\n\nThis operation is mainly useful at the end of a pipeline in combination with PermuteDims in order to prepare the image for the training algorithm, which often requires the color channels to be separate.\n\nUsage\n\nSplitChannels()\n\nSee also\n\nPermuteDims, CombineChannels, augment\n\nExamples\n\njulia> using Augmentor\n\njulia> img = testpattern()\n300×400 Array{RGBA{N0f8},2}:\n[...]\n\njulia> augment(img, SplitChannels())\n4×300×400 Array{N0f8,3}:\n[...]\n\njulia> augment(img, SplitChannels() |> PermuteDims(3,2,1))\n400×300×4 Array{N0f8,3}:\n[...]\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.CombineChannels",
+    "page": "Supported Operations",
+    "title": "Augmentor.CombineChannels",
+    "category": "Type",
+    "text": "CombineChannels <: Augmentor.Operation\n\nDescription\n\nCombines the first dimension of a given array into a colorant of type colortype using the function ImageCore.colorview. The main difference is that a separate color channel is also expected for Gray images.\n\nThe shape of the input image has to be appropriate for the given colortype, which also means that the separated color channel has to be the first dimension of the array. See PermuteDims if that is not the case.\n\nUsage\n\nCombineChannels(colortype)\n\nArguments\n\ncolortype : The color type of the resulting image. Must   be a subtype of ColorTypes.Colorant and match the color   channel of the given image.\n\nSee also\n\nSplitChannels, PermuteDims, augment\n\nExamples\n\njulia> using Augmentor, Colors\n\njulia> A = rand(3, 10, 10) # three color channels\n3×10×10 Array{Float64,3}:\n[...]\n\njulia> augment(A, CombineChannels(RGB))\n10×10 Array{RGB{Float64},2}:\n[...]\n\njulia> B = rand(1, 10, 10) # singleton color channel\n1×10×10 Array{Float64,3}:\n[...]\n\njulia> augment(B, CombineChannels(Gray))\n10×10 Array{Gray{Float64},2}:\n[...]\n\n\n\n"
+},
+
+{
+    "location": "operations/#Color-Channels-1",
+    "page": "Supported Operations",
+    "title": "Color Channels",
+    "category": "section",
+    "text": "SplitChannelsCombineChannels"
+},
+
+{
+    "location": "operations/#Augmentor.PermuteDims",
+    "page": "Supported Operations",
+    "title": "Augmentor.PermuteDims",
+    "category": "Type",
+    "text": "PermuteDims <: Augmentor.Operation\n\nDescription\n\nPermute the dimensions of the given array with the predefined permutation perm. This operation is particularly useful if the order of the dimensions needs to be different than the default julian layout.\n\nAugmentor expects the given images to be in vertical-major layout for which the colors are encoded in the element type itself. Many deep learning frameworks however require their input in a different order. For example it is not untypical that the color channels are expected to be encoded in the third dimension.\n\nUsage\n\nPermuteDims(perm)\n\nPermuteDims(perm...)\n\nArguments\n\nperm : The concrete dimension permutation that should be   used. Has to be specified as a Vararg{Int} or as a NTuple   of Int. The length of perm has to match the number of   dimensions of the expected input image to that operation.\n\nSee also\n\nSplitChannels, CombineChannels, augment\n\nExamples\n\njulia> using Augmentor, Colors\n\njulia> A = rand(10, 5, 3) # width=10, height=5, and 3 color channels\n10×5×3 Array{Float64,3}:\n[...]\n\njulia> img = augment(A, PermuteDims(3,2,1) |> CombineChannels(RGB))\n5×10 Array{RGB{Float64},2}:\n[...]\n\njulia> img2 = testpattern()\n300×400 Array{RGBA{N0f8},2}:\n[...]\n\njulia> B = augment(img2, SplitChannels() |> PermuteDims(3,2,1))\n400×300×4 Array{N0f8,3}:\n[...]\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.Reshape",
+    "page": "Supported Operations",
+    "title": "Augmentor.Reshape",
+    "category": "Type",
+    "text": "Reshape <: Augmentor.Operation\n\nDescription\n\nReinterpret the shape of the given array of numbers or colorants. This is useful for example to create singleton dimensions that deep learning frameworks may need for colorless images, or for converting an image to a feature vector and vice versa.\n\nUsage\n\nReshape(dims)\n\nReshape(dims...)\n\nArguments\n\ndims : The new sizes for each dimension of the output   image. Has to be specified as a Vararg{Int} or as a   NTuple of Int.\n\nSee also\n\nCombineChannels, augment\n\nExamples\n\njulia> using Augmentor, Colors\n\njulia> A = rand(10,10)\n10×10 Array{Float64,2}:\n[...]\n\njulia> augment(A, Reshape(10,10,1)) # add trailing singleton dimension\n10×10×1 Array{Float64,3}:\n[...]\n\n\n\n"
+},
+
+{
+    "location": "operations/#Array-Shape-1",
+    "page": "Supported Operations",
+    "title": "Array Shape",
+    "category": "section",
+    "text": "PermuteDimsReshape"
+},
+
+{
+    "location": "operations/#Augmentor.CacheImage",
+    "page": "Supported Operations",
+    "title": "Augmentor.CacheImage",
+    "category": "Type",
+    "text": "CacheImage <: Augmentor.ImageOperation\n\nDescription\n\nWrite the current state of the image into the working memory. Optionally a user has the option to specify a preallocated buffer to write the image into. Note that if a buffer is provided, then it has to be of the correct size and eltype.\n\nEven without a preallocated buffer it can be beneficial in some situations to cache the image. An example for such a scenario is when chaining a number of affine transformations after an elastic distortion, because performing that lazily requires nested interpolation.\n\nUsage\n\nCacheImage()\n\nCacheImage(buffer)\n\nArguments\n\nbuffer : Optional. A preallocated AbstractArray of the   appropriate size and eltype.\n\nSee also\n\naugment\n\nExamples\n\nusing Augmentor\n\n# make pipeline that forces caching after elastic distortion\npl = ElasticDistortion(3,3) |> CacheImage() |> Rotate(-10:10) |> ShearX(-5:5)\n\n# cache output of elastic distortion into the allocated\n# 20x20 Matrix{Float64}. Note that for this case this assumes that\n# the input image is also a 20x20 Matrix{Float64}\npl = ElasticDistortion(3,3) |> CacheImage(zeros(20,20)) |> Rotate(-10:10)\n\n# convenience syntax with the same effect as above.\npl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.NoOp",
+    "page": "Supported Operations",
+    "title": "Augmentor.NoOp",
+    "category": "Type",
+    "text": "NoOp <: Augmentor.AffineOperation\n\nIdentity transformation that does not do anything with the given image but instead passes it along unchanged (without copying).\n\nUsually used in combination with Either to denote a \"branch\" that does not perform any computation.\n\n\n\n"
+},
+
+{
+    "location": "operations/#Augmentor.Either",
+    "page": "Supported Operations",
+    "title": "Augmentor.Either",
+    "category": "Type",
+    "text": "Either <: Augmentor.ImageOperation\n\nDescription\n\nAllows for choosing between different Augmentor.Operations at random when applied. This is particularly useful if one for example wants to first either rotate the image 90 degree clockwise or anticlockwise (but never both) and then apply some other operation(s) afterwards.\n\nWhen compiling a pipeline, Either will analyze the provided operations in order to identify the most preferred way to apply the individual operation when sampled, that is supported by all given operations. This way the output of applying Either will be inferable and the whole pipeline will remain type-stable, even though randomness is involved.\n\nBy default each specified image operation has the same probability of occurrence. This default behaviour can be overwritten by specifying the chance manually.\n\nUsage\n\nEither(operations, [chances])\n\nEither(operations...; [chances])\n\nEither(pairs...)\n\n*(operations...)\n\n*(pairs...)\n\nArguments\n\noperations : NTuple or Vararg of Augmentor.ImageOperation   that denote the possible choices to sample from when applied.\nchances : Optional. Denotes the relative chances for an   operation to be sampled. Has to contain the same number of   elements as operations. Either an NTuple of numbers if   specified as positional argument, or alternatively a   AbstractVector of numbers if specified as a keyword   argument. If omitted every operation will have equal   probability of occurring.\npairs : Vararg of Pair{<:Real,<:Augmentor.ImageOperation}.   A compact way to specify an operation and its chance of   occurring together.\n\nSee also\n\nNoOp, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# all three operations have equal chance of occuring\naugment(img, Either(FlipX(), FlipY(), NoOp()))\naugment(img, FlipX() * FlipY() * NoOp())\n\n# NoOp is twice as likely as either FlipX or FlipY\naugment(img, Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()))\naugment(img, Either(FlipX(), FlipY(), NoOp(), chances=[1,1,2]))\naugment(img, Either((FlipX(), FlipY(), NoOp()), (1,1,2)))\naugment(img, (1=>FlipX()) * (1=>FlipY()) * (2=>NoOp()))\n\n\n\n"
+},
+
+{
+    "location": "operations/#Utility-Operations-1",
+    "page": "Supported Operations",
+    "title": "Utility Operations",
+    "category": "section",
+    "text": "CacheImageNoOpEither"
+},
+
+{
+    "location": "generated/testexample/#",
+    "page": "Test Tutorial",
+    "title": "Test Tutorial",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "generated/testexample/#Test-Tutorial-1",
+    "page": "Test Tutorial",
+    "title": "Test Tutorial",
+    "category": "section",
+    "text": "This is a test tutorialusing Augmentor, ImagesFirst we load the sample image using the function testpattern.img = testpattern()\nsave(\"tstimg.png\", img) # hide\nnothing # hide(Image: img)Lets see if custom treatment for jupyter worksprintln(\"Hello World\")"
+},
+
+{
+    "location": "LICENSE/#",
+    "page": "LICENSE",
+    "title": "LICENSE",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "LICENSE/#LICENSE-1",
+    "page": "LICENSE",
+    "title": "LICENSE",
+    "category": "section",
+    "text": "Markdown.parse_file(joinpath(@__DIR__, \"../LICENSE.md\"))"
+},
+
+]}
