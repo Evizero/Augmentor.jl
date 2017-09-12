@@ -1,5 +1,5 @@
 ```@eval
-using Augmentor, Images
+using Augmentor, Images, Colors
 srand(1337)
 pattern = imresize(restrict(restrict(testpattern())), (60, 80))
 save("assets/tiny_pattern.png", pattern)
@@ -26,6 +26,8 @@ save("assets/tiny_CropSize.png", augment(pattern, CropSize(20,65)))
 save("assets/tiny_CropRatio.png", augment(pattern, CropRatio(1)))
 srand(1337)
 save("assets/tiny_RCropRatio.png", augment(pattern, RCropRatio(1)))
+# Conversion
+save("assets/tiny_ConvertEltype.png", augment(pattern, ConvertEltype(GrayA)))
 nothing;
 ```
 

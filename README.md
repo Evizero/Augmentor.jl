@@ -207,33 +207,33 @@ more detailed description of all the predefined operations take a
 look at the corresponding section of the
 [documentation](http://augmentorjl.readthedocs.io/en/latest/usersguide/operations.html).
 
-| Category      | Operation           | Description
-|--------------:|:--------------------|:-----------------------------------------------------------------
-| *Mirroring:*  | `FlipX`             | Reverse the order of each pixel row.
-|               | `FlipY`             | Reverse the order of each pixel column.
-| *Rotating:*   | `Rotate90`          | Rotate upwards 90 degree.
-|               | `Rotate270`         | Rotate downwards 90 degree.
-|               | `Rotate180`         | Rotate 180 degree.
-|               | `Rotate`            | Rotate for any arbitrary angle(s).
-| *Shearing:*   | `ShearX`            | Shear horizontally for the given degree(s).
-|               | `ShearY`            | Shear vertically for the given degree(s).
-| *Resizing:*   | `Scale`             | Scale X and Y axis by some (random) factor(s).
-|               | `Zoom`              | Scale X and Y axis while preserving image size.
-|               | `Resize`            | Resize image to the specified pixel dimensions.
-| *Distorting:* | `ElasticDistortion` | Displace image with a smoothed random vector field.
-| *Cropping:*   | `Crop`              | Crop specific region of the image.
-|               | `CropNative`        | Crop specific region of the image in relative space.
-|               | `CropSize`          | Crop area around the center with specified size.
-|               | `CropRatio`         | Crop to specified aspect ratio.
-|               | `RCropRatio`        | Crop random window of specified aspect ratio.
-| *Conversion:* | `ConvertEltype`     | Convert the array elements to the given type.
-| *Layout:*     | `SplitChannels`     | Separate the color channels into a dedicated array dimension.
-|               | `CombineChannels`   | Collapse the first dimension into a specific colorant.
-|               | `PermuteDims`       | Reorganize the array dimensions into a specific order.
-|               | `Reshape`           | Change or reinterpret the shape of the array.
-| *Utilities:*  | `NoOp`              | Identity function. Pass image along unchanged.
-|               | `CacheImage`        | Buffer the current image into (preallocated) memory.
-|               | `Either`            | Apply one of the given operations at random.
+| Category      | Operation           | Preview | Description
+|--------------:|:--------------------|:-------:|:-----------------------------------------------------------------
+| *Mirroring:*  | [`FlipX`](https://evizero.github.io/Augmentor.jl/operations/flipx) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_FlipX.png) | Reverse the order of each pixel row.
+|               | [`FlipY`](https://evizero.github.io/Augmentor.jl/operations/flipy) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_FlipY.png) | Reverse the order of each pixel column.
+| *Rotating:*   | [`Rotate90`](https://evizero.github.io/Augmentor.jl/operations/rotate90) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Rotate90.png) | Rotate upwards 90 degree.
+|               | [`Rotate270`](https://evizero.github.io/Augmentor.jl/operations/rotate270) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Rotate270.png) | Rotate downwards 90 degree.
+|               | [`Rotate180`](https://evizero.github.io/Augmentor.jl/operations/rotate180) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Rotate180.png) | Rotate 180 degree.
+|               | [`Rotate`](https://evizero.github.io/Augmentor.jl/operations/rotate) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Rotate.png) | Rotate for any arbitrary angle(s).
+| *Shearing:*   | [`ShearX`](https://evizero.github.io/Augmentor.jl/operations/shearx) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_ShearX.png) | Shear horizontally for the given degree(s).
+|               | [`ShearY`](https://evizero.github.io/Augmentor.jl/operations/sheary) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_ShearY.png) | Shear vertically for the given degree(s).
+| *Resizing:*   | [`Scale`](https://evizero.github.io/Augmentor.jl/operations/scale) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Scale.png) | Scale X and Y axis by some (random) factor(s).
+|               | [`Zoom`](https://evizero.github.io/Augmentor.jl/operations/zoom) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Zoom.png) | Scale X and Y axis while preserving image size.
+|               | [`Resize`](https://evizero.github.io/Augmentor.jl/operations/resize) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Resize.png) | Resize image to the specified pixel dimensions.
+| *Distorting:* | [`ElasticDistortion`](https://evizero.github.io/Augmentor.jl/operations/elasticdistortion) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_ED1.png) | Displace image with a smoothed random vector field.
+| *Cropping:*   | [`Crop`](https://evizero.github.io/Augmentor.jl/operations/crop) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_Crop.png) | Crop specific region of the image.
+|               | [`CropNative`](https://evizero.github.io/Augmentor.jl/operations/cropnative) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_CropNative.png) | Crop specific region of the image in relative space.
+|               | [`CropSize`](https://evizero.github.io/Augmentor.jl/operations/cropsize) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_CropSize.png) | Crop area around the center with specified size.
+|               | [`CropRatio`](https://evizero.github.io/Augmentor.jl/operations/cropratio) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_CropRatio.png) | Crop to specified aspect ratio.
+|               | [`RCropRatio`](https://evizero.github.io/Augmentor.jl/operations/rcropratio) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_RCropRatio.png) | Crop random window of specified aspect ratio.
+| *Conversion:* | [`ConvertEltype`](https://evizero.github.io/Augmentor.jl/operations/converteltype) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_ConvertEltype.png) | Convert the array elements to the given type.
+| *Layout:*     | [`SplitChannels`](https://evizero.github.io/Augmentor.jl/operations/splitchannels) | - | Separate the color channels into a dedicated array dimension.
+|               | [`CombineChannels`](https://evizero.github.io/Augmentor.jl/operations/combinechannels) | - | Collapse the first dimension into a specific colorant.
+|               | [`PermuteDims`](https://evizero.github.io/Augmentor.jl/operations/permutedims) | - | Reorganize the array dimensions into a specific order.
+|               | [`Reshape`](https://evizero.github.io/Augmentor.jl/operations/reshape) | - | Change or reinterpret the shape of the array.
+| *Utilities:*  | [`NoOp`](https://evizero.github.io/Augmentor.jl/operations/noop) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_pattern.png) | Identity function. Pass image along unchanged.
+|               | [`CacheImage`](https://evizero.github.io/Augmentor.jl/operations/cacheimage) | - | Buffer the current image into (preallocated) memory.
+|               | [`Either`](https://evizero.github.io/Augmentor.jl/operations/either) | - | Apply one of the given operations at random.
 
 The purpose of an operation is to simply serve as a "dumb
 placeholder" to specify the intent and parameters of the desired
