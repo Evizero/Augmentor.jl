@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Home",
     "category": "page",
-    "text": "(Image: header)A fast library for increasing the number of training images by applying various transformations.# Can't use Reel.jl, because the way it stores the tmp pngs\n# causes the images to be upscaled too much.\nusing Augmentor, MLDatasets, Images, Colors\nusing PaddedViews, OffsetArrays\nsrand(1337)\n\nupsize(A) = A #repeat(A, inner=(2,2))\n\nmd_str = \"\"\nfor i in 1:20\n    input = MNIST.convert2image(MNIST.traintensor(i))\n    imgs = [upsize(augment(input, ElasticDistortion(5))) for j in 1:10]\n    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth\n    fnames = map(imgs) do img\n        tpath = tempname() * \".png\"\n        save(tpath, img)\n        tpath\n    end\n    args = reduce(vcat, [[fname, \"-delay\", \"1x2\", \"-alpha\", \"deactivate\"] for fname in fnames])\n    convert = strip(readstring(`which convert`))\n    outname = \"idx_mnist_$i.gif\"\n    run(`$convert $args $outname`)\n    md_str = md_str * \"![mnist $i]($outname) \"\nend\nMarkdown.parse(md_str)"
+    "text": "(Image: header)A fast library for increasing the number of training images by applying various transformations."
 },
 
 {
@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Augmentor.jl's documentation",
     "category": "section",
-    "text": "Augmentor is a real-time image augmentation library designed to render the process of artificial dataset enlargement more convenient, less error prone, and easier to reproduce. It offers the user the ability to build a stochastic augmentation pipeline using simple building blocks. In other words, a stochastic augmentation pipeline is simply a sequence of operations for which the parameters can (but need not) be random variables as the following code snippet demonstrates.using Augmentor\npipeline = Rotate([-5, -3, 0, 3, 5]) |> CropSize(64, 64) |> Zoom(1:0.1:1.2)The Julia version of Augmentor is engineered specifically for high performance applications. It makes use of multiple heuristics to generate efficient tailor-made code for the concrete user-specified augmentation pipeline. In particular Augmentor tries to avoid the need for any intermediate images, but instead aims to compute the output image directly from the input in one single pass."
+    "text": "Augmentor is a real-time image augmentation library designed to render the process of artificial dataset enlargement more convenient, less error prone, and easier to reproduce. It offers the user the ability to build a stochastic augmentation pipeline using simple building blocks. In other words, a stochastic augmentation pipeline is simply a sequence of operations for which the parameters can (but need not) be random variables as the following code snippet demonstrates.using Augmentor\npl = ElasticDistortion(6, scale=0.3, border=true) |>\n     Rotate([10, -5, -3, 0, 3, 5, 10]) |>\n     ShearX(-10:10) * ShearY(-10:10) |>\n     CropSize(28, 28) |>\n     Zoom(0.9:0.1:1.2)Such a pipeline can then be used for sampling. Here we use the first few examples of the MNIST database.# I can't use Reel.jl, because the way it stores the tmp pngs\n# causes the images to be upscaled too much.\nusing Augmentor, MLDatasets, Images, Colors\nusing PaddedViews, OffsetArrays\nsrand(1337)\n\npl = ElasticDistortion(6, scale=0.3, border=true) |>\n     Rotate([10, -5, -3, 0, 3, 5, 10]) |>\n     ShearX(-10:10) * ShearY(-10:10) |>\n     CropSize(28, 28) |>\n     Zoom(0.9:0.1:1.2)\n\nmd_lbls = String[]\nmd_imgs = String[]\nfor i in 1:24\n    input = MNIST.convert2image(MNIST.traintensor(i))\n    imgs = [augment(input, pl) for j in 1:20]\n    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth\n    fnames = map(imgs) do img\n        tpath = tempname() * \".png\"\n        save(tpath, img)\n        tpath\n    end\n    args = reduce(vcat, [[fname, \"-delay\", \"1x4\", \"-alpha\", \"deactivate\"] for fname in fnames])\n    convert = strip(readstring(`which convert`))\n    outname = joinpath(\"assets\", \"idx_mnist_$i.gif\")\n    run(`$convert $args $outname`)\n    push!(md_lbls, \"`$(MNIST.trainlabels(i))`\")\n    push!(md_imgs, \"[![mnist $i]($outname)](@ref mnist)\")\nend\ntbl = string(\n    join(md_lbls, \" | \"), \"\\n\",\n    join(map(_->\"---\", md_lbls), \"|\"), \"\\n\",\n    join(md_imgs, \" | \"), \"\\n\",\n)\n# Markdown.parse(tbl)\nMarkdown.parse(join(md_imgs, \" \"))The Julia version of Augmentor is engineered specifically for high performance applications. It makes use of multiple heuristics to generate efficient tailor-made code for the concrete user-specified augmentation pipeline. In particular Augmentor tries to avoid the need for any intermediate images, but instead aims to compute the output image directly from the input in one single pass."
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Getting Started",
     "title": "Example",
     "category": "section",
-    "text": "The following code snippet shows how a stochastic augmentation pipeline can be specified using simple building blocks that we call \"operations\". In order to give the example some meaning, we will use a real medical image from the publicly available ISIC archive as input. The concrete image can be downloaded here using their Web API.julia> using Augmentor, ISICArchive\n\njulia> img = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\n169×256 Array{RGB{N0f8},2}:\n[...]\n\njulia> pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n            Rotate(0:360) |>\n            ShearX(-5:5) * ShearY(-5:5) |>\n            CropSize(165, 165) |>\n            Zoom(1:0.05:1.2) |>\n            Resize(64, 64)\n6-step Augmentor.ImmutablePipeline:\n 1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.\n 2.) Rotate by θ ∈ 0:360 degree\n 3.) Either: (50%) ShearX by ϕ ∈ -5:5 degree. (50%) ShearY by ψ ∈ -5:5 degree.\n 4.) Crop a 165×165 window around the center\n 5.) Zoom by I ∈ {1.0×1.0, 1.05×1.05, 1.1×1.1, 1.15×1.15, 1.2×1.2}\n 6.) Resize to 64×64\n\njulia> img_new = augment(img, pl)\n64×64 Array{RGB{N0f8},2}:\n[...]using Augmentor, ISICArchive;\n\nimg = get(ImageThumbnailRequest(id =\n\"5592ac599fc3c13155a57a85\"))\n\npl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n     Rotate(0:360) |>\n     ShearX(-5:5) * ShearY(-5:5) |>\n     CropSize(165, 165) |>\n     Zoom(1:0.05:1.2) |>\n     Resize(64, 64)\n\nimg_new = augment(img, pl)\n\nusing Plots\npyplot(reuse = true)\ndefault(bg_outside=colorant\"#F3F6F6\")\nsrand(123)\n\n# Create image that shows the input\nplot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)\nPlots.png(\"isic_in.png\")\n\n# create animate gif that shows 10 outputs\nanim = @animate for i=1:10\n    plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)\nend\nPlots.gif(anim, \"isic_out.gif\", fps = 2)\n\nnothingThe function augment will generate a single augmented image from the given input image and pipeline. To visualize the effect we compiled a few resulting output images into a GIF using the plotting library Plots.jl with the PyPlot.jl back-end. You can inspect the full code by clicking on \"Edit on Github\" in the top right corner of this page.Input (img)  Output (img_new)\n(Image: input) → (Image: output)"
+    "text": "The following code snippet shows how a stochastic augmentation pipeline can be specified using simple building blocks that we call \"operations\". In order to give the example some meaning, we will use a real medical image from the publicly available ISIC archive as input. The concrete image can be downloaded here using their Web API.julia> using Augmentor, ISICArchive\n\njulia> img = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\n169×256 Array{RGB{N0f8},2}:\n[...]\n\njulia> pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n            Rotate(0:360) |>\n            ShearX(-5:5) * ShearY(-5:5) |>\n            CropSize(165, 165) |>\n            Zoom(1:0.05:1.2) |>\n            Resize(64, 64)\n6-step Augmentor.ImmutablePipeline:\n 1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.\n 2.) Rotate by θ ∈ 0:360 degree\n 3.) Either: (50%) ShearX by ϕ ∈ -5:5 degree. (50%) ShearY by ψ ∈ -5:5 degree.\n 4.) Crop a 165×165 window around the center\n 5.) Zoom by I ∈ {1.0×1.0, 1.05×1.05, 1.1×1.1, 1.15×1.15, 1.2×1.2}\n 6.) Resize to 64×64\n\njulia> img_new = augment(img, pl)\n64×64 Array{RGB{N0f8},2}:\n[...]using Augmentor, ISICArchive;\n\nimg = get(ImageThumbnailRequest(id =\n\"5592ac599fc3c13155a57a85\"))\n\npl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n     Rotate(0:360) |>\n     ShearX(-5:5) * ShearY(-5:5) |>\n     CropSize(165, 165) |>\n     Zoom(1:0.05:1.2) |>\n     Resize(64, 64)\n\nimg_new = augment(img, pl)\n\nusing Plots\npyplot(reuse = true)\ndefault(bg_outside=colorant\"#F3F6F6\")\nsrand(123)\n\n# Create image that shows the input\nplot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)\nPlots.png(joinpath(\"assets\",\"isic_in.png\"))\n\n# create animate gif that shows 10 outputs\nanim = @animate for i=1:10\n    plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)\nend\nPlots.gif(anim, joinpath(\"assets\",\"isic_out.gif\"), fps = 2)\n\nnothingThe function augment will generate a single augmented image from the given input image and pipeline. To visualize the effect we compiled a few resulting output images into a GIF using the plotting library Plots.jl with the PyPlot.jl back-end. You can inspect the full code by clicking on \"Edit on Github\" in the top right corner of this page.Input (img)  Output (img_new)\n(Image: input) → (Image: output)"
 },
 
 {
@@ -129,11 +129,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "background/#Example:-MNIST-Handwritten-Digits-1",
+    "location": "background/#mnist-1",
     "page": "Background and Motivation",
     "title": "Example: MNIST Handwritten Digits",
     "category": "section",
-    "text": "Consider the following example from the MNIST database of handwritten digits [MNIST1998]. Our input image clearly represents its associated label \"6\". If we were to use the transformation Rotate180 in our augmentation pipeline for this type of images, we could end up with the situation depicted by the image on the right side.using Augmentor, MLDatasets\ninput_img  = MNIST.convert2image(MNIST.traintensor(19))\noutput_img = augment(input_img, Rotate180())\nusing Images, FileIO; # hide\nupsize(A) = repeat(A, inner=(4,4)); # hide\nsave(\"bg_mnist_in.png\", upsize(input_img)); # hide\nsave(\"bg_mnist_out.png\", upsize(output_img)); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)To a human, this newly transformed image clearly represents the label \"9\", and not \"6\" like the original image did. In image augmentation, however, the assumption is that the output of the pipeline has the same label as the input. That means that in this example we would tell our model that the correct answer for the image on the right side is \"6\", which is clearly undesirable for obvious reasons.Thus, for the MNIST dataset, the transformation Rotate180 is not label-preserving and should not be used for augmentation.[MNIST1998]: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. \"The MNIST database of handwritten digits\" Website. 1998."
+    "text": "Consider the following example from the MNIST database of handwritten digits [MNIST1998]. Our input image clearly represents its associated label \"6\". If we were to use the transformation Rotate180 in our augmentation pipeline for this type of images, we could end up with the situation depicted by the image on the right side.using Augmentor, MLDatasets\ninput_img  = MNIST.convert2image(MNIST.traintensor(19))\noutput_img = augment(input_img, Rotate180())\nusing Images, FileIO; # hide\nupsize(A) = repeat(A, inner=(4,4)); # hide\nsave(joinpath(\"assets\",\"bg_mnist_in.png\"), upsize(input_img)); # hide\nsave(joinpath(\"assets\",\"bg_mnist_out.png\"), upsize(output_img)); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)To a human, this newly transformed image clearly represents the label \"9\", and not \"6\" like the original image did. In image augmentation, however, the assumption is that the output of the pipeline has the same label as the input. That means that in this example we would tell our model that the correct answer for the image on the right side is \"6\", which is clearly undesirable for obvious reasons.Thus, for the MNIST dataset, the transformation Rotate180 is not label-preserving and should not be used for augmentation.[MNIST1998]: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. \"The MNIST database of handwritten digits\" Website. 1998."
 },
 
 {
@@ -141,7 +141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Background and Motivation",
     "title": "Example: ISIC Skin Lesions",
     "category": "section",
-    "text": "On the other hand, the exact same transformation could very well be label-preserving for other types of images. Let us take a look at a different set of image data; this time from the medical domain.The International Skin Imaging Collaboration [ISIC] hosts a large collection of publicly available and labeled skin lesion images. A subset of that data was used in 2016's ISBI challenge [ISBI2016] where a subtask was lesion classification.Let's consider the following input image on the left side. It shows a photo of a skin lesion that was taken from above. By applying the Rotate180 operation to the input image, we end up with a transformed version shown on the right side.using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())\nusing FileIO; # hide\nsave(\"bg_isic_in.png\", input_img); # hide\nsave(\"bg_isic_out.png\", output_img); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)After looking at both images, one could argue that the orientation of the camera is somewhat arbitrary as long as it points to the lesion at an approximately orthogonal angle. Thus, for the ISIC dataset, the transformation Rotate180 could be considered as label-preserving and very well be tried for augmentation. Of course this does not guarantee that it will improve training time or model accuracy, but the point is that it is unlikely to hurt.[ISIC]: https://isic-archive.com/[ISBI2016]: Gutman, David; Codella, Noel C. F.; Celebi, Emre; Helba, Brian; Marchetti, Michael; Mishra, Nabin; Halpern, Allan. \"Skin Lesion Analysis toward Melanoma Detection: A Challenge at the International Symposium on Biomedical Imaging (ISBI) 2016, hosted by the International Skin Imaging Collaboration (ISIC)\". eprint arXiv:1605.01397. 2016."
+    "text": "On the other hand, the exact same transformation could very well be label-preserving for other types of images. Let us take a look at a different set of image data; this time from the medical domain.The International Skin Imaging Collaboration [ISIC] hosts a large collection of publicly available and labeled skin lesion images. A subset of that data was used in 2016's ISBI challenge [ISBI2016] where a subtask was lesion classification.Let's consider the following input image on the left side. It shows a photo of a skin lesion that was taken from above. By applying the Rotate180 operation to the input image, we end up with a transformed version shown on the right side.using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())\nusing FileIO; # hide\nsave(joinpath(\"assets\",\"bg_isic_in.png\"), input_img); # hide\nsave(joinpath(\"assets\",\"bg_isic_out.png\"), output_img); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)After looking at both images, one could argue that the orientation of the camera is somewhat arbitrary as long as it points to the lesion at an approximately orthogonal angle. Thus, for the ISIC dataset, the transformation Rotate180 could be considered as label-preserving and very well be tried for augmentation. Of course this does not guarantee that it will improve training time or model accuracy, but the point is that it is unlikely to hurt.[ISIC]: https://isic-archive.com/[ISBI2016]: Gutman, David; Codella, Noel C. F.; Celebi, Emre; Helba, Brian; Marchetti, Michael; Mishra, Nabin; Halpern, Allan. \"Skin Lesion Analysis toward Melanoma Detection: A Challenge at the International Symposium on Biomedical Imaging (ISBI) 2016, hosted by the International Skin Imaging Collaboration (ISIC)\". eprint arXiv:1605.01397. 2016."
 },
 
 {
@@ -205,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Supported Operations",
     "category": "page",
-    "text": "using Augmentor, Images\nsrand(1337)\npattern = imresize(restrict(restrict(testpattern())), (60, 80))\nsave(\"assets/tiny_pattern.png\", pattern)\n# Affine Transformations\nsave(\"assets/tiny_FlipX.png\", augment(pattern, FlipX()))\nsave(\"assets/tiny_FlipY.png\", augment(pattern, FlipY()))\nsave(\"assets/tiny_Rotate90.png\", augment(pattern, Rotate90()))\nsave(\"assets/tiny_Rotate270.png\", augment(pattern, Rotate270()))\nsave(\"assets/tiny_Rotate180.png\", augment(pattern, Rotate180()))\nsave(\"assets/tiny_Rotate.png\", augment(pattern, Rotate(15)))\nsave(\"assets/tiny_ShearX.png\", augment(pattern, ShearX(10)))\nsave(\"assets/tiny_ShearY.png\", augment(pattern, ShearY(10)))\nsave(\"assets/tiny_Scale.png\", augment(pattern, Scale(0.9,1.2)))\nsave(\"assets/tiny_Zoom.png\", augment(pattern, Zoom(0.9,1.2)))\n# Distortions\nsrand(1337)\nsave(\"assets/tiny_ED1.png\", augment(pattern, ElasticDistortion(15,15,0.1)))\nsave(\"assets/tiny_ED2.png\", augment(pattern, ElasticDistortion(10,10,0.2,4,3,true)))\n# Resizing and Subsetting\nsave(\"assets/tiny_Resize.png\", augment(pattern, Resize(60,60)))\nsave(\"assets/tiny_Crop.png\", augment(pattern, Rotate(45) |> Crop(1:50,1:80)))\nsave(\"assets/tiny_CropNative.png\", augment(pattern, Rotate(45) |> CropNative(1:50,1:80)))\nsave(\"assets/tiny_CropSize.png\", augment(pattern, CropSize(20,65)))\nsave(\"assets/tiny_CropRatio.png\", augment(pattern, CropRatio(1)))\nsrand(1337)\nsave(\"assets/tiny_RCropRatio.png\", augment(pattern, RCropRatio(1)))\nnothing;"
+    "text": "using Augmentor, Images, Colors\nsrand(1337)\npattern = imresize(restrict(restrict(testpattern())), (60, 80))\nsave(\"assets/tiny_pattern.png\", pattern)\n# Affine Transformations\nsave(\"assets/tiny_FlipX.png\", augment(pattern, FlipX()))\nsave(\"assets/tiny_FlipY.png\", augment(pattern, FlipY()))\nsave(\"assets/tiny_Rotate90.png\", augment(pattern, Rotate90()))\nsave(\"assets/tiny_Rotate270.png\", augment(pattern, Rotate270()))\nsave(\"assets/tiny_Rotate180.png\", augment(pattern, Rotate180()))\nsave(\"assets/tiny_Rotate.png\", augment(pattern, Rotate(15)))\nsave(\"assets/tiny_ShearX.png\", augment(pattern, ShearX(10)))\nsave(\"assets/tiny_ShearY.png\", augment(pattern, ShearY(10)))\nsave(\"assets/tiny_Scale.png\", augment(pattern, Scale(0.9,1.2)))\nsave(\"assets/tiny_Zoom.png\", augment(pattern, Zoom(0.9,1.2)))\n# Distortions\nsrand(1337)\nsave(\"assets/tiny_ED1.png\", augment(pattern, ElasticDistortion(15,15,0.1)))\nsave(\"assets/tiny_ED2.png\", augment(pattern, ElasticDistortion(10,10,0.2,4,3,true)))\n# Resizing and Subsetting\nsave(\"assets/tiny_Resize.png\", augment(pattern, Resize(60,60)))\nsave(\"assets/tiny_Crop.png\", augment(pattern, Rotate(45) |> Crop(1:50,1:80)))\nsave(\"assets/tiny_CropNative.png\", augment(pattern, Rotate(45) |> CropNative(1:50,1:80)))\nsave(\"assets/tiny_CropSize.png\", augment(pattern, CropSize(20,65)))\nsave(\"assets/tiny_CropRatio.png\", augment(pattern, CropRatio(1)))\nsrand(1337)\nsave(\"assets/tiny_RCropRatio.png\", augment(pattern, RCropRatio(1)))\n# Conversion\nsave(\"assets/tiny_ConvertEltype.png\", augment(pattern, ConvertEltype(GrayA)))\nnothing;"
 },
 
 {
@@ -257,7 +257,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/001_flipx/#",
+    "location": "operations/flipx/#",
     "page": "FlipX: Mirror horizontally",
     "title": "FlipX: Mirror horizontally",
     "category": "page",
@@ -265,7 +265,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/001_flipx/#Augmentor.FlipX",
+    "location": "operations/flipx/#Augmentor.FlipX",
     "page": "FlipX: Mirror horizontally",
     "title": "Augmentor.FlipX",
     "category": "Type",
@@ -273,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/001_flipx/#FlipX-1",
+    "location": "operations/flipx/#FlipX-1",
     "page": "FlipX: Mirror horizontally",
     "title": "FlipX: Mirror horizontally",
     "category": "section",
@@ -281,7 +281,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/002_flipy/#",
+    "location": "operations/flipy/#",
     "page": "FlipY: Mirror vertically",
     "title": "FlipY: Mirror vertically",
     "category": "page",
@@ -289,7 +289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/002_flipy/#Augmentor.FlipY",
+    "location": "operations/flipy/#Augmentor.FlipY",
     "page": "FlipY: Mirror vertically",
     "title": "Augmentor.FlipY",
     "category": "Type",
@@ -297,7 +297,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/002_flipy/#FlipY-1",
+    "location": "operations/flipy/#FlipY-1",
     "page": "FlipY: Mirror vertically",
     "title": "FlipY: Mirror vertically",
     "category": "section",
@@ -305,7 +305,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/003_rotate90/#",
+    "location": "operations/rotate90/#",
     "page": "Rotate90: Rotate upwards 90 degree",
     "title": "Rotate90: Rotate upwards 90 degree",
     "category": "page",
@@ -313,7 +313,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/003_rotate90/#Augmentor.Rotate90",
+    "location": "operations/rotate90/#Augmentor.Rotate90",
     "page": "Rotate90: Rotate upwards 90 degree",
     "title": "Augmentor.Rotate90",
     "category": "Type",
@@ -321,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/003_rotate90/#Rotate90-1",
+    "location": "operations/rotate90/#Rotate90-1",
     "page": "Rotate90: Rotate upwards 90 degree",
     "title": "Rotate90: Rotate upwards 90 degree",
     "category": "section",
@@ -329,7 +329,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/004_rotate270/#",
+    "location": "operations/rotate270/#",
     "page": "Rotate270: Rotate downwards 90 degree",
     "title": "Rotate270: Rotate downwards 90 degree",
     "category": "page",
@@ -337,7 +337,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/004_rotate270/#Augmentor.Rotate270",
+    "location": "operations/rotate270/#Augmentor.Rotate270",
     "page": "Rotate270: Rotate downwards 90 degree",
     "title": "Augmentor.Rotate270",
     "category": "Type",
@@ -345,7 +345,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/004_rotate270/#Rotate270-1",
+    "location": "operations/rotate270/#Rotate270-1",
     "page": "Rotate270: Rotate downwards 90 degree",
     "title": "Rotate270: Rotate downwards 90 degree",
     "category": "section",
@@ -353,7 +353,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/005_rotate180/#",
+    "location": "operations/rotate180/#",
     "page": "Rotate180: Rotate by 180 degree",
     "title": "Rotate180: Rotate by 180 degree",
     "category": "page",
@@ -361,7 +361,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/005_rotate180/#Augmentor.Rotate180",
+    "location": "operations/rotate180/#Augmentor.Rotate180",
     "page": "Rotate180: Rotate by 180 degree",
     "title": "Augmentor.Rotate180",
     "category": "Type",
@@ -369,7 +369,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/005_rotate180/#Rotate180-1",
+    "location": "operations/rotate180/#Rotate180-1",
     "page": "Rotate180: Rotate by 180 degree",
     "title": "Rotate180: Rotate by 180 degree",
     "category": "section",
@@ -377,7 +377,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/006_rotate/#",
+    "location": "operations/rotate/#",
     "page": "Rotate: Arbitrary rotations",
     "title": "Rotate: Arbitrary rotations",
     "category": "page",
@@ -385,7 +385,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/006_rotate/#Augmentor.Rotate",
+    "location": "operations/rotate/#Augmentor.Rotate",
     "page": "Rotate: Arbitrary rotations",
     "title": "Augmentor.Rotate",
     "category": "Type",
@@ -393,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/006_rotate/#Rotate-1",
+    "location": "operations/rotate/#Rotate-1",
     "page": "Rotate: Arbitrary rotations",
     "title": "Rotate: Arbitrary rotations",
     "category": "section",
@@ -401,7 +401,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/007_shearx/#",
+    "location": "operations/shearx/#",
     "page": "ShearX: Shear horizontally",
     "title": "ShearX: Shear horizontally",
     "category": "page",
@@ -409,7 +409,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/007_shearx/#Augmentor.ShearX",
+    "location": "operations/shearx/#Augmentor.ShearX",
     "page": "ShearX: Shear horizontally",
     "title": "Augmentor.ShearX",
     "category": "Type",
@@ -417,7 +417,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/007_shearx/#ShearX-1",
+    "location": "operations/shearx/#ShearX-1",
     "page": "ShearX: Shear horizontally",
     "title": "ShearX: Shear horizontally",
     "category": "section",
@@ -425,7 +425,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/008_sheary/#",
+    "location": "operations/sheary/#",
     "page": "ShearY: Shear vertically",
     "title": "ShearY: Shear vertically",
     "category": "page",
@@ -433,7 +433,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/008_sheary/#Augmentor.ShearY",
+    "location": "operations/sheary/#Augmentor.ShearY",
     "page": "ShearY: Shear vertically",
     "title": "Augmentor.ShearY",
     "category": "Type",
@@ -441,7 +441,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/008_sheary/#ShearY-1",
+    "location": "operations/sheary/#ShearY-1",
     "page": "ShearY: Shear vertically",
     "title": "ShearY: Shear vertically",
     "category": "section",
@@ -449,7 +449,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/009_scale/#",
+    "location": "operations/scale/#",
     "page": "Scale: Relative resizing",
     "title": "Scale: Relative resizing",
     "category": "page",
@@ -457,7 +457,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/009_scale/#Augmentor.Scale",
+    "location": "operations/scale/#Augmentor.Scale",
     "page": "Scale: Relative resizing",
     "title": "Augmentor.Scale",
     "category": "Type",
@@ -465,7 +465,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/009_scale/#Scale-1",
+    "location": "operations/scale/#Scale-1",
     "page": "Scale: Relative resizing",
     "title": "Scale: Relative resizing",
     "category": "section",
@@ -473,7 +473,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/010_zoom/#",
+    "location": "operations/zoom/#",
     "page": "Zoom: Scale without resize",
     "title": "Zoom: Scale without resize",
     "category": "page",
@@ -481,7 +481,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/010_zoom/#Augmentor.Zoom",
+    "location": "operations/zoom/#Augmentor.Zoom",
     "page": "Zoom: Scale without resize",
     "title": "Augmentor.Zoom",
     "category": "Type",
@@ -489,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/010_zoom/#Zoom-1",
+    "location": "operations/zoom/#Zoom-1",
     "page": "Zoom: Scale without resize",
     "title": "Zoom: Scale without resize",
     "category": "section",
@@ -497,7 +497,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/101_elasticdistortion/#",
+    "location": "operations/elasticdistortion/#",
     "page": "ElasticDistortion: Smoothed random distortions",
     "title": "ElasticDistortion: Smoothed random distortions",
     "category": "page",
@@ -505,7 +505,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/101_elasticdistortion/#Augmentor.ElasticDistortion",
+    "location": "operations/elasticdistortion/#Augmentor.ElasticDistortion",
     "page": "ElasticDistortion: Smoothed random distortions",
     "title": "Augmentor.ElasticDistortion",
     "category": "Type",
@@ -513,7 +513,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/101_elasticdistortion/#ElasticDistortion-1",
+    "location": "operations/elasticdistortion/#ElasticDistortion-1",
     "page": "ElasticDistortion: Smoothed random distortions",
     "title": "ElasticDistortion: Smoothed random distortions",
     "category": "section",
@@ -521,7 +521,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/201_crop/#",
+    "location": "operations/crop/#",
     "page": "Crop: Subset image",
     "title": "Crop: Subset image",
     "category": "page",
@@ -529,7 +529,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/201_crop/#Augmentor.Crop",
+    "location": "operations/crop/#Augmentor.Crop",
     "page": "Crop: Subset image",
     "title": "Augmentor.Crop",
     "category": "Type",
@@ -537,7 +537,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/201_crop/#Crop-1",
+    "location": "operations/crop/#Crop-1",
     "page": "Crop: Subset image",
     "title": "Crop: Subset image",
     "category": "section",
@@ -545,7 +545,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/202_cropnative/#",
+    "location": "operations/cropnative/#",
     "page": "CropNative: Subset image",
     "title": "CropNative: Subset image",
     "category": "page",
@@ -553,7 +553,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/202_cropnative/#Augmentor.CropNative",
+    "location": "operations/cropnative/#Augmentor.CropNative",
     "page": "CropNative: Subset image",
     "title": "Augmentor.CropNative",
     "category": "Type",
@@ -561,7 +561,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/202_cropnative/#CropNative-1",
+    "location": "operations/cropnative/#CropNative-1",
     "page": "CropNative: Subset image",
     "title": "CropNative: Subset image",
     "category": "section",
@@ -569,7 +569,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/203_cropsize/#",
+    "location": "operations/cropsize/#",
     "page": "CropSize: Crop centered window",
     "title": "CropSize: Crop centered window",
     "category": "page",
@@ -577,7 +577,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/203_cropsize/#Augmentor.CropSize",
+    "location": "operations/cropsize/#Augmentor.CropSize",
     "page": "CropSize: Crop centered window",
     "title": "Augmentor.CropSize",
     "category": "Type",
@@ -585,7 +585,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/203_cropsize/#CropSize-1",
+    "location": "operations/cropsize/#CropSize-1",
     "page": "CropSize: Crop centered window",
     "title": "CropSize: Crop centered window",
     "category": "section",
@@ -593,7 +593,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/204_cropratio/#",
+    "location": "operations/cropratio/#",
     "page": "CropRatio: Crop centered window",
     "title": "CropRatio: Crop centered window",
     "category": "page",
@@ -601,7 +601,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/204_cropratio/#Augmentor.CropRatio",
+    "location": "operations/cropratio/#Augmentor.CropRatio",
     "page": "CropRatio: Crop centered window",
     "title": "Augmentor.CropRatio",
     "category": "Type",
@@ -609,7 +609,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/204_cropratio/#CropRatio-1",
+    "location": "operations/cropratio/#CropRatio-1",
     "page": "CropRatio: Crop centered window",
     "title": "CropRatio: Crop centered window",
     "category": "section",
@@ -617,7 +617,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/205_rcropratio/#",
+    "location": "operations/rcropratio/#",
     "page": "RCropRatio: Crop random window",
     "title": "RCropRatio: Crop random window",
     "category": "page",
@@ -625,7 +625,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/205_rcropratio/#Augmentor.RCropRatio",
+    "location": "operations/rcropratio/#Augmentor.RCropRatio",
     "page": "RCropRatio: Crop random window",
     "title": "Augmentor.RCropRatio",
     "category": "Type",
@@ -633,7 +633,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/205_rcropratio/#RCropRatio-1",
+    "location": "operations/rcropratio/#RCropRatio-1",
     "page": "RCropRatio: Crop random window",
     "title": "RCropRatio: Crop random window",
     "category": "section",
@@ -641,7 +641,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/206_resize/#",
+    "location": "operations/resize/#",
     "page": "Resize: Set static image size",
     "title": "Resize: Set static image size",
     "category": "page",
@@ -649,7 +649,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/206_resize/#Augmentor.Resize",
+    "location": "operations/resize/#Augmentor.Resize",
     "page": "Resize: Set static image size",
     "title": "Augmentor.Resize",
     "category": "Type",
@@ -657,7 +657,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/206_resize/#Resize-1",
+    "location": "operations/resize/#Resize-1",
     "page": "Resize: Set static image size",
     "title": "Resize: Set static image size",
     "category": "section",
@@ -665,7 +665,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/301_converteltype/#",
+    "location": "operations/converteltype/#",
     "page": "ConvertEltype: Color conversion",
     "title": "ConvertEltype: Color conversion",
     "category": "page",
@@ -673,7 +673,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/301_converteltype/#Augmentor.ConvertEltype",
+    "location": "operations/converteltype/#Augmentor.ConvertEltype",
     "page": "ConvertEltype: Color conversion",
     "title": "Augmentor.ConvertEltype",
     "category": "Type",
@@ -681,7 +681,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/301_converteltype/#ConvertEltype-1",
+    "location": "operations/converteltype/#ConvertEltype-1",
     "page": "ConvertEltype: Color conversion",
     "title": "ConvertEltype: Color conversion",
     "category": "section",
@@ -689,7 +689,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/401_splitchannels/#",
+    "location": "operations/splitchannels/#",
     "page": "SplitChannels: Separate color channels",
     "title": "SplitChannels: Separate color channels",
     "category": "page",
@@ -697,7 +697,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/401_splitchannels/#Augmentor.SplitChannels",
+    "location": "operations/splitchannels/#Augmentor.SplitChannels",
     "page": "SplitChannels: Separate color channels",
     "title": "Augmentor.SplitChannels",
     "category": "Type",
@@ -705,7 +705,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/401_splitchannels/#SplitChannels-1",
+    "location": "operations/splitchannels/#SplitChannels-1",
     "page": "SplitChannels: Separate color channels",
     "title": "SplitChannels: Separate color channels",
     "category": "section",
@@ -713,7 +713,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/402_combinechannels/#",
+    "location": "operations/combinechannels/#",
     "page": "ComineChannels: Combine color channels",
     "title": "ComineChannels: Combine color channels",
     "category": "page",
@@ -721,7 +721,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/402_combinechannels/#Augmentor.CombineChannels",
+    "location": "operations/combinechannels/#Augmentor.CombineChannels",
     "page": "ComineChannels: Combine color channels",
     "title": "Augmentor.CombineChannels",
     "category": "Type",
@@ -729,7 +729,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/402_combinechannels/#CombineChannels-1",
+    "location": "operations/combinechannels/#CombineChannels-1",
     "page": "ComineChannels: Combine color channels",
     "title": "ComineChannels: Combine color channels",
     "category": "section",
@@ -737,7 +737,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/403_permutedims/#",
+    "location": "operations/permutedims/#",
     "page": "PermuteDims: Change dimension order",
     "title": "PermuteDims: Change dimension order",
     "category": "page",
@@ -745,7 +745,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/403_permutedims/#Augmentor.PermuteDims",
+    "location": "operations/permutedims/#Augmentor.PermuteDims",
     "page": "PermuteDims: Change dimension order",
     "title": "Augmentor.PermuteDims",
     "category": "Type",
@@ -753,7 +753,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/403_permutedims/#PermuteDims-1",
+    "location": "operations/permutedims/#PermuteDims-1",
     "page": "PermuteDims: Change dimension order",
     "title": "PermuteDims: Change dimension order",
     "category": "section",
@@ -761,7 +761,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/404_reshape/#",
+    "location": "operations/reshape/#",
     "page": "Reshape: Reinterpret shape",
     "title": "Reshape: Reinterpret shape",
     "category": "page",
@@ -769,7 +769,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/404_reshape/#Augmentor.Reshape",
+    "location": "operations/reshape/#Augmentor.Reshape",
     "page": "Reshape: Reinterpret shape",
     "title": "Augmentor.Reshape",
     "category": "Type",
@@ -777,7 +777,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/404_reshape/#Reshape-1",
+    "location": "operations/reshape/#Reshape-1",
     "page": "Reshape: Reinterpret shape",
     "title": "Reshape: Reinterpret shape",
     "category": "section",
@@ -785,7 +785,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/501_noop/#",
+    "location": "operations/noop/#",
     "page": "NoOp: Identity function",
     "title": "NoOp: Identity function",
     "category": "page",
@@ -793,7 +793,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/501_noop/#Augmentor.NoOp",
+    "location": "operations/noop/#Augmentor.NoOp",
     "page": "NoOp: Identity function",
     "title": "Augmentor.NoOp",
     "category": "Type",
@@ -801,7 +801,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/501_noop/#NoOp-1",
+    "location": "operations/noop/#NoOp-1",
     "page": "NoOp: Identity function",
     "title": "NoOp: Identity function",
     "category": "section",
@@ -809,7 +809,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/502_cacheimage/#",
+    "location": "operations/cacheimage/#",
     "page": "CacheImage: Buffer current state",
     "title": "CacheImage: Buffer current state",
     "category": "page",
@@ -817,7 +817,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/502_cacheimage/#Augmentor.CacheImage",
+    "location": "operations/cacheimage/#Augmentor.CacheImage",
     "page": "CacheImage: Buffer current state",
     "title": "Augmentor.CacheImage",
     "category": "Type",
@@ -825,7 +825,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/502_cacheimage/#CacheImage-1",
+    "location": "operations/cacheimage/#CacheImage-1",
     "page": "CacheImage: Buffer current state",
     "title": "CacheImage: Buffer current state",
     "category": "section",
@@ -833,7 +833,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/503_either/#",
+    "location": "operations/either/#",
     "page": "Either: Stochastic branches",
     "title": "Either: Stochastic branches",
     "category": "page",
@@ -841,7 +841,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/503_either/#Augmentor.Either",
+    "location": "operations/either/#Augmentor.Either",
     "page": "Either: Stochastic branches",
     "title": "Augmentor.Either",
     "category": "Type",
@@ -849,7 +849,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/503_either/#Either-1",
+    "location": "operations/either/#Either-1",
     "page": "Either: Stochastic branches",
     "title": "Either: Stochastic branches",
     "category": "section",
