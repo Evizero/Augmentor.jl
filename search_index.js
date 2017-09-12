@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Home",
     "category": "page",
-    "text": "(Image: header)using Augmentor, Images\npattern = imresize(testpattern(), (240, 320))\nsave(\"assets/testpattern.png\", pattern)A fast library for increasing the number of training images by applying various transformations."
+    "text": "(Image: header)A fast library for increasing the number of training images by applying various transformations."
 },
 
 {
@@ -141,7 +141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Background and Motivation",
     "title": "Example: ISIC Skin Lesions",
     "category": "section",
-    "text": "On the other hand, the exact same transformation could very well be label-preserving for other types of images. Let us take a look at a different set of image data; this time from the medical domain.The International Skin Imaging Collaboration [ISIC] hosts a large collection of publicly available and labeled skin lesion images. A subset of that data was used in 2016's ISBI challenge [ISBI2016] where a subtask was lesion classification.Let's consider the following input image on the left side. It shows a photo of a skin lesion that was taken from above. By applying the Rotate180 operation to the input image, we end up with a transformed version shown on the right side.using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())\nusing FileIO; # hide\nsave(\"bg_isic_in.png\", input_img); # hide\nsave(\"bg_isic_out.png\", output_img); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)After looking at both images, one could argue that the orientation of the camera is somewhat arbitrary as long as it points to the lesion at an approximately orthogonal angle. Thus, for the ISIC dataset, the transformation Rotate180 could be considered as label-preserving and very well be tried for augmentation. Of course this does not guarantee that it will improve training time or model accuracy, but the point is that it is unlikely to hurt.[ISIC]: https://isic-archive.com/[ISBI2016]: Gutman, David; Codella, Noel C. F.; Celebi, Emre; Helba, Brian; Marchetti, Michael; Mishra, Nabin; Halpern, Allan. \"Skin Lesion Analysis toward Melanoma Detection: A Challenge at the International Symposium on Biomedical Imaging (ISBI) 2016, hosted by the International Skin Imaging Collaboration (ISIC)\". eprint arXiv:1605.01397. 2016."
+    "text": "On the other hand, the exact same transformation could very well be label-preserving for other types of images. Let us take a look at a different set of image data; this time from the medical domain.The International Skin Imaging Collaboration [ISIC] hosts a large collection of publicly available and labeled skin lesion images. A subset of that data was used in 2016's ISBI challenge [ISBI2016] where a subtask was lesion classification.Let's consider the following input image on the left side. It shows a photo of a skin lesion that was taken from above. By applying the Rotate180 operation to the input image, we end up with a transformed version shown on the right side.using Augmentor, ISICArchive\ninput_img  = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\noutput_img = augment(input_img, Rotate180())\nusing FileIO; # hide\nsave(\"bg_isic_in.png\", input_img); # hide\nsave(\"bg_isic_out.png\", output_img); # hide\nnothing # hideInput (input_img) Output (output_img)\n(Image: input) (Image: output)After looking at both images, one could argue that the orientation of the camera is somewhat arbitrary as long as it points to the lesion at an approximately orthogonal angle. Thus, for the ISIC dataset, the transformation Rotate180 could be considered as label-preserving and very well be tried for augmentation. Of course this does not guarantee that it will improve training time or model accuracy, but the point is that it is unlikely to hurt.[ISIC]: https://isic-archive.com/[ISBI2016]: Gutman, David; Codella, Noel C. F.; Celebi, Emre; Helba, Brian; Marchetti, Michael; Mishra, Nabin; Halpern, Allan. \"Skin Lesion Analysis toward Melanoma Detection: A Challenge at the International Symposium on Biomedical Imaging (ISBI) 2016, hosted by the International Skin Imaging Collaboration (ISIC)\". eprint arXiv:1605.01397. 2016."
 },
 
 {
@@ -205,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Supported Operations",
     "category": "page",
-    "text": ""
+    "text": "using Augmentor, Images\nsrand(1337)\npattern = imresize(restrict(restrict(testpattern())), (60, 80))\nsave(\"assets/tiny_pattern.png\", pattern)\n# Affine Transformations\nsave(\"assets/tiny_FlipX.png\", augment(pattern, FlipX()))\nsave(\"assets/tiny_FlipY.png\", augment(pattern, FlipY()))\nsave(\"assets/tiny_Rotate90.png\", augment(pattern, Rotate90()))\nsave(\"assets/tiny_Rotate270.png\", augment(pattern, Rotate270()))\nsave(\"assets/tiny_Rotate180.png\", augment(pattern, Rotate180()))\nsave(\"assets/tiny_Rotate.png\", augment(pattern, Rotate(15)))\nsave(\"assets/tiny_ShearX.png\", augment(pattern, ShearX(10)))\nsave(\"assets/tiny_ShearY.png\", augment(pattern, ShearY(10)))\nsave(\"assets/tiny_Scale.png\", augment(pattern, Scale(0.9,1.2)))\nsave(\"assets/tiny_Zoom.png\", augment(pattern, Zoom(0.9,1.2)))\n# Distortions\nsrand(1337)\nsave(\"assets/tiny_ED1.png\", augment(pattern, ElasticDistortion(15,15,0.1)))\nsave(\"assets/tiny_ED2.png\", augment(pattern, ElasticDistortion(10,10,0.2,4,3,true)))\n# Resizing and Subsetting\nsave(\"assets/tiny_Resize.png\", augment(pattern, Resize(60,60)))\nsave(\"assets/tiny_Crop.png\", augment(pattern, Rotate(45) |> Crop(1:50,1:80)))\nsave(\"assets/tiny_CropNative.png\", augment(pattern, Rotate(45) |> CropNative(1:50,1:80)))\nsave(\"assets/tiny_CropSize.png\", augment(pattern, CropSize(20,65)))\nsave(\"assets/tiny_CropRatio.png\", augment(pattern, CropRatio(1)))\nsrand(1337)\nsave(\"assets/tiny_RCropRatio.png\", augment(pattern, RCropRatio(1)))\nnothing;"
 },
 
 {
@@ -213,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Supported Operations",
     "category": "section",
-    "text": "This page lists and describes all supported image operations in great detail. The operations are organized based on their categories and subcategories."
+    "text": "Augmentor provides a wide varitey of build-in image operations. This page provides an overview of all exported operations organized by their main category. These categories are chosen because they serve some practical purpose. For example Affine Operations allow for a special optimization under the hood when chained together.tip: Tip\nClick on an image operation for more details."
 },
 
 {
@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Affine Transformations",
     "category": "section",
-    "text": "A sizeable amount of the provided operations fall under the category of affine transformations. As such, they can be described using what is known as an affine map, which are inherently compose-able if chained together. However, utilizing such a affine formulation requires (costly) interpolation, which may not always be needed to achieve the desired effect. For that reason do some of the operations below also provide a special purpose implementation to produce their specified result. Those are usually preferred over the affine formulation if sensible considering the complete pipeline.Category Available Operations\nMirroring FlipX, FlipY\nRotating Rotate90, Rotate270, Rotate180, Rotate\nShearing ShearX, ShearY\nScaling Scale, Zoom"
+    "text": "A sizeable amount of the provided operations fall under the category of affine transformations. As such, they can be described using what is known as an affine map, which are inherently compose-able if chained together. However, utilizing such a affine formulation requires (costly) interpolation, which may not always be needed to achieve the desired effect. For that reason do some of the operations below also provide a special purpose implementation to produce their specified result. Those are usually preferred over the affine formulation if sensible considering the complete pipeline.Input  FlipX FlipY Rotate90 Rotate270 Rotate180\n(Image: ) → (Image: ) (Image: ) (Image: ) (Image: ) (Image: )\nInput  Rotate ShearX ShearY Scale Zoom\n(Image: ) → (Image: ) (Image: ) (Image: ) (Image: ) (Image: )"
 },
 
 {
@@ -229,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Distortions",
     "category": "section",
-    "text": "Aside from affine transformations, Augmentor also provides functionality for performing a variety of distortions. These types of operations usually provide a much larger distribution of possible output images.Category Available Operations\nDistorting ElasticDistortion"
+    "text": "Aside from affine transformations, Augmentor also provides functionality for performing a variety of distortions. These types of operations usually provide a much larger distribution of possible output images.Input  ElasticDistortion\n(Image: ) → (Image: ) (Image: )"
 },
 
 {
@@ -237,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Resizing and Subsetting",
     "category": "section",
-    "text": "The input images from a given dataset can be of various shapes and sizes. Yet, it is often required by the algorithm that the data must be of uniform structure. To that end Augmentor provides a number of ways to alter or subset given images.The process of cropping is useful to discard parts of the input image. To provide this functionality lazily, applying a crop introduces a layer of representation called a \"view\" or SubArray. This is different yet compatible with how affine operations or other special purpose implementations work. This means that chaining a crop with some affine operation is perfectly fine if done sequentially. However, it is generally not advised to combine affine operations with crop operations within an Either block. Doing that would force the Either to trigger the eager computation of its branches in order to preserve type-stability.Category Available Operations\nCropping Crop, CropNative, CropSize, CropRatio, RCropRatio\nResizing Resize"
+    "text": "The input images from a given dataset can be of various shapes and sizes. Yet, it is often required by the algorithm that the data must be of uniform structure. To that end Augmentor provides a number of ways to alter or subset given images.Input  Resize\n(Image: ) → (Image: )The process of cropping is useful to discard parts of the input image. To provide this functionality lazily, applying a crop introduces a layer of representation called a \"view\" or SubArray. This is different yet compatible with how affine operations or other special purpose implementations work. This means that chaining a crop with some affine operation is perfectly fine if done sequentially. However, it is generally not advised to combine affine operations with crop operations within an Either block. Doing that would force the Either to trigger the eager computation of its branches in order to preserve type-stability.Input  Crop CropNative CropSize CropRatio RCropRatio\n(Image: ) → (Image: ) (Image: ) (Image: ) (Image: ) (Image: )"
 },
 
 {
@@ -245,7 +245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Supported Operations",
     "title": "Conversion and Layout",
     "category": "section",
-    "text": "It is not uncommon that machine learning frameworks require the data in a specific form and layout. For example many deep learning frameworks expect the colorchannel of the images to be encoded in the third dimension of a 4-dimensional array. Augmentor allows to convert from (and to) these different layouts using special operations that are mainly useful in the beginning or end of a augmentation pipeline.Category Available Operations\nConversion ConvertEltype\nInformation Layout SplitChannels, CombineChannels, PermuteDims, Reshape"
+    "text": "It is not uncommon that machine learning frameworks require the data in a specific form and layout. For example many deep learning frameworks expect the colorchannel of the images to be encoded in the third dimension of a 4-dimensional array. Augmentor allows to convert from (and to) these different layouts using special operations that are mainly useful in the beginning or end of a augmentation pipeline.Category Available Operations\nConversion ConvertEltype (e.g. convert to grayscale)\nInformation Layout SplitChannels, CombineChannels, PermuteDims, Reshape"
 },
 
 {
@@ -273,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/001_flipx/#FlipX:-Mirror-horizontally-1",
+    "location": "operations/001_flipx/#FlipX-1",
     "page": "FlipX: Mirror horizontally",
     "title": "FlipX: Mirror horizontally",
     "category": "section",
@@ -297,7 +297,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/002_flipy/#FlipY:-Mirror-vertically-1",
+    "location": "operations/002_flipy/#FlipY-1",
     "page": "FlipY: Mirror vertically",
     "title": "FlipY: Mirror vertically",
     "category": "section",
@@ -321,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/003_rotate90/#Rotate90:-Rotate-upwards-90-degree-1",
+    "location": "operations/003_rotate90/#Rotate90-1",
     "page": "Rotate90: Rotate upwards 90 degree",
     "title": "Rotate90: Rotate upwards 90 degree",
     "category": "section",
@@ -345,7 +345,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/004_rotate270/#Rotate270:-Rotate-downwards-90-degree-1",
+    "location": "operations/004_rotate270/#Rotate270-1",
     "page": "Rotate270: Rotate downwards 90 degree",
     "title": "Rotate270: Rotate downwards 90 degree",
     "category": "section",
@@ -369,7 +369,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/005_rotate180/#Rotate180:-Rotate-by-180-degree-1",
+    "location": "operations/005_rotate180/#Rotate180-1",
     "page": "Rotate180: Rotate by 180 degree",
     "title": "Rotate180: Rotate by 180 degree",
     "category": "section",
@@ -393,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/006_rotate/#Rotate:-Arbitrary-rotations-1",
+    "location": "operations/006_rotate/#Rotate-1",
     "page": "Rotate: Arbitrary rotations",
     "title": "Rotate: Arbitrary rotations",
     "category": "section",
@@ -417,7 +417,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/007_shearx/#ShearX:-Shear-horizontally-1",
+    "location": "operations/007_shearx/#ShearX-1",
     "page": "ShearX: Shear horizontally",
     "title": "ShearX: Shear horizontally",
     "category": "section",
@@ -441,7 +441,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/008_sheary/#ShearY:-Shear-vertically-1",
+    "location": "operations/008_sheary/#ShearY-1",
     "page": "ShearY: Shear vertically",
     "title": "ShearY: Shear vertically",
     "category": "section",
@@ -465,7 +465,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/009_scale/#Scale:-Relative-resizing-1",
+    "location": "operations/009_scale/#Scale-1",
     "page": "Scale: Relative resizing",
     "title": "Scale: Relative resizing",
     "category": "section",
@@ -489,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/010_zoom/#Zoom:-Scale-without-resize-1",
+    "location": "operations/010_zoom/#Zoom-1",
     "page": "Zoom: Scale without resize",
     "title": "Zoom: Scale without resize",
     "category": "section",
@@ -513,7 +513,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/101_elasticdistortion/#ElasticDistortion:-Smoothed-random-distortions-1",
+    "location": "operations/101_elasticdistortion/#ElasticDistortion-1",
     "page": "ElasticDistortion: Smoothed random distortions",
     "title": "ElasticDistortion: Smoothed random distortions",
     "category": "section",
@@ -537,7 +537,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/201_crop/#Crop:-Subset-image-1",
+    "location": "operations/201_crop/#Crop-1",
     "page": "Crop: Subset image",
     "title": "Crop: Subset image",
     "category": "section",
@@ -561,7 +561,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/202_cropnative/#CropNative:-Subset-image-1",
+    "location": "operations/202_cropnative/#CropNative-1",
     "page": "CropNative: Subset image",
     "title": "CropNative: Subset image",
     "category": "section",
@@ -585,7 +585,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/203_cropsize/#CropSize:-Crop-centered-window-1",
+    "location": "operations/203_cropsize/#CropSize-1",
     "page": "CropSize: Crop centered window",
     "title": "CropSize: Crop centered window",
     "category": "section",
@@ -609,7 +609,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/204_cropratio/#CropRatio:-Crop-centered-window-1",
+    "location": "operations/204_cropratio/#CropRatio-1",
     "page": "CropRatio: Crop centered window",
     "title": "CropRatio: Crop centered window",
     "category": "section",
@@ -633,7 +633,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/205_rcropratio/#RCropRatio:-Crop-random-window-1",
+    "location": "operations/205_rcropratio/#RCropRatio-1",
     "page": "RCropRatio: Crop random window",
     "title": "RCropRatio: Crop random window",
     "category": "section",
@@ -657,7 +657,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/206_resize/#Resize:-Set-static-image-size-1",
+    "location": "operations/206_resize/#Resize-1",
     "page": "Resize: Set static image size",
     "title": "Resize: Set static image size",
     "category": "section",
@@ -681,7 +681,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/301_converteltype/#ConvertEltype:-Color-conversion-1",
+    "location": "operations/301_converteltype/#ConvertEltype-1",
     "page": "ConvertEltype: Color conversion",
     "title": "ConvertEltype: Color conversion",
     "category": "section",
@@ -705,7 +705,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/401_splitchannels/#SplitChannels:-Separate-color-channels-1",
+    "location": "operations/401_splitchannels/#SplitChannels-1",
     "page": "SplitChannels: Separate color channels",
     "title": "SplitChannels: Separate color channels",
     "category": "section",
@@ -729,7 +729,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/402_combinechannels/#ComineChannels:-Combine-color-channels-1",
+    "location": "operations/402_combinechannels/#CombineChannels-1",
     "page": "ComineChannels: Combine color channels",
     "title": "ComineChannels: Combine color channels",
     "category": "section",
@@ -753,7 +753,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/403_permutedims/#PermuteDims:-Change-dimension-order-1",
+    "location": "operations/403_permutedims/#PermuteDims-1",
     "page": "PermuteDims: Change dimension order",
     "title": "PermuteDims: Change dimension order",
     "category": "section",
@@ -777,7 +777,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/404_reshape/#Reshape:-Reinterpret-shape-1",
+    "location": "operations/404_reshape/#Reshape-1",
     "page": "Reshape: Reinterpret shape",
     "title": "Reshape: Reinterpret shape",
     "category": "section",
@@ -801,7 +801,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/501_noop/#NoOp:-Identity-function-1",
+    "location": "operations/501_noop/#NoOp-1",
     "page": "NoOp: Identity function",
     "title": "NoOp: Identity function",
     "category": "section",
@@ -825,7 +825,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/502_cacheimage/#CacheImage:-Buffer-current-state-1",
+    "location": "operations/502_cacheimage/#CacheImage-1",
     "page": "CacheImage: Buffer current state",
     "title": "CacheImage: Buffer current state",
     "category": "section",
@@ -849,7 +849,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/503_either/#Either:-Stochastic-branches-1",
+    "location": "operations/503_either/#Either-1",
     "page": "Either: Stochastic branches",
     "title": "Either: Stochastic branches",
     "category": "section",
