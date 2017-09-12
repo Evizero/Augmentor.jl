@@ -5,7 +5,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Home",
     "category": "page",
-    "text": "(Image: header)A fast library for increasing the number of training images by applying various transformations."
+    "text": "(Image: header)A fast library for increasing the number of training images by applying various transformations.# Can't use Reel.jl, because the way it stores the tmp pngs\n# causes the images to be upscaled too much.\nusing Augmentor, MLDatasets, Images, Colors\nusing PaddedViews, OffsetArrays\nsrand(1337)\n\nupsize(A) = A #repeat(A, inner=(2,2))\n\nmd_str = \"\"\nfor i in 1:20\n    input = MNIST.convert2image(MNIST.traintensor(i))\n    imgs = [upsize(augment(input, ElasticDistortion(5))) for j in 1:10]\n    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth\n    fnames = map(imgs) do img\n        tpath = tempname() * \".png\"\n        save(tpath, img)\n        tpath\n    end\n    args = reduce(vcat, [[fname, \"-delay\", \"1x2\", \"-alpha\", \"deactivate\"] for fname in fnames])\n    convert = strip(readstring(`which convert`))\n    outname = \"idx_mnist_$i.gif\"\n    run(`$convert $args $outname`)\n    md_str = md_str * \"![mnist $i]($outname) \"\nend\nMarkdown.parse(md_str)"
 },
 
 {
