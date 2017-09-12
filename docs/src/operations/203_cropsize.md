@@ -1,4 +1,4 @@
-# CropSize: Crop centered window
+# [CropSize: Crop centered window](@id CropSize)
 
 ```@docs
 CropSize

@@ -1,4 +1,4 @@
-# CacheImage: Buffer current state
+# [CacheImage: Buffer current state](@id CacheImage)
 
 ```@docs
 CacheImage

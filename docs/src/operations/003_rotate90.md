@@ -1,4 +1,4 @@
-# Rotate90: Rotate upwards 90 degree
+# [Rotate90: Rotate upwards 90 degree](@id Rotate90)
 
 ```@docs
 Rotate90

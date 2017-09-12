@@ -1,4 +1,4 @@
-# Scale: Relative resizing
+# [Scale: Relative resizing](@id Scale)
 
 ```@docs
 Scale

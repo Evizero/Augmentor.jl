@@ -1,4 +1,4 @@
-# SplitChannels: Separate color channels
+# [SplitChannels: Separate color channels](@id SplitChannels)
 
 ```@docs
 SplitChannels

@@ -1,3 +1,23 @@
+# This file is imported by most Augmentor.Operations
+# documentation pages. The purpose of this file is to generate
+# one or more example images for what the operation does.
+# Additionally the result is returned as a markdown table
+# showing the input image and the corresponding output image.
+#
+# Example use for single output image as png:
+#
+# ```@eval
+# include("optable.jl")
+# @optable Rotate(15)
+# ```
+#
+# Example use for 8 output images compiled into a gif:
+#
+# ```@eval
+# include("optable.jl")
+# @optable 8 => Rotate(-15:15)
+# ```
+
 using Augmentor, Images, Colors
 using Reel, PaddedViews, OffsetArrays
 Reel.set_output_type("gif")

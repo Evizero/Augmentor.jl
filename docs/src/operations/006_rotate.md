@@ -1,4 +1,4 @@
-# Rotate: Arbitrary rotations
+# [Rotate: Arbitrary rotations](@id Rotate)
 
 ```@docs
 Rotate

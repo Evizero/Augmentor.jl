@@ -1,4 +1,4 @@
-# ComineChannels: Combine color channels
+# [ComineChannels: Combine color channels](@id CombineChannels)
 
 ```@docs
 CombineChannels

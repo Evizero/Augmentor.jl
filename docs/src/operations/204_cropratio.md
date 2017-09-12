@@ -1,4 +1,4 @@
-# CropRatio: Crop centered window
+# [CropRatio: Crop centered window](@id CropRatio)
 
 ```@docs
 CropRatio

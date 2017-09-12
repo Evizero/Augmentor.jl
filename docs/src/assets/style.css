@@ -14,3 +14,9 @@ article section.docstring {
     padding: 0;
     margin-top: 1em;
 }
+article table {
+    text-align: center;
+}
+article p {
+    text-align: justify;
+}

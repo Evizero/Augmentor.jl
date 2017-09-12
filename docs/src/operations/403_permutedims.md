@@ -1,4 +1,4 @@
-# PermuteDims: Change dimension order
+# [PermuteDims: Change dimension order](@id PermuteDims)
 
 ```@docs
 PermuteDims

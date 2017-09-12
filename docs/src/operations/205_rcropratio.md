@@ -1,4 +1,4 @@
-# RCropRatio: Crop random window
+# [RCropRatio: Crop random window](@id RCropRatio)
 
 ```@docs
 RCropRatio

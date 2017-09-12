@@ -1,4 +1,4 @@
-# ShearY: Shear vertically
+# [ShearY: Shear vertically](@id ShearY)
 
 ```@docs
 ShearY

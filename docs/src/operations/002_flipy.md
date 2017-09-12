@@ -1,4 +1,4 @@
-# FlipY: Mirror vertically
+# [FlipY: Mirror vertically](@id FlipY)
 
 ```@docs
 FlipY

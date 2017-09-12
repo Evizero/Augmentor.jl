@@ -1,4 +1,4 @@
-# ShearX: Shear horizontally
+# [ShearX: Shear horizontally](@id ShearX)
 
 ```@docs
 ShearX

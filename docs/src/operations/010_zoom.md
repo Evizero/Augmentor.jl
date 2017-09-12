@@ -1,4 +1,4 @@
-# Zoom: Scale without resize
+# [Zoom: Scale without resize](@id Zoom)
 
 ```@docs
 Zoom

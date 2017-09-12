@@ -1,4 +1,4 @@
-# ConvertEltype: Color conversion
+# [ConvertEltype: Color conversion](@id ConvertEltype)
 
 ```@docs
 ConvertEltype

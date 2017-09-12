@@ -37,10 +37,14 @@ makedocs(
     pages = Any[
         "Home" => "index.md",
         "gettingstarted.md",
-        "background.md",
-        "images.md",
-        hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations"))) if splitext(fname)[2] == ".md"]),
-        new_md_files...,
+        "Introduction and Motivation" => Any[
+            "background.md",
+            "images.md",
+        ],
+        "User's Guide" => Any[
+            hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations"))) if splitext(fname)[2] == ".md"]),
+        ],
+        "Tutorials" => Any[new_md_files...],
         "LICENSE.md",
     ],
     html_prettyurls = !("local" in ARGS),

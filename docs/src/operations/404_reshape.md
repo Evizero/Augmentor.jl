@@ -1,4 +1,4 @@
-# Reshape: Reinterpret shape
+# [Reshape: Reinterpret shape](@id Reshape)
 
 ```@docs
 Reshape

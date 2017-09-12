@@ -1,4 +1,4 @@
-# ElasticDistortion: Smoothed random distortions
+# [ElasticDistortion: Smoothed random distortions](@id ElasticDistortion)
 
 ```@docs
 ElasticDistortion

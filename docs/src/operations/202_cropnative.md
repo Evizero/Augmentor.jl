@@ -1,4 +1,4 @@
-# CropNative: Subset image
+# [CropNative: Subset image](@id CropNative)
 
 ```@docs
 CropNative

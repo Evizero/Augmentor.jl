@@ -102,13 +102,7 @@ shows a photo of a skin lesion that was taken from above. By
 applying the [`Rotate180`](@ref) operation to the input image, we
 end up with a transformed version shown on the right side.
 
-```julia
-using Augmentor, ISICArchive
-input_img  = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
-output_img = augment(input_img, Rotate180())
-```
-
-```@eval
+```@example
 using Augmentor, ISICArchive
 input_img  = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
 output_img = augment(input_img, Rotate180())

@@ -1,4 +1,4 @@
-# NoOp: Identity function
+# [NoOp: Identity function](@id NoOp)
 
 ```@docs
 NoOp

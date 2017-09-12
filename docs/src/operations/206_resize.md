@@ -1,4 +1,4 @@
-# Resize: Set static image size
+# [Resize: Set static image size](@id Resize)
 
 ```@docs
 Resize
