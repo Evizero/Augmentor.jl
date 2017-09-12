@@ -23,6 +23,37 @@ for fname in readdir(input_dir)
     push!(new_md_files, joinpath("generated", name * ".md"))
 end
 
+op_fnames = [
+    "flipx",
+    "flipy",
+    "rotate90",
+    "rotate270",
+    "rotate180",
+    "rotate",
+    "shearx",
+    "sheary",
+    "scale",
+    "zoom",
+    "elasticdistortion",
+    "crop",
+    "cropnative",
+    "cropsize",
+    "cropratio",
+    "rcropratio",
+    "resize",
+    "converteltype",
+    "splitchannels",
+    "combinechannels",
+    "permutedims",
+    "reshape",
+    "noop",
+    "cacheimage",
+    "either",
+]
+
+dict_order = Dict(fname * ".md" => i for (i, fname) in enumerate(op_fnames))
+myless(a, b) = dict_order[a] < dict_order[b]
+
 makedocs(
     modules = [Augmentor],
     clean = false,
@@ -42,7 +73,7 @@ makedocs(
             "images.md",
         ],
         "User's Guide" => Any[
-            hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations"))) if splitext(fname)[2] == ".md"]),
+            hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations")), lt = myless) if splitext(fname)[2] == ".md"]),
         ],
         "Tutorials" => Any[new_md_files...],
         "LICENSE.md",

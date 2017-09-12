@@ -83,13 +83,13 @@ srand(123)
 
 # Create image that shows the input
 plot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)
-Plots.png("isic_in.png")
+Plots.png(joinpath("assets","isic_in.png"))
 
 # create animate gif that shows 10 outputs
 anim = @animate for i=1:10
     plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)
 end
-Plots.gif(anim, "isic_out.gif", fps = 2)
+Plots.gif(anim, joinpath("assets","isic_out.gif"), fps = 2)
 
 nothing
 ```
@@ -103,9 +103,9 @@ plotting library
 You can inspect the full code by clicking on "Edit on Github" in
 the top right corner of this page.
 
-Input (`img`)         |   | Output (`img_new`)
-:--------------------:|:-:|:-----------------------:
-![input](isic_in.png) | → | ![output](isic_out.gif)
+Input (`img`)                |   | Output (`img_new`)
+:---------------------------:|:-:|:------------------------------:
+![input](assets/isic_in.png) | → | ![output](assets/isic_out.gif)
 
 ## Getting Help
 

@@ -16,7 +16,55 @@ the following code snippet demonstrates.
 
 ```@repl
 using Augmentor
-pipeline = Rotate([-5, -3, 0, 3, 5]) |> CropSize(64, 64) |> Zoom(1:0.1:1.2)
+pl = ElasticDistortion(6, scale=0.3, border=true) |>
+     Rotate([10, -5, -3, 0, 3, 5, 10]) |>
+     ShearX(-10:10) * ShearY(-10:10) |>
+     CropSize(28, 28) |>
+     Zoom(0.9:0.1:1.2)
+```
+
+Such a pipeline can then be used for sampling. Here we use the
+first few examples of the [MNIST
+database](http://yann.lecun.com/exdb/mnist/).
+
+```@eval
+# I can't use Reel.jl, because the way it stores the tmp pngs
+# causes the images to be upscaled too much.
+using Augmentor, MLDatasets, Images, Colors
+using PaddedViews, OffsetArrays
+srand(1337)
+
+pl = ElasticDistortion(6, scale=0.3, border=true) |>
+     Rotate([10, -5, -3, 0, 3, 5, 10]) |>
+     ShearX(-10:10) * ShearY(-10:10) |>
+     CropSize(28, 28) |>
+     Zoom(0.9:0.1:1.2)
+
+md_lbls = String[]
+md_imgs = String[]
+for i in 1:24
+    input = MNIST.convert2image(MNIST.traintensor(i))
+    imgs = [augment(input, pl) for j in 1:20]
+    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth
+    fnames = map(imgs) do img
+        tpath = tempname() * ".png"
+        save(tpath, img)
+        tpath
+    end
+    args = reduce(vcat, [[fname, "-delay", "1x4", "-alpha", "deactivate"] for fname in fnames])
+    convert = strip(readstring(`which convert`))
+    outname = joinpath("assets", "idx_mnist_$i.gif")
+    run(`$convert $args $outname`)
+    push!(md_lbls, "`$(MNIST.trainlabels(i))`")
+    push!(md_imgs, "[![mnist $i]($outname)](@ref mnist)")
+end
+tbl = string(
+    join(md_lbls, " | "), "\n",
+    join(map(_->"---", md_lbls), "|"), "\n",
+    join(md_imgs, " | "), "\n",
+)
+# Markdown.parse(tbl)
+Markdown.parse(join(md_imgs, " "))
 ```
 
 The Julia version of Augmentor is engineered specifically for

@@ -47,7 +47,7 @@ images still visually represent the same concept (and thus
 label). If a pipeline only produces output images that have this
 property we call this pipeline **label-preserving**.
 
-### Example: MNIST Handwritten Digits
+### [Example: MNIST Handwritten Digits](@id mnist)
 
 Consider the following example from the MNIST database of
 handwritten digits [^MNIST1998]. Our input image clearly
@@ -62,14 +62,14 @@ input_img  = MNIST.convert2image(MNIST.traintensor(19))
 output_img = augment(input_img, Rotate180())
 using Images, FileIO; # hide
 upsize(A) = repeat(A, inner=(4,4)); # hide
-save("bg_mnist_in.png", upsize(input_img)); # hide
-save("bg_mnist_out.png", upsize(output_img)); # hide
+save(joinpath("assets","bg_mnist_in.png"), upsize(input_img)); # hide
+save(joinpath("assets","bg_mnist_out.png"), upsize(output_img)); # hide
 nothing # hide
 ```
 
-Input (`input_img`)       | Output (`output_img`)
---------------------------|-----------------------------
-![input](bg_mnist_in.png) | ![output](bg_mnist_out.png)
+Input (`input_img`)              | Output (`output_img`)
+---------------------------------|------------------------------------
+![input](assets/bg_mnist_in.png) | ![output](assets/bg_mnist_out.png)
 
 To a human, this newly transformed image clearly represents the
 label "9", and not "6" like the original image did. In image
@@ -107,14 +107,14 @@ using Augmentor, ISICArchive
 input_img  = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
 output_img = augment(input_img, Rotate180())
 using FileIO; # hide
-save("bg_isic_in.png", input_img); # hide
-save("bg_isic_out.png", output_img); # hide
+save(joinpath("assets","bg_isic_in.png"), input_img); # hide
+save(joinpath("assets","bg_isic_out.png"), output_img); # hide
 nothing # hide
 ```
 
-Input (`input_img`)      | Output (`output_img`)
--------------------------|----------------------------
-![input](bg_isic_in.png) | ![output](bg_isic_out.png)
+Input (`input_img`)             | Output (`output_img`)
+--------------------------------|-----------------------------------
+![input](assets/bg_isic_in.png) | ![output](assets/bg_isic_out.png)
 
 After looking at both images, one could argue that the
 orientation of the camera is somewhat arbitrary as long as it
