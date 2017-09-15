@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Augmentor.jl's documentation",
     "category": "section",
-    "text": "Augmentor is a real-time image augmentation library designed to render the process of artificial dataset enlargement more convenient, less error prone, and easier to reproduce. It offers the user the ability to build a stochastic augmentation pipeline using simple building blocks. In other words, a stochastic augmentation pipeline is simply a sequence of operations for which the parameters can (but need not) be random variables as the following code snippet demonstrates.using Augmentor\npl = ElasticDistortion(6, scale=0.3, border=true) |>\n     Rotate([10, -5, -3, 0, 3, 5, 10]) |>\n     ShearX(-10:10) * ShearY(-10:10) |>\n     CropSize(28, 28) |>\n     Zoom(0.9:0.1:1.2)Such a pipeline can then be used for sampling. Here we use the first few examples of the MNIST database.# I can't use Reel.jl, because the way it stores the tmp pngs\n# causes the images to be upscaled too much.\nusing Augmentor, MLDatasets, Images, Colors\nusing PaddedViews, OffsetArrays\nsrand(1337)\n\npl = ElasticDistortion(6, scale=0.3, border=true) |>\n     Rotate([10, -5, -3, 0, 3, 5, 10]) |>\n     ShearX(-10:10) * ShearY(-10:10) |>\n     CropSize(28, 28) |>\n     Zoom(0.9:0.1:1.2)\n\nmd_lbls = String[]\nmd_imgs = String[]\nfor i in 1:24\n    input = MNIST.convert2image(MNIST.traintensor(i))\n    imgs = [augment(input, pl) for j in 1:20]\n    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth\n    fnames = map(imgs) do img\n        tpath = tempname() * \".png\"\n        save(tpath, img)\n        tpath\n    end\n    args = reduce(vcat, [[fname, \"-delay\", \"1x4\", \"-alpha\", \"deactivate\"] for fname in fnames])\n    convert = strip(readstring(`which convert`))\n    outname = joinpath(\"assets\", \"idx_mnist_$i.gif\")\n    run(`$convert $args $outname`)\n    push!(md_lbls, \"`$(MNIST.trainlabels(i))`\")\n    push!(md_imgs, \"[![mnist $i]($outname)](@ref mnist)\")\nend\ntbl = string(\n    join(md_lbls, \" | \"), \"\\n\",\n    join(map(_->\"---\", md_lbls), \"|\"), \"\\n\",\n    join(md_imgs, \" | \"), \"\\n\",\n)\n# Markdown.parse(tbl)\nMarkdown.parse(join(md_imgs, \" \"))The Julia version of Augmentor is engineered specifically for high performance applications. It makes use of multiple heuristics to generate efficient tailor-made code for the concrete user-specified augmentation pipeline. In particular Augmentor tries to avoid the need for any intermediate images, but instead aims to compute the output image directly from the input in one single pass."
+    "text": "Augmentor is a real-time image augmentation library designed to render the process of artificial dataset enlargement more convenient, less error prone, and easier to reproduce. It offers the user the ability to build a stochastic image-processing pipeline (or simply augmentation pipeline) using image operations as building blocks. In other words, an augmentation pipeline is little more but a sequence of operations for which the parameters can (but need not) be random variables, as the following code snippet demonstrates.using Augmentor\npl = ElasticDistortion(6, scale=0.3, border=true) |>\n     Rotate([10, -5, -3, 0, 3, 5, 10]) |>\n     ShearX(-10:10) * ShearY(-10:10) |>\n     CropSize(28, 28) |>\n     Zoom(0.9:0.1:1.2)Such a pipeline can then be used for sampling. Here we use the first few examples of the MNIST database.# I can't use Reel.jl, because the way it stores the tmp pngs\n# causes the images to be upscaled too much.\nusing Augmentor, MLDatasets, Images, Colors\nusing PaddedViews, OffsetArrays\nsrand(1337)\n\npl = ElasticDistortion(6, scale=0.3, border=true) |>\n     Rotate([10, -5, -3, 0, 3, 5, 10]) |>\n     ShearX(-10:10) * ShearY(-10:10) |>\n     CropSize(28, 28) |>\n     Zoom(0.9:0.1:1.2)\n\nmd_imgs = String[]\nfor i in 1:24\n    input = MNIST.convert2image(MNIST.traintensor(i))\n    imgs = [augment(input, pl) for j in 1:20]\n    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth\n    fnames = map(imgs) do img\n        tpath = tempname() * \".png\"\n        save(tpath, img)\n        tpath\n    end\n    args = reduce(vcat, [[fname, \"-delay\", \"1x4\", \"-alpha\", \"deactivate\"] for fname in fnames])\n    convert = strip(readstring(`which convert`))\n    outname = joinpath(\"assets\", \"idx_mnist_$i.gif\")\n    run(`$convert $args $outname`)\n    push!(md_imgs, \"[![mnist $i]($outname)](@ref mnist)\")\n    foreach(fname -> rm(fname), fnames)\nend\nMarkdown.parse(join(md_imgs, \" \"))The Julia version of Augmentor is engineered specifically for high performance applications. It makes use of multiple heuristics to generate efficient tailor-made code for the concrete user-specified augmentation pipeline. In particular Augmentor tries to avoid the need for any intermediate images, but instead aims to compute the output image directly from the input in one single pass."
 },
 
 {
@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Where to begin?",
     "category": "section",
-    "text": "If this is the first time you consider using Augmentor.jl for your machine learning related experiments or packages, make sure to check out the \"Getting Started\" section. There we list the installation instructions and some simple hello world examples.Pages = [\"gettingstarted.md\"]\nDepth = 3Augmentor.jl is the Julia package for Augmentor. You can find the Python version here."
+    "text": "If this is the first time you consider using Augmentor.jl for your machine learning related experiments or packages, make sure to check out the \"Getting Started\" section. There we list the installation instructions and some simple hello world examples.Pages = [\"gettingstarted.md\"]\nDepth = 2Augmentor.jl is the Julia package for Augmentor. You can find the Python version here."
 },
 
 {
@@ -29,7 +29,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Introduction and Motivation",
     "category": "section",
-    "text": "If you are new to image augmentation in general, or are simply interested in some background information, feel free to take a look at the following sections. There we discuss the concepts involved and outline the most important terms and definitions.Pages = [\"background.md\"]\nDepth = 3In case you have not worked with image data in Julia before, feel free to browse the following documents for a crash course on how image data is represented in the Julia language, as well as how to visualize it.Pages = [\"images.md\"]\nDepth = 3"
+    "text": "If you are new to image augmentation in general, or are simply interested in some background information, feel free to take a look at the following sections. There we discuss the concepts involved and outline the most important terms and definitions.Pages = [\"background.md\"]\nDepth = 2In case you have not worked with image data in Julia before, feel free to browse the following documents for a crash course on how image data is represented in the Julia language, as well as how to visualize it. For more information on image processing in Julia, take a look at the documentation for the vast JuliaImages ecosystem.Pages = [\"images.md\"]\nDepth = 2"
 },
 
 {
@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "User's Guide",
     "category": "section",
-    "text": "Augmentor provides a number of already implemented functionality. The following section provides a complete list of all the exported operations and their documentation.Pages = [\"operations.md\"]\nDepth = 2"
+    "text": "As the name suggests, Augmentor was designed with image augmentation for machine learning in mind. That said, the way the library is implemented allows it to also be used for efficient image processing outside the machine learning domain.The following section describes the high-level user interface in more detail. In particular it focuses on how a (stochastic) image-processing pipeline can be defined and then be applied to an image (or a set of images).Pages = [\"interface.md\"]\nDepth = 2Augmentor ships with a number of predefined operations that should be sufficient to describe some of the most commonly used augmentation strategies. Each operation is a represented as its own unique type. The following section provides a complete list of all the exported operations and their documentation.Pages = [\"operations.md\"]\nDepth = 2"
 },
 
 {
@@ -45,15 +45,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Tutorials",
     "category": "section",
-    "text": "Pages = [joinpath(\"generated\", fname) for fname in readdir(\"generated\") if splitext(fname)[2] == \".md\"]\nDepth = 2"
+    "text": "Just like an image can say more than a thousand words, a simple hands-on tutorial can say more than many pages of formal documentation.Pages = [joinpath(\"generated\", fname) for fname in readdir(\"generated\") if splitext(fname)[2] == \".md\"]\nDepth = 2"
 },
 
 {
-    "location": "#Indices-and-tables-1",
+    "location": "#Indices-1",
     "page": "Home",
-    "title": "Indices and tables",
+    "title": "Indices",
     "category": "section",
-    "text": ""
+    "text": "Pages = [\"indices.md\"]"
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Getting Started",
     "title": "Example",
     "category": "section",
-    "text": "The following code snippet shows how a stochastic augmentation pipeline can be specified using simple building blocks that we call \"operations\". In order to give the example some meaning, we will use a real medical image from the publicly available ISIC archive as input. The concrete image can be downloaded here using their Web API.julia> using Augmentor, ISICArchive\n\njulia> img = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\n169×256 Array{RGB{N0f8},2}:\n[...]\n\njulia> pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n            Rotate(0:360) |>\n            ShearX(-5:5) * ShearY(-5:5) |>\n            CropSize(165, 165) |>\n            Zoom(1:0.05:1.2) |>\n            Resize(64, 64)\n6-step Augmentor.ImmutablePipeline:\n 1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.\n 2.) Rotate by θ ∈ 0:360 degree\n 3.) Either: (50%) ShearX by ϕ ∈ -5:5 degree. (50%) ShearY by ψ ∈ -5:5 degree.\n 4.) Crop a 165×165 window around the center\n 5.) Zoom by I ∈ {1.0×1.0, 1.05×1.05, 1.1×1.1, 1.15×1.15, 1.2×1.2}\n 6.) Resize to 64×64\n\njulia> img_new = augment(img, pl)\n64×64 Array{RGB{N0f8},2}:\n[...]using Augmentor, ISICArchive;\n\nimg = get(ImageThumbnailRequest(id =\n\"5592ac599fc3c13155a57a85\"))\n\npl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n     Rotate(0:360) |>\n     ShearX(-5:5) * ShearY(-5:5) |>\n     CropSize(165, 165) |>\n     Zoom(1:0.05:1.2) |>\n     Resize(64, 64)\n\nimg_new = augment(img, pl)\n\nusing Plots\npyplot(reuse = true)\ndefault(bg_outside=colorant\"#F3F6F6\")\nsrand(123)\n\n# Create image that shows the input\nplot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)\nPlots.png(joinpath(\"assets\",\"isic_in.png\"))\n\n# create animate gif that shows 10 outputs\nanim = @animate for i=1:10\n    plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)\nend\nPlots.gif(anim, joinpath(\"assets\",\"isic_out.gif\"), fps = 2)\n\nnothingThe function augment will generate a single augmented image from the given input image and pipeline. To visualize the effect we compiled a few resulting output images into a GIF using the plotting library Plots.jl with the PyPlot.jl back-end. You can inspect the full code by clicking on \"Edit on Github\" in the top right corner of this page.Input (img)  Output (img_new)\n(Image: input) → (Image: output)"
+    "text": "The following code snippet shows how a stochastic augmentation pipeline can be specified using simple building blocks that we call \"operations\". In order to give the example some meaning, we will use a real medical image from the publicly available ISIC archive as input. The concrete image can be downloaded here using their Web API.julia> using Augmentor, ISICArchive\n\njulia> img = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\n169×256 Array{RGB{N0f8},2}:\n[...]\n\njulia> pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n            Rotate(0:360) |>\n            ShearX(-5:5) * ShearY(-5:5) |>\n            CropSize(165, 165) |>\n            Zoom(1:0.05:1.2) |>\n            Resize(64, 64)\n6-step Augmentor.ImmutablePipeline:\n 1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.\n 2.) Rotate by θ ∈ 0:360 degree\n 3.) Either: (50%) ShearX by ϕ ∈ -5:5 degree. (50%) ShearY by ψ ∈ -5:5 degree.\n 4.) Crop a 165×165 window around the center\n 5.) Zoom by I ∈ {1.0×1.0, 1.05×1.05, 1.1×1.1, 1.15×1.15, 1.2×1.2}\n 6.) Resize to 64×64\n\njulia> img_new = augment(img, pl)\n64×64 Array{RGB{N0f8},2}:\n[...]using Augmentor, ISICArchive;\n\nimg = get(ImageThumbnailRequest(id = \"5592ac599fc3c13155a57a85\"))\n\npl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>\n     Rotate(0:360) |>\n     ShearX(-5:5) * ShearY(-5:5) |>\n     CropSize(165, 165) |>\n     Zoom(1:0.05:1.2) |>\n     Resize(64, 64)\n\nimg_new = augment(img, pl)\n\nusing Plots\npyplot(reuse = true)\ndefault(bg_outside=colorant\"#F3F6F6\")\nsrand(123)\n\n# Create image that shows the input\nplot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)\nPlots.png(joinpath(\"assets\",\"isic_in.png\"))\n\n# create animate gif that shows 10 outputs\nanim = @animate for i=1:10\n    plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)\nend\nPlots.gif(anim, joinpath(\"assets\",\"isic_out.gif\"), fps = 2)\n\nnothingThe function augment will generate a single augmented image from the given input image and pipeline. To visualize the effect we compiled a few resulting output images into a GIF using the plotting library Plots.jl with the PyPlot.jl back-end. You can inspect the full code by clicking on \"Edit on Github\" in the top right corner of this page.Input (img)  Output (img_new)\n(Image: input) → (Image: output)"
 },
 
 {
@@ -93,7 +93,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Getting Started",
     "title": "Getting Help",
     "category": "section",
-    "text": "To get help on specific functionality you can either look up the information here, or if you prefer you can make use of Julia's native doc-system. The following example shows how to get additional information on augment within Julia's REPL:?augment"
+    "text": "To get help on specific functionality you can either look up the information here, or if you prefer you can make use of Julia's native doc-system. The following example shows how to get additional information on augment within Julia's REPL:?augmentIf you find yourself stuck or have other questions concerning the package you can find us at gitter or the Machine Learning domain on discourse.julialang.orgJulia ML on Gitter\nMachine Learning on JulialangIf you encounter a bug or would like to participate in the development of this package come find us on Github.Evizero/Augmentor.jl"
 },
 
 {
@@ -201,6 +201,86 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "interface/#",
+    "page": "High-level Interface",
+    "title": "High-level Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "interface/#High-level-Interface-1",
+    "page": "High-level Interface",
+    "title": "High-level Interface",
+    "category": "section",
+    "text": "Integrating Augmentor into an existing project essentially requires the three steps outlined below. We will spend the rest of this document on describing all the necessary components in more detail.Import Augmentor into the namespace of your program.\nusing Augmentor\nDefine a (stochastic) image processing pipeline by chaining the desired operations using |> and *.\njulia> pl = FlipX() * FlipY() |> Zoom(0.9:0.1:1.2) |> CropSize(64,64)\n3-step Augmentor.ImmutablePipeline:\n 1.) Either: (50%) Flip the X axis. (50%) Flip the Y axis.\n 2.) Zoom by I ∈ {0.9×0.9, 1.0×1.0, 1.1×1.1, 1.2×1.2}\n 3.) Crop a 64×64 window around the center\nApply the pipeline to the existing image or set of images.\nimg_processed = augment(img_original, pl)Depending on the complexity of your problem, you may want to iterate between 2. and 3. to identify an appropriate pipeline. See TODO: TUTORIAL LINK for an example of how such an iterative process could look like."
+},
+
+{
+    "location": "interface/#Defining-a-Pipeline-1",
+    "page": "High-level Interface",
+    "title": "Defining a Pipeline",
+    "category": "section",
+    "text": "In Augmentor, a (stochastic) image-processing pipeline can be understood as a sequence of operations, for which the parameters can (but need not) be random variables. What that essentially means is that the user explicitly specifies which image operation to perform in what order. A complete list of available operations can be found at Supported Operations.To start off with a simple example, let us assume that we want to first rotate our image(s) counter-clockwise by 14°, then crop them down to the biggest possible square, and lastly resize the image(s) to a fixed size of 64 by 64 pixel. Such a pipeline would be defined as follows:julia> pl = Rotate(14) |> CropRatio(1) |> Resize(64,64)\n3-step Augmentor.ImmutablePipeline:\n 1.) Rotate 14 degree\n 2.) Crop to 1:1 aspect ratio\n 3.) Resize to 64×64Notice that in the example above there is no room for randomness. In other words, the same input image would always result in the same output image given that pipeline. If we wish for more variation we can do so by using a vector as our parameters, instead of a single number.note: Note\nIn this subsection we will focus only on how to define a pipeline, without actually thinking too much on about how to apply it to an actual image. The later will be the main topic of the rest of this document.Say we wish to adapt our pipeline such that the rotation is a little more random. More specifically lets say we want our image to be rotated by either -10°, -5°, 5°, 10°, or not at all. Other than that change we will leave the rest of the pipeline as is.julia> pl = Rotate([-10,-5,0,5,10]) |> CropRatio(1) |> Resize(64,64)\n3-step Augmentor.ImmutablePipeline:\n 1.) Rotate by θ ∈ [-10, -5, 0, 5, 10] degree\n 2.) Crop to 1:1 aspect ratio\n 3.) Resize to 64×64Variation in the parameters is only one way to introduce randomness to our pipeline. Additionally one can specify to choose one of multiple operations at random, using a utility operation called Either, which has its own convenience syntax.As an example, let us assume we wish to first either mirror our image(s) horizontally, or vertically, or not at all, and then crop it down to a size of 100 by 100 pixel around the image's center. We can specify the \"either\" using the * operator.julia> pl = FlipX() * FlipY() * NoOp() |> CropSize(100,100)\n2-step Augmentor.ImmutablePipeline:\n 1.) Either: (33%) Flip the X axis. (33%) Flip the Y axis. (33%) No operation.\n 2.) Crop a 100×100 window around the centerIt's also possible to specify the odds of for such an \"either\". For example we may want the NoOp to be twice as likely as either of the mirroring options.julia> pl = (1=>FlipX()) * (1=>FlipY()) * (2=>NoOp()) |> CropSize(100,100)\n2-step Augmentor.ImmutablePipeline:\n 1.) Either: (25%) Flip the X axis. (25%) Flip the Y axis. (50%) No operation.\n 2.) Crop a 100×100 window around the centerNow that we know how to define a pipeline, let us think about how to apply it to an image or a set of images."
+},
+
+{
+    "location": "interface/#Augmentor.testpattern",
+    "page": "High-level Interface",
+    "title": "Augmentor.testpattern",
+    "category": "Function",
+    "text": "testpattern() -> Matrix{RGBA{N0f8}}\n\nLoad and return the provided 300x400 test image.\n\nThe returned image was specifically designed to be informative about the effects of the applied augmentation operations. It is thus well suited to prototype an augmentation pipeline, because it makes it easy to see what kind of effects one can achieve with it.\n\n\n\n"
+},
+
+{
+    "location": "interface/#Loading-the-Example-Image-1",
+    "page": "High-level Interface",
+    "title": "Loading the Example Image",
+    "category": "section",
+    "text": "Augmentor ships with a custom example image, which was specifically designed for visualizing augmentation effects. It can be accessed by calling the function testpattern(). However, doing so should rarely be necessary in practice, since most high-level functions will default to using testpattern() if no other image is specified.testpatternusing Augmentor\nimg = testpattern()\nusing Images; # hide\nsave(joinpath(\"assets\",\"big_pattern.png\"), img); # hide\nnothing # hide(Image: testpattern)"
+},
+
+{
+    "location": "interface/#Augmentor.augment",
+    "page": "High-level Interface",
+    "title": "Augmentor.augment",
+    "category": "Function",
+    "text": "augment([img], pipeline) -> imga\n\nApply the operations of the given pipeline to the image img and return the resulting image imga.\n\nThe parameter pipeline can be a subtype of Augmentor.Pipeline, a tuple of Augmentor.Operation, or a single Augmentor.Operation\n\nimg = testpattern()\naugment(img, FlipX() |> FlipY())\naugment(img, (FlipX(), FlipY()))\naugment(img, FlipX())\n\nIf img is omitted, augmentor will use the pre-provided augmentation test image returned by the function testpattern as the input image.\n\naugment(FlipX())\n\n\n\n"
+},
+
+{
+    "location": "interface/#Augmentor.augment!",
+    "page": "High-level Interface",
+    "title": "Augmentor.augment!",
+    "category": "Function",
+    "text": "augment!(out, img, pipeline) -> out\n\nApply the operations of the given pipeline to the image img and write the resulting image into out.\n\nThe parameter pipeline can be a subtype of Augmentor.Pipeline, a tuple of Augmentor.Operation, or a single Augmentor.Operation\n\nimg = testpattern()\nout = similar(img)\naugment!(out, img, FlipX() |> FlipY())\naugment!(out, img, (FlipX(), FlipY()))\naugment!(out, img, FlipX())\n\n\n\n"
+},
+
+{
+    "location": "interface/#Augmenting-an-Image-1",
+    "page": "High-level Interface",
+    "title": "Augmenting an Image",
+    "category": "section",
+    "text": "Once a pipeline is constructed it can be applied to an image (i.e. AbstractArray{<:ColorTypes.Colorant}), or even just to an array of numbers (i.e. AbstractArray{<:Number}), using the function augment.augmentaugment!"
+},
+
+{
+    "location": "interface/#Augmentor.augmentbatch!",
+    "page": "High-level Interface",
+    "title": "Augmentor.augmentbatch!",
+    "category": "Function",
+    "text": "augmentbatch!([resource], outs, imgs, pipeline) -> outs\n\nApply the operations of the given pipeline to the images in imgs and write the resulting images into outs.\n\nBoth outs and imgs have to contain the same number of images. Each of the two variables can either be in the form of a higher dimensional array for which the last dimension enumerates the individual images, or alternatively in the form of a vector of arrays, for which each vector element denotes an image.\n\nThe parameter pipeline can be a subtype of Augmentor.Pipeline, a tuple of Augmentor.Operation, or a single Augmentor.Operation.\n\nThe optional first parameter resource can either be CPU1() (default) or CPUThreads(). In the case of the later the images will be augmented in parallel. For this to make sense make sure that the environment variable JULIA_NUM_THREADS is set to a reasonable number so that Threads.nthreads() is greater than 1.\n\n\n\n"
+},
+
+{
+    "location": "interface/#Augmenting-Image-Batches-1",
+    "page": "High-level Interface",
+    "title": "Augmenting Image Batches",
+    "category": "section",
+    "text": "augmentbatch!"
+},
+
+{
     "location": "operations/#",
     "page": "Supported Operations",
     "title": "Supported Operations",
@@ -209,7 +289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/#Supported-Operations-1",
+    "location": "operations/#operations-1",
     "page": "Supported Operations",
     "title": "Supported Operations",
     "category": "section",
@@ -509,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "ElasticDistortion: Smoothed random distortions",
     "title": "Augmentor.ElasticDistortion",
     "category": "Type",
-    "text": "ElasticDistortion <: Augmentor.ImageOperation\n\nDescription\n\nDistorts the given image using a randomly (uniform) generated vector field of the given grid size. This field will be stretched over the given image when applied, which in turn will morph the original image into a new image using a linear interpolation of both the image and the vector field.\n\nIn contrast to RandomDistortion, the resulting vector field is also smoothed using a Gaussian filter with of parameter sigma. This will result in a less chaotic vector field and thus resemble a more natural distortion.\n\nUsage\n\nElasticDistortion(gridheight, gridwidth, scale, sigma, [iter=1], [border=false], [norm=true])\n\nElasticDistortion(gridheight, gridwidth, scale; [sigma=2], [iter=1], [border=false], [norm=true])\n\nElasticDistortion(gridheight, [gridwidth]; [scale=0.2], [sigma=2], [iter=1], [border=false], [norm=true])\n\nArguments\n\ngridheight : The grid height of the displacement vector   field. This effectively specifies the number of vertices   along the Y dimension used as landmarks, where all the   positions between the grid points are interpolated.\ngridwidth : The grid width of the displacement vector   field. This effectively specifies the number of vertices   along the Y dimension used as landmarks, where all the   positions between the grid points are interpolated.\nscale : Optional. The scaling factor applied to all   displacement vectors in the field. This effectively defines   the \"strength\" of the deformation. There is no theoretical   upper limit to this factor, but a value somewhere between   0.01 and 1.0 seem to be the most reasonable choices.   Default to 0.2.\nsigma : Optional. Sigma parameter of the Gaussian filter.   This parameter effectively controls the strength of the   smoothing. Defaults to 2.\niter : Optional. The number of times the smoothing   operation is applied to the displacement vector field. This   is especially useful if border = false because the border   will be reset to zero after each pass. Thus the displacement   is a little less aggressive towards the borders of the image   than it is towards its center. Defaults to   1.\nborder : Optional. Specifies if the borders should be   distorted as well. If false, the borders of the image will   be preserved. This effectively pins the outermost vertices on   their original position and the operation thus only distorts   the inner content of the image. Defaults to   false.\nnorm : Optional. If true, the displacement vectors of   the field will be normalized by the norm of the field. This   will have the effect that the scale factor should be more   or less independent of the grid size. Defaults to   true.\n\nSee also\n\nRandomDistortion, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# distort with pinned borders\naugment(img, ElasticDistortion(15, 15; scale = 0.1))\n\n# distort everything more smoothly.\naugment(img, ElasticDistortion(10, 10; sigma = 4, iter=3, border=true))\n\n\n\n"
+    "text": "ElasticDistortion <: Augmentor.ImageOperation\n\nDescription\n\nDistorts the given image using a randomly (uniform) generated vector field of the given grid size. This field will be stretched over the given image when applied, which in turn will morph the original image into a new image using a linear interpolation of both the image and the vector field.\n\nIn contrast to [RandomDistortion], the resulting vector field is also smoothed using a Gaussian filter with of parameter sigma. This will result in a less chaotic vector field and thus resemble a more natural distortion.\n\nUsage\n\nElasticDistortion(gridheight, gridwidth, scale, sigma, [iter=1], [border=false], [norm=true])\n\nElasticDistortion(gridheight, gridwidth, scale; [sigma=2], [iter=1], [border=false], [norm=true])\n\nElasticDistortion(gridheight, [gridwidth]; [scale=0.2], [sigma=2], [iter=1], [border=false], [norm=true])\n\nArguments\n\ngridheight : The grid height of the displacement vector   field. This effectively specifies the number of vertices   along the Y dimension used as landmarks, where all the   positions between the grid points are interpolated.\ngridwidth : The grid width of the displacement vector   field. This effectively specifies the number of vertices   along the Y dimension used as landmarks, where all the   positions between the grid points are interpolated.\nscale : Optional. The scaling factor applied to all   displacement vectors in the field. This effectively defines   the \"strength\" of the deformation. There is no theoretical   upper limit to this factor, but a value somewhere between   0.01 and 1.0 seem to be the most reasonable choices.   Default to 0.2.\nsigma : Optional. Sigma parameter of the Gaussian filter.   This parameter effectively controls the strength of the   smoothing. Defaults to 2.\niter : Optional. The number of times the smoothing   operation is applied to the displacement vector field. This   is especially useful if border = false because the border   will be reset to zero after each pass. Thus the displacement   is a little less aggressive towards the borders of the image   than it is towards its center. Defaults to   1.\nborder : Optional. Specifies if the borders should be   distorted as well. If false, the borders of the image will   be preserved. This effectively pins the outermost vertices on   their original position and the operation thus only distorts   the inner content of the image. Defaults to   false.\nnorm : Optional. If true, the displacement vectors of   the field will be normalized by the norm of the field. This   will have the effect that the scale factor should be more   or less independent of the grid size. Defaults to   true.\n\nSee also\n\naugment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# distort with pinned borders\naugment(img, ElasticDistortion(15, 15; scale = 0.1))\n\n# distort everything more smoothly.\naugment(img, ElasticDistortion(10, 10; sigma = 4, iter=3, border=true))\n\n\n\n"
 },
 
 {
@@ -557,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "CropNative: Subset image",
     "title": "Augmentor.CropNative",
     "category": "Type",
-    "text": "CropNative <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the area denoted by the specified pixel ranges.\n\nFor example the operation CropNative(5:100, 2:10) would denote a crop for the rectangle that starts at x=2 and y=5 in the top left corner of native space and ends at x=10 and y=100 in the bottom right corner of native space.\n\nIn contrast to Crop, the position x=1 y=1 is not necessarily located at the top left of the current image, but instead depends on the cumulative effect of the previous transformations. The reason for this is because affine transformations are usually performed around the center of the image, which is reflected in \"native space\". This is useful for combining transformations such as Rotation or ShearX with a crop around the center area.\n\nUsage\n\nCropNative(indices)\n\nCropNative(indices...)\n\nArguments\n\nindices : NTuple or Vararg of UnitRange that denote   the cropping range for each array dimension. This is very   similar to how the indices for view are specified.\n\nSee also\n\nCrop, CropSize, CropRatio, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# cropped at top left corner\naugment(img, Rotate(45) |> Crop(1:300, 1:400))\n\n# cropped around center of rotated image\naugment(img, Rotate(45) |> CropNative(1:300, 1:400))\n\n\n\n"
+    "text": "CropNative <: Augmentor.ImageOperation\n\nDescription\n\nCrops out the area denoted by the specified pixel ranges.\n\nFor example the operation CropNative(5:100, 2:10) would denote a crop for the rectangle that starts at x=2 and y=5 in the top left corner of native space and ends at x=10 and y=100 in the bottom right corner of native space.\n\nIn contrast to Crop, the position x=1 y=1 is not necessarily located at the top left of the current image, but instead depends on the cumulative effect of the previous transformations. The reason for this is because affine transformations are usually performed around the center of the image, which is reflected in \"native space\". This is useful for combining transformations such as Rotate or ShearX with a crop around the center area.\n\nUsage\n\nCropNative(indices)\n\nCropNative(indices...)\n\nArguments\n\nindices : NTuple or Vararg of UnitRange that denote   the cropping range for each array dimension. This is very   similar to how the indices for view are specified.\n\nSee also\n\nCrop, CropSize, CropRatio, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# cropped at top left corner\naugment(img, Rotate(45) |> Crop(1:300, 1:400))\n\n# cropped around center of rotated image\naugment(img, Rotate(45) |> CropNative(1:300, 1:400))\n\n\n\n"
 },
 
 {
@@ -857,19 +937,67 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "generated/testexample/#",
-    "page": "Test Tutorial",
-    "title": "Test Tutorial",
+    "location": "generated/mnist_elastic/#",
+    "page": "MNIST: Elastic Distortions",
+    "title": "MNIST: Elastic Distortions",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "generated/testexample/#Test-Tutorial-1",
-    "page": "Test Tutorial",
-    "title": "Test Tutorial",
+    "location": "generated/mnist_elastic/#MNIST:-Elastic-Distortions-1",
+    "page": "MNIST: Elastic Distortions",
+    "title": "MNIST: Elastic Distortions",
     "category": "section",
-    "text": "This is a test tutorialusing Augmentor, ImagesFirst we load the sample image using the function testpattern.img = testpattern()\nsave(\"tstimg.png\", img) # hide\nnothing # hide(Image: img)Lets see if custom treatment for jupyter worksprintln(\"Hello World\")"
+    "text": "In this example we are going to use Augmentor.jl on the famous MNIST database of handwritten digits [MNIST1998] to reproduce the elastic distortions discussed in [SIMARD2003].Note that the way Augmentor implements deformations is a little different than how it is described by the authors in the paper. This is for a couple of reasons, most notably that we want the parameters for our deformations to be intepended of the size of image it is applied on. As a consequence the parameter numbers specified in the paper are not 1-to-1 transferable to Augmentor."
+},
+
+{
+    "location": "generated/mnist_elastic/#Loading-the-MNIST-Trainingset-1",
+    "page": "MNIST: Elastic Distortions",
+    "title": "Loading the MNIST Trainingset",
+    "category": "section",
+    "text": "In order to access and visualize the MNIST images we employ the help of two additional Julia packages.Images.jl will provide us with the tool for working with image data in Julia.\nMLDatasets.jl has an MNIST submodule that offers a convenience interface to read the MNIST database.The function MNIST.traintensor returns the MNIST training images corresponding to the given indices as a multi-dimensional array. These images are stored in the native horizontal-major memory layout as a single floating point array, where all values are scaled to be between 0.0 and 1.0.using Images, MLDatasets\ntrain_tensor = MNIST.traintensor()\n@show summary(train_tensor)\nnothing # hideThis horizontal-major format is the standard way of utilizing this dataset for training machine learning models. In this tutorial, however, we are more interested in working with the MNIST images as actual Julia images in vertical-major layout, and as black digits on white background.We can convert the \"tensor\" to a Colorant array using the provided function MNIST.convert2image.train_images = MNIST.convert2image(train_tensor)\ntrain_images[:,:,1] # show first image\nimg_1 = ans # hide\nsave(\"mnist_1.png\",repeat(img_1,inner=(4,4))) # hide\nnothing # hide(Image: first image)"
+},
+
+{
+    "location": "generated/mnist_elastic/#Visualizing-Distortion-Effects-1",
+    "page": "MNIST: Elastic Distortions",
+    "title": "Visualizing Distortion Effects",
+    "category": "section",
+    "text": "Before we apply a smoothed displacement field to our dataset and train a network, we should invest some time to come up with a decent set of hyper parameters for the operation. A useful tool for tasks like this is the package Interact.jl.# These two package will provide us with the capabilities\n# to perform interactive visualisations in a jupyter notebook\nusing Augmentor, Interact, Reactive\n\n# The manipulate macro will turn the parameters of the\n# loop into interactive widgets.\n@manipulate for\n        unpaused = true,\n        ticks = fpswhen(signal(unpaused), 5.),\n        image_index = 1:100,\n        grid_size = 3:20,\n        scale = .1:.1:.5,\n        sigma = 1:5,\n        iterations = 1:6,\n        free_border = true\n    op = ElasticDistortion(grid_size, grid_size, # equal width & height\n                           sigma = sigma,\n                           scale = scale,\n                           iter = iterations,\n                           border = free_border)\n    augment(train_images[:, :, image_index], op)\nend\nnothing # hideExecuting the code above in a Juypter notebook will result in the following interactive visualisation. You can now use the sliders to investigate the effects that different parameters have on the MNIST training set.tip: Tip\nYou should always use your training set to do this kind of visualisation (not the test test!). Otherwise you are likely to achieve overly optimistic (i.e. biased) results during training.(Image: notebook)Congratulations! With just a few simple lines of code, you created a simple interactive tool to visualize your image augmentation pipeline. Once you found a set of parameters that you think are appropriate for your dataset you can go ahead and train your model."
+},
+
+{
+    "location": "generated/mnist_elastic/#References-1",
+    "page": "MNIST: Elastic Distortions",
+    "title": "References",
+    "category": "section",
+    "text": "[MNIST1998]: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. \"The MNIST database of handwritten digits\" Website. 1998.[SIMARD2003]: Simard, Patrice Y., David Steinkraus, and John C. Platt. \"Best practices for convolutional neural networks applied to visual document analysis.\" ICDAR. Vol. 3. 2003."
+},
+
+{
+    "location": "indices/#",
+    "page": "Indices",
+    "title": "Indices",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "indices/#Functions-1",
+    "page": "Indices",
+    "title": "Functions",
+    "category": "section",
+    "text": "Order   = [:function]"
+},
+
+{
+    "location": "indices/#Types-1",
+    "page": "Indices",
+    "title": "Types",
+    "category": "section",
+    "text": "Order   = [:type]"
 },
 
 {
