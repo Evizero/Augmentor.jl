@@ -1,20 +1,21 @@
-[![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/header.png)](http://augmentorjl.readthedocs.io/)
+[![Augmentor](https://raw.githubusercontent.com/JuliaML/FileStorage/master/Augmentor/readme/header.png)](https://evizero.github.io/Augmentor.jl/)
 
 A **fast** Julia library for increasing the number of training
 images by applying various transformations.
 
 | **Package Status** | **Package Evaluator** | **Build Status**  |
 |:------------------:|:---------------------:|:-----------------:|
-| [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md) [![Documentation Status](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](http://augmentorjl.readthedocs.io/en/latest/?badge=latest) | [![Julia Pkg 0.5](http://pkg.julialang.org/badges/Augmentor_0.5.svg)](http://pkg.julialang.org/?pkg=Augmentor) [![Julia Pkg 0.6](http://pkg.julialang.org/badges/Augmentor_0.6.svg)](http://pkg.julialang.org/?pkg=Augmentor) | [![Travis Status](https://travis-ci.org/Evizero/Augmentor.jl.svg?branch=master)](https://travis-ci.org/Evizero/Augmentor.jl) [![AppVeyor status](https://ci.appveyor.com/api/projects/status/stfgx2856r8ckskw?svg=true)](https://ci.appveyor.com/project/Evizero/augmentor-jl) [![Coverage Status](https://coveralls.io/repos/github/Evizero/Augmentor.jl/badge.svg?branch=master)](https://coveralls.io/github/Evizero/Augmentor.jl?branch=master) |
+| [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md) [![Documentation Status](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](https://evizero.github.io/Augmentor.jl/) | [![Julia Pkg 0.5](http://pkg.julialang.org/badges/Augmentor_0.5.svg)](http://pkg.julialang.org/?pkg=Augmentor) [![Julia Pkg 0.6](http://pkg.julialang.org/badges/Augmentor_0.6.svg)](http://pkg.julialang.org/?pkg=Augmentor) | [![Travis Status](https://travis-ci.org/Evizero/Augmentor.jl.svg?branch=master)](https://travis-ci.org/Evizero/Augmentor.jl) [![AppVeyor status](https://ci.appveyor.com/api/projects/status/stfgx2856r8ckskw?svg=true)](https://ci.appveyor.com/project/Evizero/augmentor-jl) [![Coverage Status](https://coveralls.io/repos/github/Evizero/Augmentor.jl/badge.svg?branch=master)](https://coveralls.io/github/Evizero/Augmentor.jl?branch=master) |
 
 Augmentor is a real-time image augmentation library designed to
 render the process of artificial dataset enlargement more
 convenient, less error prone, and easier to reproduce. It offers
-the user the ability to build a stochastic augmentation pipeline
-using simple building blocks. For our purposes, a stochastic
-augmentation pipeline can be understood as a sequence of
-operations for which the parameters can (but need not) be random
-variables.
+the user the ability to build a *stochastic image-processing
+pipeline* -- which we will also refer to as *augmentation
+pipeline* -- using image operations as building blocks. For our
+purposes, an augmentation pipeline can be understood as a
+sequence of operations for which the parameters can (but need
+not) be random variables.
 
 ```julia
 julia> pipeline = FlipX(0.5) |> Rotate([-5,-3,0,3,5]) |> CropSize(64,64) |> Zoom(1:0.1:1.2)
@@ -39,12 +40,12 @@ is available [here](https://github.com/mdbloice/Augmentor).
 
 ## Introduction
 
-The following code snippet shows how a stochastic augmentation
-pipeline can be specified using simple building blocks that we
-call "operations". In order to give the example some meaning, we
-will use a real medical image from the publicly available
-[ISIC archive](https://isic-archive.com/) as input. The concrete
-image can be downloaded
+The following code snippet shows how an augmentation pipeline can
+be specified using simple building blocks that we call
+"operations". In order to give the example some meaning, we will
+use a real medical image from the publicly available [ISIC
+archive](https://isic-archive.com/) as input. The concrete image
+can be downloaded
 [here](https://isic-archive.com/api/v1/image/5592ac599fc3c13155a57a85/thumbnail)
 using their [Web API](https://isic-archive.com/api/v1).
 
@@ -205,7 +206,7 @@ augmentation strategies. Each operation is a represented as its
 own unique type (see table below for a concise overview). For a
 more detailed description of all the predefined operations take a
 look at the corresponding section of the
-[documentation](http://augmentorjl.readthedocs.io/en/latest/usersguide/operations.html).
+[documentation](https://evizero.github.io/Augmentor.jl/operations/).
 
 | Category      | Operation           | Preview | Description
 |--------------:|:--------------------|:-------:|:-----------------------------------------------------------------
@@ -283,7 +284,7 @@ of the pipeline and their concrete order.
 ## Documentation
 
 For a more detailed treatment check out the **[latest
-documentation](http://augmentorjl.readthedocs.io/en/latest/index.html)**.
+documentation](https://evizero.github.io/Augmentor.jl/)**.
 
 Additionally, you can make use of Julia's native docsystem.
 The following example shows how to get additional information

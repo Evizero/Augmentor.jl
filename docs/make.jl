@@ -1,4 +1,4 @@
-using Documenter, Augmentor
+using Documenter, Augmentor, MLDatasets
 
 using Weave
 input_dir = joinpath(@__DIR__, "..", "examples")
@@ -73,9 +73,11 @@ makedocs(
             "images.md",
         ],
         "User's Guide" => Any[
+            "interface.md",
             hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations")), lt = myless) if splitext(fname)[2] == ".md"]),
         ],
         "Tutorials" => Any[new_md_files...],
+        hide("Indices" => "indices.md"),
         "LICENSE.md",
     ],
     html_prettyurls = !("local" in ARGS),

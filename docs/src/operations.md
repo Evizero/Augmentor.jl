@@ -31,7 +31,7 @@ save("assets/tiny_ConvertEltype.png", augment(pattern, ConvertEltype(GrayA)))
 nothing;
 ```
 
-# Supported Operations
+# [Supported Operations](@id operations)
 
 Augmentor provides a wide varitey of build-in image operations.
 This page provides an overview of all exported operations

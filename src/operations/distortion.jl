@@ -16,7 +16,7 @@ over the given image when applied, which in turn will morph the
 original image into a new image using a linear interpolation of
 both the image and the vector field.
 
-In contrast to [`RandomDistortion`](@ref), the resulting vector
+In contrast to [`RandomDistortion`], the resulting vector
 field is also smoothed using a Gaussian filter with of parameter
 `sigma`. This will result in a less chaotic vector field and thus
 resemble a more natural distortion.
@@ -78,7 +78,7 @@ Arguments
 See also
 --------------
 
-[`RandomDistortion`](@ref), [`augment`](@ref)
+[`augment`](@ref)
 
 Examples
 --------------

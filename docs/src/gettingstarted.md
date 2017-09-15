@@ -64,8 +64,7 @@ julia> img_new = augment(img, pl)
 ```@eval
 using Augmentor, ISICArchive;
 
-img = get(ImageThumbnailRequest(id =
-"5592ac599fc3c13155a57a85"))
+img = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
 
 pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>
      Rotate(0:360) |>
@@ -117,3 +116,16 @@ additional information on [`augment`](@ref) within Julia's REPL:
 ```julia
 ?augment
 ```
+
+If you find yourself stuck or have other questions concerning the
+package you can find us at gitter or the **Machine Learning**
+domain on discourse.julialang.org
+
+- [Julia ML on Gitter](https://gitter.im/JuliaML/chat)
+
+- [Machine Learning on Julialang](https://discourse.julialang.org/c/domain/ML)
+
+If you encounter a bug or would like to participate in the
+development of this package come find us on Github.
+
+- [Evizero/Augmentor.jl](https://github.com/Evizero/Augmentor.jl)

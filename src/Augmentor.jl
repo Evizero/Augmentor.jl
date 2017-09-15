@@ -22,6 +22,9 @@ using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
 
+    CPU1,
+    CPUThreads,
+
     Gray,
     RGB,
 

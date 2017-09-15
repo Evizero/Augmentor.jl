@@ -107,7 +107,7 @@ instead depends on the cumulative effect of the previous
 transformations. The reason for this is because affine
 transformations are usually performed around the center of the
 image, which is reflected in "native space". This is useful for
-combining transformations such as [`Rotation`](@ref) or
+combining transformations such as [`Rotate`](@ref) or
 [`ShearX`](@ref) with a crop around the center area.
 
 Usage
