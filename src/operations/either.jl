@@ -52,6 +52,11 @@ Arguments
     A compact way to specify an operation and its chance of
     occurring together.
 
+See also
+--------------
+
+[`NoOp`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -69,11 +74,6 @@ augment(img, Either(FlipX(), FlipY(), NoOp(), chances=[1,1,2]))
 augment(img, Either((FlipX(), FlipY(), NoOp()), (1,1,2)))
 augment(img, (1=>FlipX()) * (1=>FlipY()) * (2=>NoOp()))
 ```
-
-see also
---------------
-
-[`augment`](@ref)
 """
 struct Either{N,T<:Tuple} <: ImageOperation
     operations::T

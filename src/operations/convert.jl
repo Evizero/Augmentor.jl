@@ -25,6 +25,11 @@ Arguments
 
 - **`eltype`** : The eltype of the resulting array/image.
 
+See also
+--------------
+
+[`CombineChannels`](@ref), [`SplitChannels`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -43,11 +48,6 @@ julia> augment(A, ConvertEltype(Gray{Float32})) # more specific
 10×10 Array{Gray{Float32},2}:
 [...]
 ```
-
-see also
---------------
-
-[`CombineChannels`](@ref), [`SplitChannels`](@ref), [`augment`](@ref)
 """
 struct ConvertEltype{T} <: Operation
     eltype::Type{T}

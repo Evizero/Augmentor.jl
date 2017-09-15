@@ -37,6 +37,11 @@ Arguments
     assumed that height and width should be scaled by the same
     factor(s).
 
+See also
+--------------
+
+[`Zoom`](@ref), [`Resize`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -53,11 +58,6 @@ augment(img, Scale([1.2, 1.3, 1.4]))
 # scale by either 0.5x0.7 or by 0.6x0.8
 augment(img, Scale([0.5, 0.6], [0.7, 0.8]))
 ```
-
-see also
---------------
-
-[`Zoom`](@ref), [`Resize`](@ref), [`augment`](@ref)
 """
 struct Scale{N,T<:AbstractVector} <: AffineOperation
     factors::NTuple{N,T}

@@ -1,3 +1,28 @@
+# v0.3.0
+
+New functionality:
+
+- `augmentbatch!`: Now accepts an `ObsDimension` as an optional
+  last parameter.
+
+Other changes:
+
+- Add basic `PkgBenchmark` integration.
+
+- Switch testing backend for reference tests to
+  [ReferenceTests.jl](https://github.com/Evizero/ReferenceTests.jl).
+
+Online documentation:
+
+- Switch documentation engine to
+  [Documenter.jl](https://github.com/JuliaDocs/Documenter.jl)
+
+- Add detailed documentation for provided operations.
+
+- Add basic usage examples/tutorials
+
+- Slight improvements to the README
+
 # v0.2.0
 
 New functionality:

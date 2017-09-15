@@ -28,6 +28,11 @@ Arguments
     the cropping range for each array dimension. This is very
     similar to how the indices for `view` are specified.
 
+See also
+--------------
+
+[`CropNative`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -42,11 +47,6 @@ julia> augment(img, Crop(1:30, 361:400)) # crop upper right corner
 30×40 Array{RGBA{N0f8},2}:
 [...]
 ```
-
-see also
---------------
-
-[`CropNative`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
 struct Crop{N,I<:Tuple} <: ImageOperation
     indexes::I
@@ -107,7 +107,7 @@ instead depends on the cumulative effect of the previous
 transformations. The reason for this is because affine
 transformations are usually performed around the center of the
 image, which is reflected in "native space". This is useful for
-combining transformations such as [`Rotation`](@ref) or
+combining transformations such as [`Rotate`](@ref) or
 [`ShearX`](@ref) with a crop around the center area.
 
 Usage
@@ -124,6 +124,11 @@ Arguments
     the cropping range for each array dimension. This is very
     similar to how the indices for `view` are specified.
 
+See also
+--------------
+
+[`Crop`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -137,11 +142,6 @@ augment(img, Rotate(45) |> Crop(1:300, 1:400))
 # cropped around center of rotated image
 augment(img, Rotate(45) |> CropNative(1:300, 1:400))
 ```
-
-see also
---------------
-
-[`Crop`](@ref), [`CropSize`](@ref), [`CropRatio`](@ref), [`augment`](@ref)
 """
 struct CropNative{N,I<:Tuple} <: ImageOperation
     indexes::I
@@ -213,6 +213,11 @@ Arguments
 - **`size`** : `NTuple` or `Vararg` of `Int` that denote the
     output size in pixel for each dimension.
 
+See also
+--------------
+
+[`CropRatio`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -223,11 +228,6 @@ img = testpattern()
 # cropped around center of rotated image
 augment(img, Rotate(45) |> CropSize(300, 400))
 ```
-
-see also
---------------
-
-[`CropRatio`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 struct CropSize{N} <: ImageOperation
     size::NTuple{N,Int}
@@ -309,9 +309,14 @@ Usage
 Arguments
 --------------
 
-- **`ratio`** : Optional. A number denoting the aspect ratio. For
-    example specifying `ratio=16/9` would denote a 16:9 aspect
-    ratio. Defaults to `1`, which describes a square crop.
+- **`ratio::Number`** : Optional. A number denoting the aspect
+    ratio. For example specifying `ratio=16/9` would denote a 16:9
+    aspect ratio. Defaults to `1`, which describes a square crop.
+
+See also
+--------------
+
+[`RCropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 
 Examples
 --------------
@@ -323,11 +328,6 @@ img = testpattern()
 # crop biggest square around the image center
 augment(img, CropRatio(1))
 ```
-
-see also
---------------
-
-[`RCropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 struct CropRatio <: ImageOperation
     ratio::Float64
@@ -431,9 +431,14 @@ Usage
 Arguments
 --------------
 
-- **`ratio`** : Optional. A number denoting the aspect ratio. For
-    example specifying `ratio=16/9` would denote a 16:9 aspect
-    ratio. Defaults to `1`, which describes a square crop.
+- **`ratio::Number`** : Optional. A number denoting the aspect
+    ratio. For example specifying `ratio=16/9` would denote a 16:9
+    aspect ratio. Defaults to `1`, which describes a square crop.
+
+See also
+--------------
+
+[`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 
 Examples
 --------------
@@ -445,11 +450,6 @@ img = testpattern()
 # crop a randomly placed square of maxmimum size
 augment(img, RCropRatio(1))
 ```
-
-see also
---------------
-
-[`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 """
 struct RCropRatio <: ImageOperation
     ratio::Float64

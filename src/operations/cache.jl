@@ -28,6 +28,11 @@ Arguments
 - **`buffer`** : Optional. A preallocated `AbstractArray` of the
     appropriate size and eltype.
 
+See also
+--------------
+
+[`augment`](@ref)
+
 Examples
 --------------
 
@@ -45,11 +50,6 @@ pl = ElasticDistortion(3,3) |> CacheImage(zeros(20,20)) |> Rotate(-10:10)
 # convenience syntax with the same effect as above.
 pl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)
 ```
-
-see also
---------------
-
-[`augment`](@ref)
 """
 struct CacheImage <: ImageOperation end
 

@@ -16,7 +16,7 @@ over the given image when applied, which in turn will morph the
 original image into a new image using a linear interpolation of
 both the image and the vector field.
 
-In contrast to [`RandomDistortion`](@ref), the resulting vector
+In contrast to [`RandomDistortion`], the resulting vector
 field is also smoothed using a Gaussian filter with of parameter
 `sigma`. This will result in a less chaotic vector field and thus
 resemble a more natural distortion.
@@ -75,6 +75,11 @@ Arguments
     or less independent of the grid size. Defaults to
     `$ED_DEFAULT_NORM`.
 
+See also
+--------------
+
+[`augment`](@ref)
+
 Examples
 --------------
 
@@ -88,11 +93,6 @@ augment(img, ElasticDistortion(15, 15; scale = 0.1))
 # distort everything more smoothly.
 augment(img, ElasticDistortion(10, 10; sigma = 4, iter=3, border=true))
 ```
-
-see also
---------------
-
-[`RandomDistortion`](@ref), [`augment`](@ref)
 """ ->
 struct ElasticDistortion <: ImageOperation
     gridheight::Int

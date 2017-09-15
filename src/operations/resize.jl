@@ -26,6 +26,11 @@ Arguments
 - **`size`** : `NTuple` or `Vararg` of `Int` that denote the
     output size in pixel for each dimension.
 
+See also
+--------------
+
+[`CropSize`](@ref), [`augment`](@ref)
+
 Examples
 --------------
 
@@ -35,11 +40,6 @@ img = testpattern()
 
 augment(img, Resize(30, 40))
 ```
-
-see also
---------------
-
-[`CropSize`](@ref), [`augment`](@ref)
 """
 struct Resize{N} <: ImageOperation
     size::NTuple{N,Int}

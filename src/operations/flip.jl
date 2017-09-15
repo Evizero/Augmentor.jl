@@ -26,13 +26,18 @@ Usage
 Arguments
 --------------
 
-- **`p`** : Optional. Probability of applying the operation. Must
-    be in the interval [0,1].
+- **`p::Number`** : Optional. Probability of applying the
+    operation. Must be in the interval [0,1].
+
+See also
+--------------
+
+[`FlipY`](@ref), [`Either`](@ref), [`augment`](@ref)
 
 Examples
 --------------
 
-```julia
+```jldoctest
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
@@ -45,11 +50,6 @@ julia> img_new = augment(img, FlipX())
  150  200
    1   50
 ```
-
-see also
---------------
-
-[`FlipY`](@ref), [`Either`](@ref), [`augment`](@ref)
 """
 struct FlipX <: AffineOperation end
 FlipX(p::Number) = Either(FlipX(), p)
@@ -108,13 +108,18 @@ Usage
 Arguments
 --------------
 
-- **`p`** : Optional. Probability of applying the operation. Must
-    be in the interval [0,1].
+- **`p::Number`** : Optional. Probability of applying the
+    operation. Must be in the interval [0,1].
+
+See also
+--------------
+
+[`FlipX`](@ref), [`Either`](@ref), [`augment`](@ref)
 
 Examples
 --------------
 
-```julia
+```jldoctest
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
@@ -127,11 +132,6 @@ julia> img_new = augment(img, FlipY())
   50    1
  200  150
 ```
-
-see also
---------------
-
-[`FlipX`](@ref), [`Either`](@ref), [`augment`](@ref)
 """
 struct FlipY <: AffineOperation end
 FlipY(p::Number) = Either(FlipY(), p)
