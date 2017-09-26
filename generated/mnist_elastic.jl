@@ -1,8 +1,8 @@
 #' # [MNIST: Elastic Distortions](@id elastic)
 
 #' In this example we are going to use `Augmentor.jl` on the
-#' famous **MNIST database of handwritten digits** [^MNIST1998]
-#' to reproduce the elastic distortions discussed in [^SIMARD2003].
+#' famous **MNIST database of handwritten digits** [MNIST1998]
+#' to reproduce the elastic distortions discussed in [SIMARD2003].
 #'
 #' Note that the way Augmentor implements deformations is a
 #' little different than how it is described by the authors in
@@ -99,7 +99,7 @@ end
 
 #' ## References
 #'
-#' [^MNIST1998]: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. ["The MNIST database of handwritten digits"](http://yann.lecun.com/exdb/mnist/) Website. 1998.
+#' **MNIST1998**: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. ["The MNIST database of handwritten digits"](http://yann.lecun.com/exdb/mnist/) Website. 1998.
 #'
-#' [^SIMARD2003]: Simard, Patrice Y., David Steinkraus, and John C. Platt. ["Best practices for convolutional neural networks applied to visual document analysis."](https://www.microsoft.com/en-us/research/publication/best-practices-for-convolutional-neural-networks-applied-to-visual-document-analysis/) ICDAR. Vol. 3. 2003.
+#' **SIMARD2003**: Simard, Patrice Y., David Steinkraus, and John C. Platt. ["Best practices for convolutional neural networks applied to visual document analysis."](https://www.microsoft.com/en-us/research/publication/best-practices-for-convolutional-neural-networks-applied-to-visual-document-analysis/) ICDAR. Vol. 3. 2003.
 

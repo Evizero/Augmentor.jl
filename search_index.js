@@ -949,7 +949,7 @@ var documenterSearchIndex = {"docs": [
     "page": "MNIST: Elastic Distortions",
     "title": "MNIST: Elastic Distortions",
     "category": "section",
-    "text": "In this example we are going to use Augmentor.jl on the famous MNIST database of handwritten digits [MNIST1998] to reproduce the elastic distortions discussed in [SIMARD2003].Note that the way Augmentor implements deformations is a little different than how it is described by the authors in the paper. This is for a couple of reasons, most notably that we want the parameters for our deformations to be intepended of the size of image it is applied on. As a consequence the parameter numbers specified in the paper are not 1-to-1 transferable to Augmentor.Download as Juypter notebook"
+    "text": "In this example we are going to use Augmentor.jl on the famous MNIST database of handwritten digits [MNIST1998] to reproduce the elastic distortions discussed in [SIMARD2003].Note that the way Augmentor implements deformations is a little different than how it is described by the authors in the paper. This is for a couple of reasons, most notably that we want the parameters for our deformations to be intepended of the size of image it is applied on. As a consequence the parameter numbers specified in the paper are not 1-to-1 transferable to Augmentor.View as Juypter notebook"
 },
 
 {
