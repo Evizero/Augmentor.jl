@@ -73,7 +73,7 @@ possible output images.
 
 | **Input** |    | **[`ElasticDistortion`](@ref ElasticDistortion)** |
 |:---------:|:--:|:-------------------------------------------------:|
-| ![](assets/tiny_pattern.png) | → | [![](assets/tiny_ED1.png)](@ref ElasticDistortion) [![](assets/tiny_ED2.png)](@ref ElasticDistortion) |
+| ![](assets/tiny_pattern.png) | → | [![](assets/tiny_ED1.png)](@ref ElasticDistortion) |
 
 ## Resizing and Subsetting
 

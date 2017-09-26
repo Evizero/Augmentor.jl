@@ -10,7 +10,8 @@ for fname in readdir(input_dir)
     name = splitext(fname)[1]
     inpath = joinpath(input_dir, fname)
     doc_inpath = joinpath(output_dir, name * ".jl")
-    str_md = replace(readstring(inpath), r"\n(#jp ).*\n", "\n")
+    # md version
+    str_md = replace(readstring(inpath), r"\n(#jp ).*", "")
     str_md = replace(str_md, "\n#md ", "\n")
     write(doc_inpath, str_md)
     outpath_jmd = joinpath(output_dir, name * ".jmd")
@@ -21,6 +22,14 @@ for fname in readdir(input_dir)
     rm(outpath_jmd)
     write(outpath_md, str_md)
     push!(new_md_files, joinpath("generated", name * ".md"))
+    # jp version
+    str_jp = replace(readstring(inpath), r"\n(#md ).*", "")
+    str_jp = replace(str_jp, r"\[\^(.*)\]:", s"**\1**:") # references
+    str_jp = replace(str_jp, r"\[\^(.*)\]", s"[\1]") # citations
+    str_jp = replace(str_jp, "\n#jp ", "\n")
+    write(doc_inpath, str_jp)
+    outpath_jp = joinpath(output_dir, name * ".ipynb")
+    convert_doc(doc_inpath, outpath_jp)
 end
 
 op_fnames = [

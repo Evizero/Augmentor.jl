@@ -30,10 +30,11 @@ more detail.
 
 Depending on the complexity of your problem, you may want to
 iterate between `2.` and `3.` to identify an appropriate
-pipeline. See **TODO: TUTORIAL LINK** for an example of how such
-an iterative process could look like.
+pipeline.
+Take a look at the [Elastic Distortions Tutorial](@ref elastic)
+for an example of how such an iterative process could look like.
 
-## Defining a Pipeline
+## [Defining a Pipeline](@id pipeline)
 
 In Augmentor, a (stochastic) image-processing pipeline can be
 understood as a sequence of operations, for which the parameters

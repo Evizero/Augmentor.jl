@@ -1,4 +1,4 @@
-#' # MNIST: Elastic Distortions
+#' # [MNIST: Elastic Distortions](@id elastic)
 
 #' In this example we are going to use `Augmentor.jl` on the
 #' famous **MNIST database of handwritten digits** [^MNIST1998]
@@ -11,6 +11,10 @@
 #' of the size of image it is applied on. As a consequence the
 #' parameter numbers specified in the paper are not 1-to-1
 #' transferable to Augmentor.
+
+#md #'
+#md #' [View as Juypter notebook](https://nbviewer.jupyter.org/github/Evizero/Augmentor.jl/blob/gh-pages/generated/mnist_elastic.ipynb)
+#md #'
 
 #' ## Loading the MNIST Trainingset
 #'
@@ -32,7 +36,7 @@
 
 using Images, MLDatasets
 train_tensor = MNIST.traintensor()
-@show summary(train_tensor)
+@show summary(train_tensor);
 #md nothing # hide
 
 #' This horizontal-major format is the standard way of utilizing
@@ -43,22 +47,32 @@ train_tensor = MNIST.traintensor()
 #'
 #' We can convert the "tensor" to a `Colorant` array using the
 #' provided function `MNIST.convert2image`.
+#' This way, Julia knows we are dealing with image data and can
+#' tell programming environments such as Juypter how to visualize
+#' it. If you are working in the terminal you may want to also
+#' use the package [ImageInTerminal.jl](https://github.com/JuliaImages/ImageInTerminal.jl)
 
 train_images = MNIST.convert2image(train_tensor)
-train_images[:,:,1] # show first image
-#md img_1 = ans # hide
+img_1 = train_images[:,:,1] # show first image
 #md save("mnist_1.png",repeat(img_1,inner=(4,4))) # hide
 #md nothing # hide
 
 #md #' ![first image](mnist_1.png)
 
-#' ## Visualizing Distortion Effects
+#' ## Visualizing the Augmentation Pipeline
 
 #' Before we apply a smoothed displacement field to our dataset
 #' and train a network, we should invest some time to come up
 #' with a decent set of hyper parameters for the operation.
 #' A useful tool for tasks like this is the package
 #' [Interact.jl](https://github.com/JuliaGizmos/Interact.jl).
+#'
+#' Note that while the code below only focuses on configuring
+#' the parameters of a single operation, it could also be
+#' adapted to tweak a whole pipelined.
+#' Take a look at the corresponding section in
+#' [High-level Interface](@ref pipeline) for more information
+#' on how to define and use a pipeline.
 
 # These two package will provide us with the capabilities
 # to perform interactive visualisations in a jupyter notebook
@@ -96,7 +110,7 @@ end
 #md #'     you are likely to achieve overly optimistic (i.e. biased)
 #md #'     results during training.
 #md #'
-#md #' ![notebook](https://cloud.githubusercontent.com/assets/10854026/17641720/5de6cd8c-612c-11e6-933f-b91d58cf2fde.gif)
+#md #' ![interact](https://user-images.githubusercontent.com/10854026/30867456-4afe0800-a2dc-11e7-90eb-800b6ea025d0.gif)
 
 #' Congratulations! With just a few simple lines of code, you
 #' created a simple interactive tool to visualize your image
