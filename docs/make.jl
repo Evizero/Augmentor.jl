@@ -1,37 +1,13 @@
-using Documenter, Augmentor, MLDatasets
+using Documenter, Augmentor
 
-using Weave
-input_dir = joinpath(@__DIR__, "..", "examples")
-output_dir = joinpath(@__DIR__, "src", "generated")
-mkpath(output_dir)
-new_md_files = []
-for fname in readdir(input_dir)
-    splitext(fname)[2] == ".jl" || continue;
-    name = splitext(fname)[1]
-    inpath = joinpath(input_dir, fname)
-    doc_inpath = joinpath(output_dir, name * ".jl")
-    # md version
-    str_md = replace(readstring(inpath), r"\n(#jp ).*", "")
-    str_md = replace(str_md, "\n#md ", "\n")
-    write(doc_inpath, str_md)
-    outpath_jmd = joinpath(output_dir, name * ".jmd")
-    outpath_md = joinpath(output_dir, name * ".md")
-    convert_doc(doc_inpath, outpath_jmd)
-    str_md = replace(readstring(outpath_jmd), "```julia", "```@example $name")
-    rm(doc_inpath)
-    rm(outpath_jmd)
-    write(outpath_md, str_md)
-    push!(new_md_files, joinpath("generated", name * ".md"))
-    # jp version
-    str_jp = replace(readstring(inpath), r"\n(#md ).*", "")
-    str_jp = replace(str_jp, r"\[\^(.*)\]:", s"**\1**:") # references
-    str_jp = replace(str_jp, r"\[\^(.*)\]", s"[\1]") # citations
-    str_jp = replace(str_jp, "\n#jp ", "\n")
-    write(doc_inpath, str_jp)
-    outpath_jp = joinpath(output_dir, name * ".ipynb")
-    convert_doc(doc_inpath, outpath_jp)
-end
+# Autogenerate documentation markdown and jupyter notebooks
+# for all the scripts in the "examples/" subfolder.
+include("exampleweaver.jl")
+ExampleWeaver.weave(overwrite=false, execute=true)
 
+# Define the documentation order of the operations. The whole
+# purpose of this vector is literally just to dictate in what
+# chronological order the operations are documented.
 op_fnames = [
     "flipx",
     "flipy",
@@ -59,10 +35,12 @@ op_fnames = [
     "cacheimage",
     "either",
 ]
-
 dict_order = Dict(fname * ".md" => i for (i, fname) in enumerate(op_fnames))
 myless(a, b) = dict_order[a] < dict_order[b]
 
+# --------------------------------------------------------------------
+
+srand(1337)
 makedocs(
     modules = [Augmentor],
     clean = false,
@@ -85,7 +63,7 @@ makedocs(
             "interface.md",
             hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations")), lt = myless) if splitext(fname)[2] == ".md"]),
         ],
-        "Tutorials" => Any[new_md_files...],
+        "Tutorials" => joinpath.("generated", ExampleWeaver.listmarkdown()),
         hide("Indices" => "indices.md"),
         "LICENSE.md",
     ],
@@ -99,3 +77,31 @@ deploydocs(
     deps = nothing,
     make = nothing,
 )
+
+# --------------------------------------------------------------------
+# Post-process the generated HTML files of the examples/tutorials
+# 1. Redirect "Edit on Github" link to the "examples/*.jl" file
+# 2. Add a link in the top right corner to the Juypter notebook
+
+build_dir = abspath(joinpath(@__DIR__, "build"))
+for markdownname in ExampleWeaver.listmarkdown()
+    name = splitext(markdownname)[1]
+    htmlpath = joinpath(build_dir, "generated", name, "index.html")
+    str_html = readstring(htmlpath)
+    # replace github url to .jl file
+    str_html = replace(
+        str_html,
+        r"docs/src/generated/([^.]*)\.md",
+        s"examples/\1.jl"
+    )
+    # insert link to jupyter notebook
+    str_html = replace(
+        str_html,
+        r"(<a class=\"edit-page\".*GitHub<\/a>)",
+        s"\1<a class=\"edit-page\" href=\"___HREFPLACEHOLDER___\"><span class=\"fa fa-external-link\"> </span> Juypter Notebook</a>"
+    )
+    href = "https://nbviewer.jupyter.org/github/Evizero/Augmentor.jl/blob/gh-pages/generated/$(name * ".ipynb")"
+    str_html = replace(str_html, "___HREFPLACEHOLDER___", href)
+    # overwrite html file
+    write(htmlpath, str_html)
+end

@@ -1,23 +1,19 @@
 #' # [MNIST: Elastic Distortions](@id elastic)
 
-#' In this example we are going to use `Augmentor.jl` on the
-#' famous **MNIST database of handwritten digits** [^MNIST1998]
-#' to reproduce the elastic distortions discussed in [^SIMARD2003].
-#'
+#' In this example we are going to use Augmentor on the famous
+#' **MNIST database of handwritten digits** [^MNIST1998] to
+#' reproduce the elastic distortions discussed in [^SIMARD2003].
+
 #' Note that the way Augmentor implements deformations is a
 #' little different than how it is described by the authors in
 #' the paper. This is for a couple of reasons, most notably that
-#' we want the parameters for our deformations to be intepended
+#' we want the parameters for our deformations to be independent
 #' of the size of image it is applied on. As a consequence the
 #' parameter numbers specified in the paper are not 1-to-1
 #' transferable to Augmentor.
 
-#md #'
-#md #' [View as Juypter notebook](https://nbviewer.jupyter.org/github/Evizero/Augmentor.jl/blob/gh-pages/generated/mnist_elastic.ipynb)
-#md #'
-
 #' ## Loading the MNIST Trainingset
-#'
+
 #' In order to access and visualize the MNIST images we employ
 #' the help of two additional Julia packages.
 #'
@@ -44,7 +40,7 @@ train_tensor = MNIST.traintensor()
 #' In this tutorial, however, we are more interested in working
 #' with the MNIST images as actual Julia images in vertical-major
 #' layout, and as black digits on white background.
-#'
+
 #' We can convert the "tensor" to a `Colorant` array using the
 #' provided function `MNIST.convert2image`.
 #' This way, Julia knows we are dealing with image data and can
@@ -59,18 +55,18 @@ img_1 = train_images[:,:,1] # show first image
 
 #md #' ![first image](mnist_1.png)
 
-#' ## Visualizing the Augmentation Pipeline
+#' ## Visualizing the Effects
 
-#' Before we apply a smoothed displacement field to our dataset
-#' and train a network, we should invest some time to come up
-#' with a decent set of hyper parameters for the operation.
-#' A useful tool for tasks like this is the package
+#' Before we apply an operation or pipeline of operations to our
+#' dataset and train a network, we should invest some time to
+#' come up with a decent set of hyper parameters for the
+#' operation. A useful tool for tasks like this is the package
 #' [Interact.jl](https://github.com/JuliaGizmos/Interact.jl).
-#'
+
 #' Note that while the code below only focuses on configuring
-#' the parameters of a single operation, it could also be
-#' adapted to tweak a whole pipelined.
-#' Take a look at the corresponding section in
+#' the parameters of a single operation, specifically
+#' [`ElasticDistortion`](@ref), it could also be adapted to tweak
+#' a whole pipeline. Take a look at the corresponding section in
 #' [High-level Interface](@ref pipeline) for more information
 #' on how to define and use a pipeline.
 
@@ -123,4 +119,3 @@ end
 #' [^MNIST1998]: LeCun, Yan, Corinna Cortes, Christopher J.C. Burges. ["The MNIST database of handwritten digits"](http://yann.lecun.com/exdb/mnist/) Website. 1998.
 #'
 #' [^SIMARD2003]: Simard, Patrice Y., David Steinkraus, and John C. Platt. ["Best practices for convolutional neural networks applied to visual document analysis."](https://www.microsoft.com/en-us/research/publication/best-practices-for-convolutional-neural-networks-applied-to-visual-document-analysis/) ICDAR. Vol. 3. 2003.
-

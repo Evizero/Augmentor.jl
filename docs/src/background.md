@@ -32,7 +32,7 @@ convolutional neural networks. An orthogonal approach to bias the
 model to learn about this equivariance - and the focus of this
 package - is by using label-preserving transformations.
 
-## Label-preserving Transformations
+## [Label-preserving Transformations](@id labelpreserving)
 
 Before attempting to train a model using some augmentation
 pipeline, it's a good idea to invest some time in deciding on an

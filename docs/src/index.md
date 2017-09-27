@@ -33,7 +33,6 @@ database](http://yann.lecun.com/exdb/mnist/).
 # causes the images to be upscaled too much.
 using Augmentor, MLDatasets, Images, Colors
 using PaddedViews, OffsetArrays
-srand(1337)
 
 pl = ElasticDistortion(6, scale=0.3, border=true) |>
      Rotate([10, -5, -3, 0, 3, 5, 10]) |>
@@ -43,6 +42,7 @@ pl = ElasticDistortion(6, scale=0.3, border=true) |>
 
 md_imgs = String[]
 for i in 1:24
+    srand(i) # somehow srand in the beginning isn't enough
     input = MNIST.convert2image(MNIST.traintensor(i))
     imgs = [augment(input, pl) for j in 1:20]
     insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth
@@ -102,7 +102,7 @@ free to browse the following documents for a crash course on how
 image data is represented in the Julia language, as well as how
 to visualize it. For more information on image processing in
 Julia, take a look at the documentation for the vast
-[`JuliaImages`](http://juliaimages.github.io/latest/) ecosystem.
+[`JuliaImages`](https://juliaimages.github.io/latest/) ecosystem.
 
 ```@contents
 Pages = ["images.md"]
@@ -143,9 +143,22 @@ Just like an image can say more than a thousand words, a simple
 hands-on tutorial can say more than many pages of formal
 documentation.
 
+The first step of devising a useful augmentation strategy is to
+identify an appropriate set of operations and parameters. What
+that means can vary widely, because it depends on the data set
+(see [label-preserving transformations](@ref labelpreserving) for
+an example). To that end, we will spend the first tutorial
+discussing one possible approach to explore and visualize the
+space of possible parameters.
+
 ```@contents
-Pages = [joinpath("generated", fname) for fname in readdir("generated") if splitext(fname)[2] == ".md"]
+Pages = [joinpath("generated", "mnist_elastic.md")]
 Depth = 2
+```
+
+```@eval
+# Pages = [joinpath("generated", fname) for fname in readdir("generated") if splitext(fname)[2] == ".md"]
+# Depth = 2
 ```
 
 ## Indices
