@@ -20,3 +20,6 @@ article table {
 article p {
     text-align: justify;
 }
+article > header .edit-page {
+    margin-left: 1em;
+}
