@@ -117,20 +117,24 @@ library is implemented allows it to also be used for efficient
 image processing outside the machine learning domain.
 
 The following section describes the high-level user interface in
-more detail. In particular it focuses on how a (stochastic)
+detail. In particular it focuses on how a (stochastic)
 image-processing pipeline can be defined and then be applied to
-an image (or a set of images).
+an image (or a set of images). It also discusses how batch
+processing of multiple images can be performed in parallel using
+multi-threading.
 
 ```@contents
 Pages = ["interface.md"]
 Depth = 2
 ```
 
-Augmentor ships with a number of predefined operations that
-should be sufficient to describe some of the most commonly used
-augmentation strategies. Each operation is a represented as its
-own unique type. The following section provides a complete list
-of all the exported operations and their documentation.
+We mentioned before that an augmentation pipeline is just a
+sequence of image operations. Augmentor ships with a number of
+predefined operations, which should be sufficient to describe the
+most commonly utilized augmentation strategies. Each operation is
+represented as its own unique type. The following section
+provides a complete list of all the exported operations and their
+documentation.
 
 ```@contents
 Pages = ["operations.md"]
@@ -140,16 +144,17 @@ Depth = 2
 ## Tutorials
 
 Just like an image can say more than a thousand words, a simple
-hands-on tutorial can say more than many pages of formal
-documentation.
+hands-on tutorial showing actual code can say more than many
+pages of formal documentation.
 
-The first step of devising a useful augmentation strategy is to
-identify an appropriate set of operations and parameters. What
-that means can vary widely, because it depends on the data set
-(see [label-preserving transformations](@ref labelpreserving) for
-an example). To that end, we will spend the first tutorial
-discussing one possible approach to explore and visualize the
-space of possible parameters.
+The first step of devising a successful augmentation strategy is
+to identify an appropriate set of operations and parameters. What
+that means can vary widely, because the utility of each operation
+depends on the dataset at hand (see [label-preserving
+transformations](@ref labelpreserving) for an example). To that
+end, we will spend the first tutorial discussing a simple but
+useful approach to interactively explore and visualize the space
+of possible parameters.
 
 ```@contents
 Pages = [joinpath("generated", "mnist_elastic.md")]

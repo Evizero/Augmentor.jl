@@ -64,7 +64,7 @@ function weave_markdown(scriptname; overwrite=false)
         info("skipping markdown generation for \"$scriptname\" (file already exists)")
         return mdpath
     else
-        info("generating markdown for \"$scriptname\"")
+        info("generating markdown \"$(name*".md")\" for \"$scriptname\"")
         mkpath(GENERATED_DIR)
     end
     # load and preprocess script for markdown generation
@@ -98,7 +98,7 @@ function weave_notebook(scriptname; overwrite=false, execute=true)
         info("skipping notebook generation for \"$scriptname\" (file already exists)")
         return jppath
     else
-        info("generating notebook for \"$scriptname\"")
+        info("generating notebook \"$(name*".ipynb")\" for \"$scriptname\"")
         mkpath(GENERATED_DIR)
     end
     # load and preprocess script for notebook generation

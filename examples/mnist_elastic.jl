@@ -3,22 +3,41 @@
 #' In this example we are going to use Augmentor on the famous
 #' **MNIST database of handwritten digits** [^MNIST1998] to
 #' reproduce the elastic distortions discussed in [^SIMARD2003].
-
-#' Note that the way Augmentor implements deformations is a
-#' little different than how it is described by the authors in
-#' the paper. This is for a couple of reasons, most notably that
-#' we want the parameters for our deformations to be independent
-#' of the size of image it is applied on. As a consequence the
-#' parameter numbers specified in the paper are not 1-to-1
+#' It may be interesting to point out, that the way Augmentor
+#' implements distortions is a little different to how it is
+#' described by the authors of the paper.
+#' This is for a couple of reasons, most notably that we want the
+#' parameters for our deformations to be independent of the size
+#' of image it is applied on. As a consequence the
+#' parameter-numbers specified in the paper are not 1-to-1
 #' transferable to Augmentor.
+
+#' If the effects are sensible for the dataset, then applying
+#' elastic distortions can be a really effective way to improve
+#' the generalization ability of the network.
+#' That said, our implementation of [`ElasticDistortion`](@ref)
+#' has a lot of possible parameters to choose from. To that end,
+#' we will introduce a simple strategy for interactively
+#' exploring the parameter space on our dataset of interest.
+
+#md #' !!! note
+#md #'
+#md #'     This tutorial was designed to be performed in a
+#md #'     [Juypter](https://jupyter.org/) notebook. You can
+#md #'     find a link to the Juypter version of this tutorial
+#md #'     in the top right corner of this page.
 
 #' ## Loading the MNIST Trainingset
 
 #' In order to access and visualize the MNIST images we employ
-#' the help of two additional Julia packages.
+#' the help of two additional Julia packages. In the interest of
+#' time and space we will not go into great detail about their
+#' functionality. Feel free to click on their respective names to
+#' find out more information about the utility they can provide.
 #'
 #' - [Images.jl](https://github.com/JuliaImages/Images.jl) will
-#'   provide us with the tool for working with image data in Julia.
+#'   provide us with the necessary tools for working with image
+#'   data in Julia.
 #'
 #' - [MLDatasets.jl](https://github.com/JuliaML/MLDatasets.jl)
 #'   has an MNIST submodule that offers a convenience interface
@@ -45,8 +64,8 @@ train_tensor = MNIST.traintensor()
 #' provided function `MNIST.convert2image`.
 #' This way, Julia knows we are dealing with image data and can
 #' tell programming environments such as Juypter how to visualize
-#' it. If you are working in the terminal you may want to also
-#' use the package [ImageInTerminal.jl](https://github.com/JuliaImages/ImageInTerminal.jl)
+#' it. If you are working in the terminal you may want to use the
+#' package [ImageInTerminal.jl](https://github.com/JuliaImages/ImageInTerminal.jl)
 
 train_images = MNIST.convert2image(train_tensor)
 img_1 = train_images[:,:,1] # show first image
@@ -57,11 +76,13 @@ img_1 = train_images[:,:,1] # show first image
 
 #' ## Visualizing the Effects
 
-#' Before we apply an operation or pipeline of operations to our
-#' dataset and train a network, we should invest some time to
-#' come up with a decent set of hyper parameters for the
-#' operation. A useful tool for tasks like this is the package
-#' [Interact.jl](https://github.com/JuliaGizmos/Interact.jl).
+#' Before applying an operation (or pipeline of operations) on
+#' some dataset to train a network, we strongly recommend
+#' investing some time in selecting a decent set of hyper
+#' parameters for the operation(s). A useful tool for tasks like
+#' this is the package [Interact.jl](https://github.com/JuliaGizmos/Interact.jl).
+#' We will use this package to define a number of widgets for
+#' controlling the parameters to our operation.
 
 #' Note that while the code below only focuses on configuring
 #' the parameters of a single operation, specifically
@@ -97,7 +118,7 @@ end
 #md #' Executing the code above in a Juypter notebook will result
 #md #' in the following interactive visualisation. You can now
 #md #' use the sliders to investigate the effects that different
-#md #' parameters have on the MNIST training set.
+#md #' parameters have on the MNIST training images.
 #md #'
 #md #' !!! tip
 #md #'
