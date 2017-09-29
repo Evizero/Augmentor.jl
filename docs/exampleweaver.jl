@@ -67,10 +67,11 @@ function weave_markdown(scriptname; overwrite=false)
         info("generating markdown \"$(name*".md")\" for \"$scriptname\"")
         mkpath(GENERATED_DIR)
     end
-    # load and preprocess script for markdown generation
-    # this removes `# jp` lines and the `# md` prefix
+    # load and pre-process script for markdown generation this
+    # removes `# jp` and `#jp-only` lines and the `# md` prefix
     str_jl = readstring(scriptpath)
     str_jl = replace(str_jl, r"\n(#jp ).*", "")
+    str_jl = replace(str_jl, r"\n.*(#jl-only)", "")
     str_jl = replace(str_jl, "\n#md ", "\n")
     write(processed_scriptpath, str_jl)
     # weave the .jl file into a .jmd file
@@ -101,10 +102,11 @@ function weave_notebook(scriptname; overwrite=false, execute=true)
         info("generating notebook \"$(name*".ipynb")\" for \"$scriptname\"")
         mkpath(GENERATED_DIR)
     end
-    # load and preprocess script for notebook generation
-    # this removes `# md` lines and the `# jp` prefix
+    # load and pre-process script for notebook generation this
+    # removes `# md` and `#jp-only` lines and the `# jp` prefix
     str_jl = readstring(scriptpath)
     str_jl = replace(str_jl, r"\n(#md ).*", "")
+    str_jl = replace(str_jl, r"\n.*(#jl-only)", "")
     str_jl = replace(str_jl, "\n#jp ", "\n")
     # additionally we slightly tweak the look of the references
     str_jl = replace(str_jl, r"\[\^(.*)\]:", s"**\1**:") # references
@@ -115,7 +117,7 @@ function weave_notebook(scriptname; overwrite=false, execute=true)
     # execute notebook
     if execute
         info("executing and overwrite notebook \"$(name*".ipynb")\"")
-        run(`jupyter nbconvert --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
+        run(`jupyter nbconvert --ExecutePreprocessor.timeout=-1 --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
     end
     # cleanup temporary files
     rm(processed_scriptpath)

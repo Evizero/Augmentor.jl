@@ -161,6 +161,21 @@ Pages = [joinpath("generated", "mnist_elastic.md")]
 Depth = 2
 ```
 
+In the next tutorial we will take a close look at how we can
+actually use Augmentor in combination with popular deep learning
+frameworks. One of the most famous of such frameworks is arguable
+[TensorFlow](https://www.tensorflow.org/), which will be the
+topic of the next tutorial. In particular we will focus on
+adapting an already existing example to make use of a (quite
+complicated) augmentation pipeline. Furthermore, this tutorial
+will also serve to showcase the various ways that augmentation
+can influence the performance of your network.
+
+```@contents
+Pages = [joinpath("generated", "mnist_tensorflow.md")]
+Depth = 2
+```
+
 ```@eval
 # Pages = [joinpath("generated", fname) for fname in readdir("generated") if splitext(fname)[2] == ".md"]
 # Depth = 2
