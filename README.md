@@ -318,6 +318,16 @@ Pkg.checkout("Augmentor")
 
 This code is free to use under the terms of the MIT license.
 
+## Citing Augmentor
+
+If you use Augmentor for academic research and wish to cite it,
+please use the following paper.
+
+Marcus D. Bloice, Christof Stocker, and Andreas Holzinger,
+*Augmentor: An Image Augmentation Library for Machine Learning*,
+arXiv preprint **arXiv:1708.04680**,
+<https://arxiv.org/abs/1708.04680>, 2017.
+
 ## Acknowledgments
 
 This package makes heavy use of the following packages in order

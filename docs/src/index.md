@@ -181,6 +181,16 @@ Depth = 2
 # Depth = 2
 ```
 
+## Citing Augmentor
+
+If you use Augmentor for academic research and wish to cite it,
+please use the following paper.
+
+Marcus D. Bloice, Christof Stocker, and Andreas Holzinger,
+*Augmentor: An Image Augmentation Library for Machine Learning*,
+arXiv preprint **arXiv:1708.04680**,
+<https://arxiv.org/abs/1708.04680>, 2017.
+
 ## Indices
 
 ```@contents
