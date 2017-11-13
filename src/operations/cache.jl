@@ -95,7 +95,7 @@ end
 function showconstruction(io::IO, op::CacheImageInto)
     print(io, "CacheImage(") # shows exported API
     print(io, "Array{")
-    ImageCore.showcoloranttype(io, eltype(op.buffer))
+    ColorTypes.showcoloranttype(io, eltype(op.buffer))
     print(io, "}(")
     print(io, join(map(i->string(length(i)), indices(op.buffer)), ", "))
     print(io, "))")

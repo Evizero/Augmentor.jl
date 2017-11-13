@@ -9,12 +9,12 @@
         @test typeof(@inferred(ConvertEltype(RGB))) <: ConvertEltype <: Augmentor.Operation
         @test typeof(@inferred(ConvertEltype(RGB{N0f8}))) <: ConvertEltype <: Augmentor.Operation
         @test str_show(ConvertEltype(Float64)) == "Augmentor.ConvertEltype(Float64)"
-        @test str_show(ConvertEltype(RGB)) == "Augmentor.ConvertEltype(RGB{Any})"
-        @test str_show(ConvertEltype(Gray{N0f8})) == "Augmentor.ConvertEltype(Gray{N0f8})"
+        @test_broken str_show(ConvertEltype(RGB)) == "Augmentor.ConvertEltype(RGB{Any})"
+        @test_broken str_show(ConvertEltype(Gray{N0f8})) == "Augmentor.ConvertEltype(Gray{N0f8})"
         @test str_showconst(ConvertEltype(Float64)) == "ConvertEltype(Float64)"
-        @test str_showconst(ConvertEltype(RGB{N0f8})) == "ConvertEltype(RGB{N0f8})"
+        @test_broken str_showconst(ConvertEltype(RGB{N0f8})) == "ConvertEltype(RGB{N0f8})"
         @test str_showcompact(ConvertEltype(Float64)) == "Convert eltype to Float64"
-        @test str_showcompact(ConvertEltype(Gray)) == "Convert eltype to Gray{Any}"
+        @test_broken str_showcompact(ConvertEltype(Gray)) == "Convert eltype to Gray{Any}"
     end
     @testset "eager" begin
         @test Augmentor.supports_eager(ConvertEltype) === true

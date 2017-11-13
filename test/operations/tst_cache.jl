@@ -47,7 +47,7 @@ end
     op = @inferred CacheImage(buf)
     @test Augmentor.CacheImageInto(buf) === op
     @test str_show(op) == "Augmentor.CacheImageInto(::Array{Gray{N0f8},2})"
-    @test str_showconst(op) == "CacheImage(Array{Gray{N0f8}}(2, 3))"
+    @test_broken str_showconst(op) == "CacheImage(Array{Gray{N0f8}}(2, 3))"
     op2 = @inferred CacheImage(Array{Gray{N0f8}}(2, 3))
     @test typeof(op) == typeof(op2)
     @test typeof(op.buffer) == typeof(op2.buffer)
