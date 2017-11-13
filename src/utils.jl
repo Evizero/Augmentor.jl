@@ -124,6 +124,9 @@ function unionrange(i1::AbstractUnitRange, i2::AbstractUnitRange)
     map(min, first(i1), first(i2)):map(max, last(i1), last(i2))
 end
 
+@inline _showcolor(io::IO, T::Type{<:Number}) = print(io, T)
+@inline _showcolor(io::IO, T) = ColorTypes.colorant_string_with_eltype(io, T)
+
 # --------------------------------------------------------------------
 
 function _2dborder!(A::AbstractArray{T,3}, val::T) where T

@@ -65,14 +65,14 @@ end
 
 function showconstruction(io::IO, op::ConvertEltype)
     print(io, typeof(op).name.name, '(')
-    ColorTypes.showcoloranttype(io, op.eltype)
+    _showcolor(io, op.eltype)
     print(io, ')')
 end
 
 function Base.show(io::IO, op::ConvertEltype)
     if get(io, :compact, false)
         print(io, "Convert eltype to ")
-        ColorTypes.showcoloranttype(io, op.eltype)
+        _showcolor(io, op.eltype)
     else
         print(io, "Augmentor.")
         showconstruction(io, op)

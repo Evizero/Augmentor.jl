@@ -1,3 +1,10 @@
+# v0.3.1
+
+Small fixes:
+
+- Update some internals to comply with upstream changes to
+  ImageCore (v0.5.0) and ColorTypes (v0.6.6).
+
 # v0.3.0
 
 New functionality:

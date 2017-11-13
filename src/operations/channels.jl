@@ -145,14 +145,14 @@ end
 
 function showconstruction(io::IO, op::CombineChannels)
     print(io, typeof(op).name.name, '(')
-    ColorTypes.showcoloranttype(io, op.colortype)
+    _showcolor(io, op.colortype)
     print(io, ')')
 end
 
 function Base.show(io::IO, op::CombineChannels)
     if get(io, :compact, false)
         print(io, "Combine color channels into colorant ")
-        ColorTypes.showcoloranttype(io, op.colortype)
+        _showcolor(io, op.colortype)
     else
         print(io, "Augmentor.")
         showconstruction(io, op)

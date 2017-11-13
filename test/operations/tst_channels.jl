@@ -71,10 +71,10 @@ end
         @test_throws MethodError CombineChannels(Float64)
         @test typeof(@inferred(CombineChannels(RGB))) <: CombineChannels <: Augmentor.Operation
         @test typeof(@inferred(CombineChannels(RGB{N0f8}))) <: CombineChannels <: Augmentor.Operation
-        @test_broken str_show(CombineChannels(RGB)) == "Augmentor.CombineChannels(RGB{Any})"
-        @test_broken str_show(CombineChannels(Gray{N0f8})) == "Augmentor.CombineChannels(Gray{N0f8})"
-        @test_broken str_showconst(CombineChannels(RGB{N0f8})) == "CombineChannels(RGB{N0f8})"
-        @test_broken str_showcompact(CombineChannels(Gray)) == "Combine color channels into colorant Gray{Any}"
+        @test str_show(CombineChannels(RGB)) == "Augmentor.CombineChannels(RGB{Any})"
+        @test str_show(CombineChannels(Gray{N0f8})) == "Augmentor.CombineChannels(Gray{N0f8})"
+        @test str_showconst(CombineChannels(RGB{N0f8})) == "CombineChannels(RGB{N0f8})"
+        @test str_showcompact(CombineChannels(Gray)) == "Combine color channels into colorant Gray{Any}"
     end
     @testset "eager" begin
         @test Augmentor.supports_eager(CombineChannels) === false
