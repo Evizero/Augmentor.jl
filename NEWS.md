@@ -2,6 +2,8 @@
 
 Small fixes:
 
+- Update REQUIRE versions for StaticArrays and Rotations
+
 - Update some internals to comply with upstream changes to
   ImageCore (v0.5.0) and ColorTypes (v0.6.6).
 

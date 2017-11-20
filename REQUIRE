@@ -5,8 +5,8 @@ ImageTransformations 0.3.0
 ImageFiltering 0.1.4
 CoordinateTransformations 0.4.0
 Interpolations 0.6
-Rotations
-StaticArrays
+Rotations 0.6.1
+StaticArrays 0.6.5
 OffsetArrays
 IdentityRanges
 ColorTypes 0.6.6
