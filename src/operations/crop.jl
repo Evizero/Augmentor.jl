@@ -36,7 +36,7 @@ See also
 Examples
 --------------
 
-```julia
+```julia-repl
 julia> using Augmentor
 
 julia> img = testpattern()

@@ -131,12 +131,12 @@ end
 
 function _2dborder!(A::AbstractArray{T,3}, val::T) where T
     ndims, h, w = size(A)
-    @inbounds for i = 1:h, j = (1,w)
+    @inbounds for j = (1,w), i = 1:h
         for d = 1:ndims
             A[d,i,j] = val
         end
     end
-    @inbounds for i = (1,h), j = 1:w
+    @inbounds for j = 1:w, i = (1,h)
         for d = 1:ndims
             A[d,i,j] = val
         end

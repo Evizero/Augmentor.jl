@@ -261,15 +261,15 @@ Description
 --------------
 
 Rotate the image upwards for the given `degree`. This operation
-can only be described as an affine transformation and will in
+can only be performed as an affine transformation and will in
 general cause other operations of the pipeline to use their
 affine formulation as well (if they have one).
 
-In contrast to the special case rotations outlined above, the
-type `Rotate` can describe any arbitrary number of degrees. It
-will always perform the rotation around the center of the image.
-This can be particularly useful when combining the operation with
-[`CropNative`](@ref).
+In contrast to the special case rotations (e.g.
+[`Rotate90`](@ref), the type `Rotate` can describe any arbitrary
+number of degrees. It will always perform the rotation around the
+center of the image. This can be particularly useful when
+combining the operation with [`CropNative`](@ref).
 
 Usage
 --------------

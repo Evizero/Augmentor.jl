@@ -4,18 +4,17 @@
 Description
 --------------
 
-Allows for choosing between different `Augmentor.Operations` at
-random when applied. This is particularly useful if one for
-example wants to first either rotate the image 90 degree
-clockwise or anticlockwise (but never both) and then apply some
-other operation(s) afterwards.
+Chooses between the given `operations` at random when applied.
+This is particularly useful if one for example wants to first
+either rotate the image 90 degree clockwise or anticlockwise (but
+never both), and then apply some other operation(s) afterwards.
 
 When compiling a pipeline, `Either` will analyze the provided
-`operations` in order to identify the most preferred way to apply
-the individual operation when sampled, that is supported by all
-given `operations`. This way the output of applying `Either` will
-be inferable and the whole pipeline will remain type-stable, even
-though randomness is involved.
+`operations` in order to identify the preferred formalism to use
+when applied. The chosen formalism is chosen such that it is
+supported by all given `operations`. This way the output of
+applying `Either` will be inferable and the whole pipeline will
+remain type-stable (even though randomness is involved).
 
 By default each specified image operation has the same
 probability of occurrence. This default behaviour can be

@@ -7,8 +7,8 @@ Description
 --------------
 
 Reverses the x-order of each pixel row. Another way of describing
-it would be to mirror the image on the y-axis, or to mirror the
-image horizontally.
+it would be that it mirrors the image on the y-axis, or that it
+mirrors the image horizontally.
 
 If created using the parameter `p`, the operation will be lifted
 into `Either(p=>FlipX(), 1-p=>NoOp())`, where `p` denotes the
@@ -89,8 +89,8 @@ Description
 --------------
 
 Reverses the y-order of each pixel column. Another way of
-describing it would be to mirror the image on the x-axis, or to
-mirror the image vertically.
+describing it would be that it mirrors the image on the x-axis,
+or that it mirrors the image vertically.
 
 If created using the parameter `p`, the operation will be lifted
 into `Either(p=>FlipY(), 1-p=>NoOp())`, where `p` denotes the

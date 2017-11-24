@@ -5,7 +5,7 @@ Description
 --------------
 
 Shear the image horizontally for the given `degree`. This
-operation can only be described as an affine transformation and
+operation can only be performed as an affine transformation and
 will in general cause other operations of the pipeline to use
 their affine formulation as well (if they have one).
 
@@ -89,7 +89,7 @@ Description
 --------------
 
 Shear the image vertically for the given `degree`. This operation
-can only be described as an affine transformation and will in
+can only be performed as an affine transformation and will in
 general cause other operations of the pipeline to use their
 affine formulation as well (if they have one).
 

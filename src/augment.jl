@@ -4,9 +4,8 @@
 Apply the operations of the given `pipeline` to the image `img`
 and return the resulting image `imga`.
 
-The parameter `pipeline` can be a subtype of
-`Augmentor.Pipeline`, a tuple of `Augmentor.Operation`, or a
-single `Augmentor.Operation`
+The parameter `pipeline` can be a `Augmentor.Pipeline`, a tuple
+of `Augmentor.Operation`, or a single `Augmentor.Operation`.
 
 ```julia
 img = testpattern()
@@ -15,9 +14,9 @@ augment(img, (FlipX(), FlipY()))
 augment(img, FlipX())
 ```
 
-If `img` is omitted, augmentor will use the pre-provided
-augmentation test image returned by the function
-[`testpattern`](@ref) as the input image.
+If `img` is omitted, Augmentor will use the augmentation test
+image provided by the function [`testpattern`](@ref) as the input
+image.
 
 ```julia
 augment(FlipX())
@@ -55,9 +54,8 @@ end
 Apply the operations of the given `pipeline` to the image `img`
 and write the resulting image into `out`.
 
-The parameter `pipeline` can be a subtype of
-`Augmentor.Pipeline`, a tuple of `Augmentor.Operation`, or a
-single `Augmentor.Operation`
+The parameter `pipeline` can be a `Augmentor.Pipeline`, a tuple
+of `Augmentor.Operation`, or a single `Augmentor.Operation`.
 
 ```julia
 img = testpattern()

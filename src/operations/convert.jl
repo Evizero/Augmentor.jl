@@ -6,7 +6,7 @@ Description
 
 Convert the element type of the given array/image into the given
 `eltype`. This operation is especially useful for converting
-color images to grayscale (or the other way around). That said
+color images to grayscale (or the other way around). That said,
 the operation is not specific to color types and can also be used
 for numeric arrays (e.g. with separated channels).
 
@@ -33,7 +33,7 @@ See also
 Examples
 --------------
 
-```julia
+```julia-repl
 julia> using Augmentor, Colors
 
 julia> A = rand(RGB, 10, 10) # three color channels

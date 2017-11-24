@@ -4,7 +4,7 @@
 Description
 --------------
 
-Transforms the image into a fixed specified pixel size.
+Rescales the image to a fixed pre-specified pixel size.
 
 This operation does not take any measures to preserve aspect
 ratio of the source image. Instead, the original image will

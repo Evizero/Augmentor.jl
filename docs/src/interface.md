@@ -1,9 +1,10 @@
 # High-level Interface
 
-Integrating Augmentor into an existing project essentially
-requires the three steps outlined below. We will spend the rest
-of this document on describing all the necessary components in
-more detail.
+Integrating Augmentor into an existing project should in general
+not require any major changes to your code. In most cases it
+should break down to the three basic steps outlined below. We
+will spend the rest of this document investigating these in more
+detail.
 
 1. Import Augmentor into the namespace of your program.
 
@@ -66,12 +67,12 @@ instead of a single number.
 !!! note
 
     In this subsection we will focus only on how to define a
-    pipeline, without actually thinking too much on about how to
-    apply it to an actual image. The later will be the main topic
-    of the rest of this document.
+    pipeline, without actually thinking too much about how to
+    apply that pipeline to an actual image. The later will be the
+    main topic of the rest of this document.
 
 Say we wish to adapt our pipeline such that the rotation is a
-little more random. More specifically lets say we want our image
+little more random. More specifically, lets say we want our image
 to be rotated by either -10°, -5°, 5°, 10°, or not at all. Other
 than that change we will leave the rest of the pipeline as is.
 
@@ -83,11 +84,12 @@ julia> pl = Rotate([-10,-5,0,5,10]) |> CropRatio(1) |> Resize(64,64)
  3.) Resize to 64×64
 ```
 
-Variation in the parameters is only one way to introduce
-randomness to our pipeline. Additionally one can specify to
-choose one of multiple operations at random, using a utility
-operation called [`Either`](@ref), which has its own convenience
-syntax.
+Variation in the parameters is only one of the two main ways to
+introduce randomness to our pipeline. Additionally, one can
+specify that an operation should be sampled randomly from a
+chosen set of operations . This can be accomplished using a
+utility operation called [`Either`](@ref), which has its own
+convenience syntax.
 
 As an example, let us assume we wish to first either mirror our
 image(s) horizontally, or vertically, or not at all, and then
@@ -101,7 +103,7 @@ julia> pl = FlipX() * FlipY() * NoOp() |> CropSize(100,100)
  2.) Crop a 100×100 window around the center
 ```
 
-It's also possible to specify the odds of for such an "either".
+It is also possible to specify the odds of for such an "either".
 For example we may want the [`NoOp`](@ref) to be twice as likely
 as either of the mirroring options.
 
@@ -119,10 +121,10 @@ to apply it to an image or a set of images.
 
 Augmentor ships with a custom example image, which was
 specifically designed for visualizing augmentation effects. It
-can be accessed by calling the function `testpattern()`. However,
-doing so should rarely be necessary in practice, since most
-high-level functions will default to using `testpattern()` if no
-other image is specified.
+can be accessed by calling the function `testpattern()`. That
+said, doing so explicitly should rarely be necessary in practice,
+because most high-level functions will default to using
+`testpattern()` if no other image is specified.
 
 ```@docs
 testpattern
@@ -149,11 +151,21 @@ function `augment`.
 augment
 ```
 
+We also provide a mutating version of `augment` that writes the
+output into preallocated memory. While this function avoids
+allocation, it does have the caveat that the size of the output
+image must be known beforehand (and thus must not be random).
+
 ```@docs
 augment!
 ```
 
 ## Augmenting Image Batches
+
+In most machine learning scenarios we will want to process a
+whole batch of images at once, instead of a single image at a
+time. For this reason we provide the function `augmentbatch!`,
+which also supports multi-threading.
 
 ```@docs
 augmentbatch!

@@ -8,7 +8,7 @@ Splits out the color channels of the given image using the
 function `ImageCore.channelview`. This will effectively create a
 new array dimension for the colors in the front. In contrast to
 `ImageCore.channelview` it will also result in a new dimension
-for Gray images.
+for gray images.
 
 This operation is mainly useful at the end of a pipeline in
 combination with [`PermuteDims`](@ref) in order to prepare the
@@ -28,7 +28,7 @@ See also
 Examples
 --------------
 
-```julia
+```julia-repl
 julia> using Augmentor
 
 julia> img = testpattern()
@@ -106,7 +106,7 @@ See also
 Examples
 --------------
 
-```julia
+```julia-repl
 julia> using Augmentor, Colors
 
 julia> A = rand(3, 10, 10) # three color channels
@@ -170,13 +170,13 @@ Description
 Permute the dimensions of the given array with the predefined
 permutation `perm`. This operation is particularly useful if the
 order of the dimensions needs to be different than the default
-julian layout.
+"julian" layout (described below).
 
 Augmentor expects the given images to be in vertical-major layout
 for which the colors are encoded in the element type itself. Many
 deep learning frameworks however require their input in a
-different order. For example it is not untypical that the color
-channels are expected to be encoded in the third dimension.
+different order. For example it is not untypical that separate
+color channels are expected to be encoded in the third dimension.
 
 Usage
 --------------
@@ -201,7 +201,7 @@ See also
 Examples
 --------------
 
-```julia
+```julia-repl
 julia> using Augmentor, Colors
 
 julia> A = rand(10, 5, 3) # width=10, height=5, and 3 color channels
@@ -259,9 +259,9 @@ Description
 --------------
 
 Reinterpret the shape of the given array of numbers or colorants.
-This is useful for example to create singleton dimensions that
+This is useful for example to create singleton-dimensions that
 deep learning frameworks may need for colorless images, or for
-converting an image to a feature vector and vice versa.
+converting an image array to a feature vector (and vice versa).
 
 Usage
 --------------
@@ -285,7 +285,7 @@ See also
 Examples
 --------------
 
-```julia
+```julia-repl
 julia> using Augmentor, Colors
 
 julia> A = rand(10,10)
