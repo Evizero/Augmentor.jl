@@ -32,7 +32,7 @@ work with them.
     partial overview of Julia's arrays capabilities in order to
     gain some intuition about pixel data. For a more detailed
     treatment of the topic please have a look at the [official
-    documentation](https://docs.julialang.org/en/latest/manual/arrays.html)
+    documentation](https://docs.julialang.org/en/latest/manual/arrays/)
 
 Whenever we work with an `Array` in which the elements are
 bit-types (e.g. `Int64`, `Float32`, `UInt8`, etc), we can think
@@ -73,7 +73,7 @@ julia> A = reinterpret(UInt8, memory, (3,2))
 
 Note how we specified the number of rows first. This is because
 the Julia language follows the [column-major
-convention](https://docs.julialang.org/en/latest/manual/performance-tips.html#Access-arrays-in-memory-order,-along-columns-1)
+convention](https://docs.julialang.org/en/latest/manual/performance-tips/#Access-arrays-in-memory-order,-along-columns-1)
 for multi dimensional arrays. What this means can be observed
 when we compare our new matrix `A` with the initial vector
 `memory` and look at the element layout. Both variables are using
@@ -181,7 +181,7 @@ julia> At = reinterpret(UInt8, memory, (3,2))' # "row-major" layout
    julia> using ImageCore
 
    julia> C = permuteddimsview(At, (2,1))
-   3×2 permuteddimsview(::Array{UInt8,2}, (2, 1)) with element type UInt8:
+   3×2 PermutedDimsArray(::Array{UInt8,2}, (2, 1)) with element type UInt8:
     0x01  0x04
     0x02  0x05
     0x03  0x06
