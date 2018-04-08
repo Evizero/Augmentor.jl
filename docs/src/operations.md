@@ -102,7 +102,7 @@ in order to preserve type-stability.
 |:---------:|:--:|:------------------:|:------------------------:|:----------------------:|:-----------------------:|:------------------------:|
 | ![](assets/tiny_pattern.png) | → | [![](assets/tiny_Crop.png)](@ref Crop) | [![](assets/tiny_CropNative.png)](@ref CropNative) | [![](assets/tiny_CropSize.png)](@ref CropSize) | [![](assets/tiny_CropRatio.png)](@ref CropRatio) | [![](assets/tiny_RCropRatio.png)](@ref RCropRatio) |
 
-## Conversion and Layout
+## Element-wise Transformations and Layout
 
 It is not uncommon that machine learning frameworks require the
 data in a specific form and layout. For example many deep
@@ -115,6 +115,7 @@ or end of a augmentation pipeline.
 Category              | Available Operations
 ----------------------|-----------------------------------------------
 Conversion            | [`ConvertEltype`](@ref ConvertEltype) (e.g. convert to grayscale)
+Mapping               | [`MapFun`](@ref MapFun), [`AggregateThenMapFun`](@ref AggregateThenMapFun)
 Information Layout    | [`SplitChannels`](@ref SplitChannels), [`CombineChannels`](@ref CombineChannels), [`PermuteDims`](@ref PermuteDims), [`Reshape`](@ref Reshape)
 
 ## Utility Operations

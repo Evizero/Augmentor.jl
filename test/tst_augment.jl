@@ -287,5 +287,16 @@ ops = (Rotate(45),Zoom(2))
     @test_reference "reference/rot45_zoom.txt" img
 end
 
+ops = (Rotate(45),CropSize(200,200),Zoom(1.1),ConvertEltype(RGB{Float64}),SplitChannels())
+@testset "$(str_showcompact(ops))" begin
+    wv1 = @inferred Augmentor._augment(camera, ops[1:3])
+    wv2 = @inferred Augmentor._augment(camera, ops[1:4])
+    wv3 = @inferred Augmentor._augment(camera, ops)
+    img = colorview(RGB{Float64}, wv3)
+    @test RGB{Float64}.(collect(wv1)) ≈ wv2
+    @test wv1 ≈ img
+    @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
+end
+
 # just for code coverage
 @test typeof(@inferred(Augmentor.augment_impl(Rotate90()))) <: Expr

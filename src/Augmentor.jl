@@ -34,6 +34,8 @@ export
     Reshape,
 
     ConvertEltype,
+    MapFun,
+    AggregateThenMapFun,
 
     Rotate90,
     Rotate180,
@@ -75,6 +77,7 @@ include("operation.jl")
 
 include("operations/channels.jl")
 include("operations/convert.jl")
+include("operations/mapfun.jl")
 
 include("operations/noop.jl")
 include("operations/cache.jl")

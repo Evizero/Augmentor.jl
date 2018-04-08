@@ -228,6 +228,8 @@ look at the corresponding section of the
 |               | [`CropRatio`](https://evizero.github.io/Augmentor.jl/operations/cropratio) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_CropRatio.png) | Crop to specified aspect ratio.
 |               | [`RCropRatio`](https://evizero.github.io/Augmentor.jl/operations/rcropratio) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_RCropRatio.png) | Crop random window of specified aspect ratio.
 | *Conversion:* | [`ConvertEltype`](https://evizero.github.io/Augmentor.jl/operations/converteltype) | ![](https://evizero.github.io/Augmentor.jl/assets/tiny_ConvertEltype.png) | Convert the array elements to the given type.
+| *Mapping:*    | [`MapFun`](https://evizero.github.io/Augmentor.jl/operations/mapfun) | - | Map custom function over image
+|               | [`AggregateThenMapFun`](https://evizero.github.io/Augmentor.jl/operations/aggmapfun) | - | Map aggregated value over image
 | *Layout:*     | [`SplitChannels`](https://evizero.github.io/Augmentor.jl/operations/splitchannels) | - | Separate the color channels into a dedicated array dimension.
 |               | [`CombineChannels`](https://evizero.github.io/Augmentor.jl/operations/combinechannels) | - | Collapse the first dimension into a specific colorant.
 |               | [`PermuteDims`](https://evizero.github.io/Augmentor.jl/operations/permutedims) | - | Reorganize the array dimensions into a specific order.
