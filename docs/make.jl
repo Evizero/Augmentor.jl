@@ -27,6 +27,8 @@ op_fnames = [
     "rcropratio",
     "resize",
     "converteltype",
+    "mapfun",
+    "aggmapfun",
     "splitchannels",
     "combinechannels",
     "permutedims",

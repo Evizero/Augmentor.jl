@@ -35,6 +35,7 @@ export
 
     ConvertEltype,
     MapFun,
+    AggregateThenMapFun,
 
     Rotate90,
     Rotate180,

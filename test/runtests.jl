@@ -46,6 +46,7 @@ tests = [
     "tst_utils.jl",
     "operations/tst_channels.jl",
     "operations/tst_convert.jl",
+    "operations/tst_mapfun.jl",
     "operations/tst_noop.jl",
     "operations/tst_cache.jl",
     "operations/tst_rotation.jl",
