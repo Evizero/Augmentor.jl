@@ -99,29 +99,29 @@ end</code></pre></div><p>Aside from the accuracy, we will also keep an eye on th
 baseline_log = @time train_baseline(epochs=200);</code></pre><pre><code class="language-none">epoch    5: train accuracy 0.550, test accuracy 0.460
 epoch   10: train accuracy 0.694, test accuracy 0.592
 epoch   15: train accuracy 0.820, test accuracy 0.749
-epoch   20: train accuracy 0.864, test accuracy 0.781
-epoch   25: train accuracy 0.888, test accuracy 0.815
-epoch   30: train accuracy 0.896, test accuracy 0.851
+epoch   20: train accuracy 0.862, test accuracy 0.781
+epoch   25: train accuracy 0.890, test accuracy 0.815
+epoch   30: train accuracy 0.896, test accuracy 0.850
 epoch   35: train accuracy 0.920, test accuracy 0.866
 epoch   40: train accuracy 0.930, test accuracy 0.875
-epoch   45: train accuracy 0.940, test accuracy 0.881
-epoch   50: train accuracy 0.950, test accuracy 0.884
+epoch   45: train accuracy 0.940, test accuracy 0.882
+epoch   50: train accuracy 0.954, test accuracy 0.885
 epoch   55: train accuracy 0.964, test accuracy 0.889
 epoch   60: train accuracy 0.968, test accuracy 0.891
-epoch   65: train accuracy 0.974, test accuracy 0.893
+epoch   65: train accuracy 0.972, test accuracy 0.893
 epoch   70: train accuracy 0.978, test accuracy 0.894
-epoch   75: train accuracy 0.982, test accuracy 0.897
+epoch   75: train accuracy 0.982, test accuracy 0.896
 epoch   80: train accuracy 0.988, test accuracy 0.898
 epoch   85: train accuracy 0.994, test accuracy 0.899
-epoch   90: train accuracy 0.996, test accuracy 0.900
+epoch   90: train accuracy 0.996, test accuracy 0.899
 epoch   95: train accuracy 0.998, test accuracy 0.901
 epoch  100: train accuracy 1.000, test accuracy 0.901
 epoch  105: train accuracy 1.000, test accuracy 0.902
 epoch  110: train accuracy 1.000, test accuracy 0.902
 epoch  115: train accuracy 1.000, test accuracy 0.902
-epoch  120: train accuracy 1.000, test accuracy 0.902
+epoch  120: train accuracy 1.000, test accuracy 0.903
 epoch  125: train accuracy 1.000, test accuracy 0.902
-epoch  130: train accuracy 1.000, test accuracy 0.903
+epoch  130: train accuracy 1.000, test accuracy 0.902
 epoch  135: train accuracy 1.000, test accuracy 0.903
 epoch  140: train accuracy 1.000, test accuracy 0.903
 epoch  145: train accuracy 1.000, test accuracy 0.903
@@ -130,13 +130,13 @@ epoch  155: train accuracy 1.000, test accuracy 0.903
 epoch  160: train accuracy 1.000, test accuracy 0.903
 epoch  165: train accuracy 1.000, test accuracy 0.903
 epoch  170: train accuracy 1.000, test accuracy 0.903
-epoch  175: train accuracy 1.000, test accuracy 0.902
-epoch  180: train accuracy 1.000, test accuracy 0.903
-epoch  185: train accuracy 1.000, test accuracy 0.903
+epoch  175: train accuracy 1.000, test accuracy 0.903
+epoch  180: train accuracy 1.000, test accuracy 0.902
+epoch  185: train accuracy 1.000, test accuracy 0.902
 epoch  190: train accuracy 1.000, test accuracy 0.903
 epoch  195: train accuracy 1.000, test accuracy 0.903
-epoch  200: train accuracy 1.000, test accuracy 0.902
-  7.040568 seconds (3.18 M allocations: 275.038 MiB, 1.52% gc time)</code></pre></div><p>As we can see, the accuracy on the training set is around a 100%, while the accuracy on the test set peaks around 90%. For a mere 500 training examples, this isn&#39;t actually that bad of a result.</p><h2><a class="nav-anchor" id="Integrating-Augmentor-1" href="#Integrating-Augmentor-1">Integrating Augmentor</a></h2><p>Now that we have a network architecture with a baseline to compare to, let us finally see what it takes to add Augmentor to our experiment. First, we need to include the package to our experiment.</p><div><pre><code class="language-julia">using Augmentor</code></pre></div><p>The next step, and maybe the most human-hour consuming part of adding image augmentation to a prediction problem, is to design and select a sensible augmentation pipeline. Take a look at the <a href="../mnist_elastic/#elastic-1">elastic distortions tutorial</a> for an example of how to do just that.</p><p>For this example, we already choose a quite complicated but promising augmentation pipeline for you. This pipeline was designed to yield a large variation of effects as well as to showcase how even deep pipelines are quite efficient in terms of performance.</p><div><pre><code class="language-julia">pl = Reshape(28,28) |&gt;
+epoch  200: train accuracy 1.000, test accuracy 0.903
+  7.016101 seconds (3.18 M allocations: 275.083 MiB, 1.49% gc time)</code></pre></div><p>As we can see, the accuracy on the training set is around a 100%, while the accuracy on the test set peaks around 90%. For a mere 500 training examples, this isn&#39;t actually that bad of a result.</p><h2><a class="nav-anchor" id="Integrating-Augmentor-1" href="#Integrating-Augmentor-1">Integrating Augmentor</a></h2><p>Now that we have a network architecture with a baseline to compare to, let us finally see what it takes to add Augmentor to our experiment. First, we need to include the package to our experiment.</p><div><pre><code class="language-julia">using Augmentor</code></pre></div><p>The next step, and maybe the most human-hour consuming part of adding image augmentation to a prediction problem, is to design and select a sensible augmentation pipeline. Take a look at the <a href="../mnist_elastic/#elastic-1">elastic distortions tutorial</a> for an example of how to do just that.</p><p>For this example, we already choose a quite complicated but promising augmentation pipeline for you. This pipeline was designed to yield a large variation of effects as well as to showcase how even deep pipelines are quite efficient in terms of performance.</p><div><pre><code class="language-julia">pl = Reshape(28,28) |&gt;
      PermuteDims(2,1) |&gt;
      ShearX(-5:5) * ShearY(-5:5) |&gt;
      Rotate(-15:15) |&gt;
@@ -176,48 +176,48 @@ epoch  200: train accuracy 1.000, test accuracy 0.902
         end
     end
     log
-end</code></pre></div><p>You may have noticed in the code above that we also pass a <code>CPUThreads()</code> as the first argument to <a href="../../interface/#Augmentor.augmentbatch!"><code>augmentbatch!</code></a>. This instructs Augmentor to process the images of the batch in parallel using multi-threading. For this to work properly you will need to set the environment variable <code>JULIA_NUM_THREADS</code> to the number of threads you wish to use. You can check how many threads are used with the function <code>Threads.nthreads()</code></p><div><pre><code class="language-julia">@show Threads.nthreads();</code></pre><pre><code class="language-none">Threads.nthreads() = 12</code></pre></div><p>Now that all pieces are in place, let us train our network once more. We will use the same parameters except that now instead of the original training images we will be using randomly augmented images. This will cause every epoch to be different.</p><div><pre><code class="language-julia">train_augmented(epochs=1) # warm-up
-augmented_log = @time train_augmented(epochs=200);</code></pre><pre><code class="language-none">epoch    5: train accuracy 0.512, test accuracy 0.448
-epoch   10: train accuracy 0.634, test accuracy 0.551
-epoch   15: train accuracy 0.742, test accuracy 0.681
-epoch   20: train accuracy 0.752, test accuracy 0.682
-epoch   25: train accuracy 0.846, test accuracy 0.798
-epoch   30: train accuracy 0.846, test accuracy 0.818
-epoch   35: train accuracy 0.882, test accuracy 0.849
-epoch   40: train accuracy 0.908, test accuracy 0.861
-epoch   45: train accuracy 0.906, test accuracy 0.878
-epoch   50: train accuracy 0.916, test accuracy 0.884
-epoch   55: train accuracy 0.916, test accuracy 0.887
-epoch   60: train accuracy 0.936, test accuracy 0.905
-epoch   65: train accuracy 0.944, test accuracy 0.900
-epoch   70: train accuracy 0.940, test accuracy 0.899
-epoch   75: train accuracy 0.954, test accuracy 0.925
-epoch   80: train accuracy 0.952, test accuracy 0.908
-epoch   85: train accuracy 0.952, test accuracy 0.923
-epoch   90: train accuracy 0.966, test accuracy 0.928
-epoch   95: train accuracy 0.968, test accuracy 0.923
-epoch  100: train accuracy 0.978, test accuracy 0.934
-epoch  105: train accuracy 0.980, test accuracy 0.934
-epoch  110: train accuracy 0.976, test accuracy 0.928
-epoch  115: train accuracy 0.986, test accuracy 0.933
-epoch  120: train accuracy 0.986, test accuracy 0.939
-epoch  125: train accuracy 0.986, test accuracy 0.937
-epoch  130: train accuracy 0.984, test accuracy 0.926
-epoch  135: train accuracy 0.988, test accuracy 0.930
-epoch  140: train accuracy 0.990, test accuracy 0.933
-epoch  145: train accuracy 0.994, test accuracy 0.935
-epoch  150: train accuracy 0.998, test accuracy 0.939
-epoch  155: train accuracy 0.996, test accuracy 0.937
-epoch  160: train accuracy 0.994, test accuracy 0.943
-epoch  165: train accuracy 0.998, test accuracy 0.949
-epoch  170: train accuracy 0.998, test accuracy 0.945
-epoch  175: train accuracy 0.998, test accuracy 0.950
-epoch  180: train accuracy 0.998, test accuracy 0.952
-epoch  185: train accuracy 0.998, test accuracy 0.944
-epoch  190: train accuracy 0.998, test accuracy 0.946
-epoch  195: train accuracy 0.998, test accuracy 0.946
-epoch  200: train accuracy 0.998, test accuracy 0.951
- 33.476714 seconds (38.18 M allocations: 24.298 GiB, 11.81% gc time)</code></pre></div><p>As we can see, our network reaches far better results on our testset than our baseline network did. However, we can also see that the training took quite a bit longer than before. This difference generally decreases as the complexity of the utilized neural network increases. Yet another way to improve performance (aside from simplifying the augmentation pipeline) would be to increase the number of available threads.</p><h2><a class="nav-anchor" id="Improving-Performance-1" href="#Improving-Performance-1">Improving Performance</a></h2><p>One of the most effective ways to make the most out of the available resources is to augment the next (couple) mini-batch while the current minibatch is being processed on the GPU. We can do this via julia&#39;s build in parallel computing capabilities</p><p>First we need a worker process that will be responsible for augmenting our dataset each epoch. This worker also needs access to a couple of our packages</p><div><pre><code class="language-julia"># addprocs(1)
+end</code></pre></div><p>You may have noticed in the code above that we also pass a <code>CPUThreads()</code> as the first argument to <a href="../../interface/#Augmentor.augmentbatch!"><code>augmentbatch!</code></a>. This instructs Augmentor to process the images of the batch in parallel using multi-threading. For this to work properly you will need to set the environment variable <code>JULIA_NUM_THREADS</code> to the number of threads you wish to use. You can check how many threads are used with the function <code>Threads.nthreads()</code></p><div><pre><code class="language-julia">@show Threads.nthreads();</code></pre><pre><code class="language-none">Threads.nthreads() = 10</code></pre></div><p>Now that all pieces are in place, let us train our network once more. We will use the same parameters except that now instead of the original training images we will be using randomly augmented images. This will cause every epoch to be different.</p><div><pre><code class="language-julia">train_augmented(epochs=1) # warm-up
+augmented_log = @time train_augmented(epochs=200);</code></pre><pre><code class="language-none">epoch    5: train accuracy 0.508, test accuracy 0.449
+epoch   10: train accuracy 0.636, test accuracy 0.557
+epoch   15: train accuracy 0.710, test accuracy 0.656
+epoch   20: train accuracy 0.812, test accuracy 0.763
+epoch   25: train accuracy 0.826, test accuracy 0.775
+epoch   30: train accuracy 0.870, test accuracy 0.804
+epoch   35: train accuracy 0.890, test accuracy 0.854
+epoch   40: train accuracy 0.880, test accuracy 0.840
+epoch   45: train accuracy 0.910, test accuracy 0.868
+epoch   50: train accuracy 0.912, test accuracy 0.877
+epoch   55: train accuracy 0.922, test accuracy 0.873
+epoch   60: train accuracy 0.932, test accuracy 0.890
+epoch   65: train accuracy 0.938, test accuracy 0.902
+epoch   70: train accuracy 0.950, test accuracy 0.915
+epoch   75: train accuracy 0.950, test accuracy 0.911
+epoch   80: train accuracy 0.956, test accuracy 0.923
+epoch   85: train accuracy 0.954, test accuracy 0.914
+epoch   90: train accuracy 0.962, test accuracy 0.916
+epoch   95: train accuracy 0.972, test accuracy 0.920
+epoch  100: train accuracy 0.978, test accuracy 0.929
+epoch  105: train accuracy 0.964, test accuracy 0.918
+epoch  110: train accuracy 0.964, test accuracy 0.903
+epoch  115: train accuracy 0.966, test accuracy 0.900
+epoch  120: train accuracy 0.982, test accuracy 0.928
+epoch  125: train accuracy 0.986, test accuracy 0.928
+epoch  130: train accuracy 0.988, test accuracy 0.927
+epoch  135: train accuracy 0.990, test accuracy 0.937
+epoch  140: train accuracy 0.990, test accuracy 0.940
+epoch  145: train accuracy 0.990, test accuracy 0.949
+epoch  150: train accuracy 0.996, test accuracy 0.942
+epoch  155: train accuracy 0.994, test accuracy 0.947
+epoch  160: train accuracy 0.996, test accuracy 0.939
+epoch  165: train accuracy 0.998, test accuracy 0.944
+epoch  170: train accuracy 0.998, test accuracy 0.942
+epoch  175: train accuracy 0.996, test accuracy 0.947
+epoch  180: train accuracy 0.998, test accuracy 0.941
+epoch  185: train accuracy 0.994, test accuracy 0.940
+epoch  190: train accuracy 0.998, test accuracy 0.949
+epoch  195: train accuracy 0.998, test accuracy 0.953
+epoch  200: train accuracy 0.998, test accuracy 0.947
+ 27.291215 seconds (38.85 M allocations: 21.443 GiB, 13.05% gc time)</code></pre></div><p>As we can see, our network reaches far better results on our testset than our baseline network did. However, we can also see that the training took quite a bit longer than before. This difference generally decreases as the complexity of the utilized neural network increases. Yet another way to improve performance (aside from simplifying the augmentation pipeline) would be to increase the number of available threads.</p><h2><a class="nav-anchor" id="Improving-Performance-1" href="#Improving-Performance-1">Improving Performance</a></h2><p>One of the most effective ways to make the most out of the available resources is to augment the next (couple) mini-batch while the current minibatch is being processed on the GPU. We can do this via julia&#39;s build in parallel computing capabilities</p><p>First we need a worker process that will be responsible for augmenting our dataset each epoch. This worker also needs access to a couple of our packages</p><div><pre><code class="language-julia"># addprocs(1)
 # @everywhere using Augmentor, MLDataUtils</code></pre></div><p>Next, we replace the inner <code>eachbatch</code> loop with a more complicated version using a <code>RemoteChannel</code> to exchange and queue the augmented data.</p><div><pre><code class="language-julia">function async_train_augmented(; epochs = 500, batchsize = 100, lr = .03)
     w = weights()
     log = MVHistory()

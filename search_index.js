@@ -329,11 +329,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "operations/#Conversion-and-Layout-1",
+    "location": "operations/#Element-wise-Transformations-and-Layout-1",
     "page": "Supported Operations",
-    "title": "Conversion and Layout",
+    "title": "Element-wise Transformations and Layout",
     "category": "section",
-    "text": "It is not uncommon that machine learning frameworks require the data in a specific form and layout. For example many deep learning frameworks expect the colorchannel of the images to be encoded in the third dimension of a 4-dimensional array. Augmentor allows to convert from (and to) these different layouts using special operations that are mainly useful in the beginning or end of a augmentation pipeline.Category Available Operations\nConversion ConvertEltype (e.g. convert to grayscale)\nInformation Layout SplitChannels, CombineChannels, PermuteDims, Reshape"
+    "text": "It is not uncommon that machine learning frameworks require the data in a specific form and layout. For example many deep learning frameworks expect the colorchannel of the images to be encoded in the third dimension of a 4-dimensional array. Augmentor allows to convert from (and to) these different layouts using special operations that are mainly useful in the beginning or end of a augmentation pipeline.Category Available Operations\nConversion ConvertEltype (e.g. convert to grayscale)\nMapping MapFun, AggregateThenMapFun\nInformation Layout SplitChannels, CombineChannels, PermuteDims, Reshape"
 },
 
 {
@@ -774,6 +774,54 @@ var documenterSearchIndex = {"docs": [
     "title": "ConvertEltype: Color conversion",
     "category": "section",
     "text": "ConvertEltypeinclude(\"optable.jl\")\n@optable ConvertEltype(GrayA)"
+},
+
+{
+    "location": "operations/mapfun/#",
+    "page": "MapFun: Map function over Image",
+    "title": "MapFun: Map function over Image",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "operations/mapfun/#Augmentor.MapFun",
+    "page": "MapFun: Map function over Image",
+    "title": "Augmentor.MapFun",
+    "category": "type",
+    "text": "MapFun <: Augmentor.Operation\n\nDescription\n\nMaps the given function over all individual array elements.\n\nThis means that the given function is called with an individual elements and is expected to return a transformed element that should take the original\'s place. This further implies that the function is expected to be unary. It is encouraged that the function should be consistent with its return type and type-stable.\n\nUsage\n\nMapFun(fun)\n\nArguments\n\nfun : The unary function that should be mapped over all   individual array elements.\n\nSee also\n\nAggregateThenMapFun, ConvertEltype, augment\n\nExamples\n\nusing Augmentor, ColorTypes\nimg = testpattern()\n\n# subtract the constant RGBA value from each pixel\naugment(img, MapFun(px -> px - RGBA(0.5, 0.3, 0.7, 0.0)))\n\n# separate channels to scale each numeric element by a constant value\npl = SplitChannels() |> MapFun(el -> el * 0.5) |> CombineChannels(RGBA)\naugment(img, pl)\n\n\n\n"
+},
+
+{
+    "location": "operations/mapfun/#MapFun-1",
+    "page": "MapFun: Map function over Image",
+    "title": "MapFun: Map function over Image",
+    "category": "section",
+    "text": "MapFun"
+},
+
+{
+    "location": "operations/aggmapfun/#",
+    "page": "AggregateThenMapFun: Aggregate and Map over Image",
+    "title": "AggregateThenMapFun: Aggregate and Map over Image",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "operations/aggmapfun/#Augmentor.AggregateThenMapFun",
+    "page": "AggregateThenMapFun: Aggregate and Map over Image",
+    "title": "Augmentor.AggregateThenMapFun",
+    "category": "type",
+    "text": "AggregateThenMapFun <: Augmentor.Operation\n\nDescription\n\nCompute some aggregated value of the current image using the given function aggfun, and map that value over the current image using the given function mapfun.\n\nThis is particularly useful for achieving effects such as per-image normalization.\n\nUsage\n\nAggregateThenMapFun(aggfun, mapfun)\n\nArguments\n\naggfun : A function that takes the whole current image as   input and which result will also be passed to mapfun. It   should have a signature of img -> agg, where img will the   the current image. What type and value agg should be is up   to the user.\nmapfun : The binary function that should be mapped over   all individual array elements. It should have a signature of   (px, agg) -> new_px where px is a single element of the   current image, and agg is the output of aggfun.\n\nSee also\n\nMapFun, ConvertEltype, augment\n\nExamples\n\nusing Augmentor\nimg = testpattern()\n\n# subtract the average RGB value of the current image\naugment(img, AggregateThenMapFun(img -> mean(img), (px, agg) -> px - agg))\n\n\n\n"
+},
+
+{
+    "location": "operations/aggmapfun/#AggregateThenMapFun-1",
+    "page": "AggregateThenMapFun: Aggregate and Map over Image",
+    "title": "AggregateThenMapFun: Aggregate and Map over Image",
+    "category": "section",
+    "text": "AggregateThenMapFun"
 },
 
 {
