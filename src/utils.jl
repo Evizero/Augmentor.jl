@@ -40,6 +40,7 @@ end
 # avoid recursion
 @inline plain_array(A::SubArray) = _plain_array(copy(A))
 @inline plain_array(A::AbstractArray) = _plain_array(collect(A))
+plain_array(A::Tuple) = map(plain_array, A)
 
 # --------------------------------------------------------------------
 

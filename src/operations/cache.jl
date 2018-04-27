@@ -58,6 +58,7 @@ applyeager(op::CacheImage, img::OffsetArray) = img
 applyeager(op::CacheImage, img::SubArray) = copy(img)
 applyeager(op::CacheImage, img::InvWarpedView) = copy(img)
 applyeager(op::CacheImage, img) = collect(img)
+applyeager(op::CacheImage, imgs::Tuple) = map(img->applyeager(op,img), imgs)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
@@ -79,26 +80,48 @@ end
 
 see [`CacheImage`](@ref)
 """
-struct CacheImageInto{T<:AbstractArray} <: ImageOperation
+struct CacheImageInto{T<:Union{AbstractArray,Tuple}} <: ImageOperation
     buffer::T
 end
 CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
+CacheImage(buffers::AbstractArray...) = CacheImageInto(buffers)
+CacheImage(buffers::NTuple{N,AbstractArray}) where {N} = CacheImageInto(buffers)
 
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
 applyeager(op::CacheImageInto, img) = applylazy(op, img)
 
-function applylazy(op::CacheImageInto, img)
+function applylazy(op::CacheImageInto{<:AbstractArray}, img::AbstractArray)
     copy!(match_idx(op.buffer, indices(img)), img)
 end
 
-function showconstruction(io::IO, op::CacheImageInto)
-    print(io, "CacheImage(") # shows exported API
+function applylazy(op::CacheImageInto{<:Tuple}, imgs::Tuple)
+    map(op.buffer, imgs) do buffer, img
+        copy!(match_idx(buffer, indices(img)), img)
+    end
+end
+
+function _showarrayconstruction(io::IO, array::AbstractArray)
     print(io, "Array{")
-    _showcolor(io, eltype(op.buffer))
+    _showcolor(io, eltype(array))
     print(io, "}(")
-    print(io, join(map(i->string(length(i)), indices(op.buffer)), ", "))
-    print(io, "))")
+    print(io, join(map(i->string(length(i)), indices(array)), ", "))
+    print(io, ")")
+end
+
+function showconstruction(io::IO, op::CacheImageInto{<:AbstractArray})
+    print(io, "CacheImage(") # shows exported API
+    _showarrayconstruction(io, op.buffer)
+    print(io, ")")
+end
+
+function showconstruction(io::IO, op::CacheImageInto{<:Tuple})
+    print(io, "CacheImage(")
+    for (i, buffer) in enumerate(op.buffer)
+        _showarrayconstruction(io, buffer)
+        i < length(op.buffer) && print(io, ", ")
+    end
+    print(io, ")")
 end
 
 function Base.show(io::IO, op::CacheImageInto)

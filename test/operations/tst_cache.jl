@@ -7,6 +7,8 @@
     @test str_showcompact(CacheImage()) == "Cache into temporary buffer"
 
     @test @inferred(Augmentor.applyeager(CacheImage(),square)) === square
+    @test @inferred(Augmentor.applyeager(CacheImage(),(square,))) === (square,)
+    @test @inferred(Augmentor.applyeager(CacheImage(),(square,square2))) === (square,square2)
 
     v = view(square, :, :)
     img = @inferred Augmentor.applyeager(CacheImage(), v)
@@ -14,9 +16,16 @@
     @test eltype(img) == eltype(v)
     @test img !== square
     @test img == square
+    tmp,img = @inferred Augmentor.applyeager(CacheImage(), (square,v))
+    @test typeof(img) <: Array
+    @test eltype(img) == eltype(v)
+    @test tmp === square
+    @test img !== square
+    @test img == square
 
     o = OffsetArray(square, (-1,2))
     @test @inferred(Augmentor.applyeager(CacheImage(),o)) === o
+    @test @inferred(Augmentor.applyeager(CacheImage(),(o,square))) === (o,square)
 
     @test Augmentor.supports_eager(CacheImage) === true
     @test Augmentor.supports_lazy(CacheImage) === false
@@ -27,6 +36,7 @@
     @test Augmentor.supports_affineview(CacheImage) === false
 
     @test_throws MethodError Augmentor.applylazy(CacheImage(), v)
+    @test_throws MethodError Augmentor.applylazy(CacheImage(), (v,v))
     @test_throws MethodError Augmentor.applyview(CacheImage(), v)
     @test_throws MethodError Augmentor.applystepview(CacheImage(), v)
     @test_throws MethodError Augmentor.applypermute(CacheImage(), v)

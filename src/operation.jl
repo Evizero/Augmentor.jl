@@ -35,6 +35,7 @@ prepareaffine(img) = invwarpedview(img, toaffinemap(NoOp(), img), Flat())
 prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffinemap(NoOp(), img))
 @inline prepareaffine(img::SubArray{T,N,<:InvWarpedView}) where {T,N} = img
 @inline prepareaffine(img::InvWarpedView) = img
+prepareaffine(imgs::Tuple) = map(prepareaffine, imgs)
 
 # currently unused
 @inline preparelazy(img) = img
