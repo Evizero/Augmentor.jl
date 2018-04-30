@@ -87,9 +87,14 @@ CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 CacheImage(buffers::AbstractArray...) = CacheImageInto(buffers)
 CacheImage(buffers::NTuple{N,AbstractArray}) where {N} = CacheImageInto(buffers)
 
+# TODO: figure out why I decided to say it supports lazy
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
 applyeager(op::CacheImageInto, img) = applylazy(op, img)
+
+function applylazy(op::CacheImageInto, img)
+    throw(ArgumentError("Operation $(op) not compatiable with given image(s) ($(summary(img))). This can happen if the amount of images does not match the amount of buffers in the operation"))
+end
 
 function applylazy(op::CacheImageInto{<:AbstractArray}, img::AbstractArray)
     copy!(match_idx(op.buffer, indices(img)), img)
@@ -101,7 +106,7 @@ function applylazy(op::CacheImageInto{<:Tuple}, imgs::Tuple)
     end
 end
 
-function _showarrayconstruction(io::IO, array::AbstractArray)
+function _showconstruction(io::IO, array::AbstractArray)
     print(io, "Array{")
     _showcolor(io, eltype(array))
     print(io, "}(")
@@ -111,25 +116,40 @@ end
 
 function showconstruction(io::IO, op::CacheImageInto{<:AbstractArray})
     print(io, "CacheImage(") # shows exported API
-    _showarrayconstruction(io, op.buffer)
+    _showconstruction(io, op.buffer)
     print(io, ")")
 end
 
 function showconstruction(io::IO, op::CacheImageInto{<:Tuple})
     print(io, "CacheImage(")
     for (i, buffer) in enumerate(op.buffer)
-        _showarrayconstruction(io, buffer)
+        _showconstruction(io, buffer)
         i < length(op.buffer) && print(io, ", ")
     end
     print(io, ")")
 end
 
-function Base.show(io::IO, op::CacheImageInto)
+function Base.show(io::IO, op::CacheImageInto{<:AbstractArray})
     if get(io, :compact, false)
-        print(io, "Cache into preallocated ", summary(op.buffer))
+        print(io, "Cache into preallocated ")
+        print(io, summary(op.buffer))
     else
         print(io, typeof(op).name, "(")
         showarg(io, op.buffer)
-        print(io, ')')
+        print(io, ")")
+    end
+end
+
+function Base.show(io::IO, op::CacheImageInto{<:Tuple})
+    if get(io, :compact, false)
+        print(io, "Cache into preallocated ")
+        print(io, "(", join(map(summary, op.buffer), ", "), ")")
+    else
+        print(io, typeof(op).name, "((")
+        for (i, buffer) in enumerate(op.buffer)
+            showarg(io, buffer)
+            i < length(op.buffer) && print(io, ", ")
+        end
+        print(io, "))")
     end
 end
