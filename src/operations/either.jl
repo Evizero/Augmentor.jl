@@ -131,7 +131,7 @@ end
 # Note: We prefer "affine" only if "img" already is some
 #   "InvWarpedView", otherwise the preference is
 #   view > stepview > permute > affine > affineview
-@generated function applylazy(op::Either, img)
+@generated function applylazy(op::Either, img::AbstractArray)
     if isinvwarpedview(img) && supports_affine(op)
         :(applyaffine(op, img))
     elseif isinvwarpedview(img) && supports_affineview(op)
@@ -148,6 +148,25 @@ end
         :(applyaffineview(op, prepareaffine(img)))
     else
         :(throw(MethodError(applylazy, (op, img))))
+    end
+end
+@generated function applylazy(op::Either, imgs::Tuple)
+    if isinvwarpedview(imgs[1]) && supports_affine(op)
+        :(applyaffine(op, imgs))
+    elseif isinvwarpedview(imgs[1]) && supports_affineview(op)
+        :(applyaffineview(op, imgs))
+    elseif supports_view(op)
+        :(applyview(op, imgs))
+    elseif supports_stepview(op)
+        :(applystepview(op, imgs))
+    elseif supports_permute(op)
+        :(applypermute(op, imgs))
+    elseif supports_affine(op)
+        :(applyaffine(op, map(prepareaffine, imgs)))
+    elseif supports_affineview(op)
+        :(applyaffineview(op, map(prepareaffine, imgs)))
+    else
+        :(throw(MethodError(applylazy, (op, imgs))))
     end
 end
 
@@ -176,15 +195,17 @@ for KIND in (:eager, :permute, :view, :stepview, :affine, :affineview)
     FUN = Symbol(:apply, KIND)
     SUP = Symbol(:supports_, KIND)
     APP = startswith(String(KIND),"affine") ? Symbol(FUN, :_common) : FUN
-    @eval function ($FUN)(op::Either, img)
-        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
-        p = safe_rand()
-        for (i, p_i) in enumerate(op.cum_chances)
-            if p <= p_i
-                return ($APP)(op.operations[i], img)
+    for T in (:AbstractArray, :Tuple)
+        @eval function ($FUN)(op::Either, img::($T))
+            ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
+            p = safe_rand()
+            for (i, p_i) in enumerate(op.cum_chances)
+                if p <= p_i
+                    return ($APP)(op.operations[i], img)
+                end
             end
+            error("unreachable code reached")
         end
-        error("unreachable code reached")
     end
 end
 

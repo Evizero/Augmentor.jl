@@ -119,7 +119,7 @@ end
         @test parent.(res) === (op.buffer[1], op.buffer[2])
 
         @test_throws BoundsError Augmentor.applyeager(op, (camera,buf1))
-        @test_throws ArgumentError Augmentor.applylazy(op, v1)
+        @test_throws MethodError Augmentor.applylazy(op, v1)
         @test_throws BoundsError Augmentor.applylazy(op, (buf2,buf1))
         @test_throws BoundsError Augmentor.applylazy(op, (buf1,))
         # ?

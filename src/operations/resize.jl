@@ -66,9 +66,11 @@ function toaffinemap(op::Resize{2}, img::AbstractMatrix)
     tscale ∘ ttrans
 end
 
-applyeager(op::Resize, img) = plain_array(imresize(img, op.size))
+function applyeager(op::Resize, img::AbstractArray)
+    plain_array(imresize(img, op.size))
+end
 
-function applylazy(op::Resize, img)
+function applylazy(op::Resize, img::AbstractArray)
     applyaffineview(op, prepareaffine(img))
 end
 

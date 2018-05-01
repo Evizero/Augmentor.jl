@@ -30,7 +30,6 @@ end
 end
 @testset "lazy" begin
     @test Augmentor.supports_lazy(NoOp) === true
-    @test @inferred(Augmentor.applylazy(NoOp(), nothing)) === nothing
     @test @inferred(Augmentor.applylazy(NoOp(), rect)) === rect
     wv = Augmentor.prepareaffine(rect)
     @test @inferred(Augmentor.applylazy(NoOp(), wv)) === wv

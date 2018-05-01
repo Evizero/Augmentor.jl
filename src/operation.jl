@@ -43,29 +43,39 @@ prepareaffine(imgs::Tuple) = map(prepareaffine, imgs)
 # --------------------------------------------------------------------
 # Operation and AffineOperation fallbacks
 
-function applyeager(op::Operation, img)
+for FUN in (:applyeager, :applylazy, :applypermute,
+            :applyaffineview, :applyview, :applystepview)
+    @eval begin
+        function ($FUN)(op::Operation, imgs::Tuple)
+            map(img -> ($FUN)(op, img), imgs)
+        end
+    end
+end
+
+function applyeager(op::Operation, img::AbstractArray)
     plain_array(applylazy(op, img))
 end
 
-function applyaffine(op::AffineOperation, img)
-    invwarpedview(img, toaffinemap(op, img))
-end
-
-function applyaffineview(op::Operation, img)
+function applyaffineview(op::Operation, img::AbstractArray)
     wv = applyaffine(op, img)
     direct_view(wv, indices(wv))
+end
+
+function applyaffine(op::AffineOperation, img::AbstractArray)
+    invwarpedview(img, toaffinemap(op, img))
 end
 
 # Allow affine operations to omit specifying a custom
 # "applylazy". On the other hand this also makes sure that a
 # custom implementation of "applylazy" is preferred over
 # "applylazy_fallback" which by default just calls "applyaffine".
-function applylazy(op::AffineOperation, img)
+function applylazy(op::AffineOperation, img::AbstractArray)
     _applylazy(op, img)
 end
 
 # The purpose of having a separate "_applylazy" is to not
-# force "applylazy" implementations to specify the type of "img".
+# force "applylazy" implementations to specify the type of "img",
+# when typeof(img) <: AbstractArray.
 function _applylazy(op::AffineOperation, img::InvWarpedView)
     applyaffine(op, img)
 end

@@ -49,7 +49,10 @@ struct SplitChannels <: Operation end
 @inline supports_eager(::Type{SplitChannels}) = false
 @inline supports_lazy(::Type{SplitChannels}) = true
 
-applylazy(op::SplitChannels, img::AbstractArray{<:Colorant}) = channelview(img)
+function applylazy(op::SplitChannels, img::AbstractArray{<:Colorant})
+    channelview(img)
+end
+
 function applylazy(op::SplitChannels, img::AbstractArray{<:AbstractGray})
     ns = (1, map(length, indices(img))...)
     reshape(channelview(img), ns)
@@ -307,7 +310,7 @@ Reshape(dims::Int...) = Reshape(dims)
 @inline supports_eager(::Type{<:Reshape}) = false
 @inline supports_lazy(::Type{<:Reshape}) = true
 
-applylazy(op::Reshape, img) = reshape(img, op.dims)
+applylazy(op::Reshape, img::AbstractArray) = reshape(img, op.dims)
 
 function showconstruction(io::IO, op::Reshape)
     print(io, typeof(op).name.name, '(', join(map(string, op.dims),", "), ')')

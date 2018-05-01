@@ -57,8 +57,7 @@ applyeager(op::CacheImage, img::Array) = img
 applyeager(op::CacheImage, img::OffsetArray) = img
 applyeager(op::CacheImage, img::SubArray) = copy(img)
 applyeager(op::CacheImage, img::InvWarpedView) = copy(img)
-applyeager(op::CacheImage, img) = collect(img)
-applyeager(op::CacheImage, imgs::Tuple) = map(img->applyeager(op,img), imgs)
+applyeager(op::CacheImage, img::AbstractArray) = collect(img)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
@@ -90,9 +89,10 @@ CacheImage(buffers::NTuple{N,AbstractArray}) where {N} = CacheImageInto(buffers)
 # TODO: figure out why I decided to say it supports lazy
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
-applyeager(op::CacheImageInto, img) = applylazy(op, img)
+applyeager(op::CacheImageInto, img::AbstractArray) = applylazy(op, img)
+applyeager(op::CacheImageInto, img::Tuple) = applylazy(op, img)
 
-function applylazy(op::CacheImageInto, img)
+function applylazy(op::CacheImageInto, img::Tuple)
     throw(ArgumentError("Operation $(op) not compatiable with given image(s) ($(summary(img))). This can happen if the amount of images does not match the amount of buffers in the operation"))
 end
 

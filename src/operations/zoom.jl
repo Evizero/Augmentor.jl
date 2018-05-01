@@ -96,7 +96,7 @@ function toaffinemap(op::Zoom{2}, img::AbstractMatrix)
     tfm
 end
 
-function applylazy(op::Zoom, img)
+function applylazy(op::Zoom, img::AbstractArray)
     applyaffineview(op, prepareaffine(img))
 end
 
