@@ -10,19 +10,21 @@
     @test @inferred(Augmentor.applyeager(CacheImage(),(square,))) === (square,)
     @test @inferred(Augmentor.applyeager(CacheImage(),(square,square2))) === (square,square2)
 
+    # SubArray
     v = view(square, :, :)
     img = @inferred Augmentor.applyeager(CacheImage(), v)
     @test typeof(img) <: Array
     @test eltype(img) == eltype(v)
     @test img !== square
     @test img == square
+    # Array and SubArray
     tmp,img = @inferred Augmentor.applyeager(CacheImage(), (square,v))
     @test typeof(img) <: Array
     @test eltype(img) == eltype(v)
     @test tmp === square
     @test img !== square
     @test img == square
-
+    # OffsetArray
     o = OffsetArray(square, (-1,2))
     @test @inferred(Augmentor.applyeager(CacheImage(),o)) === o
     @test @inferred(Augmentor.applyeager(CacheImage(),(o,square))) === (o,square)
