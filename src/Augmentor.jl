@@ -76,6 +76,7 @@ include("types.jl")
 include("operation.jl")
 
 include("operations/channels.jl")
+include("operations/dims.jl")
 include("operations/convert.jl")
 include("operations/mapfun.jl")
 
