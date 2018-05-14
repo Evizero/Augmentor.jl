@@ -12,7 +12,8 @@ using ImageInTerminal
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
-@test length(setdiff(ambs, refambs)) == 0
+# The 1 is from plain_indices with a Tuple{} (so its spurious)
+@test length(setdiff(ambs, refambs)) == 1
 
 function str_show(obj)
     io = IOBuffer()

@@ -53,7 +53,7 @@ for FUN in (:applyeager, :applylazy, :applypermute,
 end
 
 function applyeager(op::Operation, img::AbstractArray)
-    plain_array(applylazy(op, img))
+    maybe_copy(applylazy(op, img))
 end
 
 function applyaffineview(op::Operation, img::AbstractArray)

@@ -50,7 +50,7 @@ struct SplitChannels <: Operation end
 @inline supports_lazy(::Type{SplitChannels}) = true
 
 function applylazy(op::SplitChannels, img::AbstractArray{<:Colorant})
-    channelview(img)
+    plain_indices(channelview(img))
 end
 
 function applylazy(op::SplitChannels, img::AbstractArray{<:AbstractGray})
@@ -137,7 +137,7 @@ end
 @inline supports_lazy(::Type{<:CombineChannels}) = true
 
 function applylazy(op::CombineChannels, img::AbstractArray{<:Number})
-    colorview(op.colortype, img)
+    colorview(op.colortype, plain_indices(img))
 end
 
 function applylazy(op::CombineChannels{<:AbstractGray}, img::AbstractArray{<:Number})
