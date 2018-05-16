@@ -144,7 +144,7 @@ Reshape(dims::Int...) = Reshape(dims)
 @inline supports_eager(::Type{<:Reshape}) = false
 @inline supports_lazy(::Type{<:Reshape}) = true
 
-applylazy(op::Reshape, img::AbstractArray) = reshape(img, op.dims)
+applylazy(op::Reshape, img::AbstractArray) = reshape(plain_indices(img), op.dims)
 
 function showconstruction(io::IO, op::Reshape)
     print(io, typeof(op).name.name, '(', join(map(string, op.dims),", "), ')')
