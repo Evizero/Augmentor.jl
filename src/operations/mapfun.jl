@@ -51,7 +51,7 @@ end
 @inline supports_lazy(::Type{<:MapFun}) = true
 
 function applyeager(op::MapFun, img::AbstractArray)
-    plain_array(map(op.fun, img))
+    maybe_copy(map(op.fun, img))
 end
 
 function applylazy(op::MapFun, img::AbstractArray)
@@ -130,7 +130,7 @@ end
 
 function applyeager(op::AggregateThenMapFun, img::AbstractArray)
     agg = op.aggfun(img)
-    plain_array(map(x -> op.mapfun(x, agg), img))
+    maybe_copy(map(x -> op.mapfun(x, agg), img))
 end
 
 function applylazy(op::AggregateThenMapFun, img::AbstractArray)
