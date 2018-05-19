@@ -40,11 +40,7 @@ julia> A = rand(RGB, 10, 10) # three color channels
 10×10 Array{RGB{Float64},2}:
 [...]
 
-julia> augment(A, ConvertEltype(Gray)) # convert to grayscale
-10×10 Array{Gray{Float64},2}:
-[...]
-
-julia> augment(A, ConvertEltype(Gray{Float32})) # more specific
+julia> augment(A, ConvertEltype(Gray{Float32})) # convert to grayscale
 10×10 Array{Gray{Float32},2}:
 [...]
 ```
@@ -56,7 +52,7 @@ end
 @inline supports_lazy(::Type{<:ConvertEltype}) = true
 
 function applyeager(op::ConvertEltype{T}, img::AbstractArray) where T
-    convert(Array{T}, img)
+    maybe_copy(convert(AbstractArray{T}, img))
 end
 
 function applylazy(op::ConvertEltype{T}, img::AbstractArray) where T
