@@ -68,6 +68,7 @@
                 img_out = f(img_in)
                 res = @inferred(Augmentor.applylazy(SplitChannels(), img_in))
                 @test res == img_out
+                @test res == Augmentor.applyeager(SplitChannels(), img_in)
                 @test typeof(res) == typeof(img_out)
             end
         end
@@ -214,6 +215,7 @@ end
                 img_out = f1(T, img_in)
                 res = @inferred(Augmentor.applylazy(CombineChannels(T), img_in))
                 @test res == img_out
+                @test res == Augmentor.applyeager(CombineChannels(T), img_in)
                 @test typeof(res) == typeof(img_out)
                 @test eltype(res) == Gray{N0f8}
             end
@@ -221,6 +223,7 @@ end
                 img_out = f2(T, img_in)
                 res = @inferred(Augmentor.applylazy(CombineChannels(T), img_in))
                 @test res == img_out
+                @test res == Augmentor.applyeager(CombineChannels(T), img_in)
                 @test typeof(res) == typeof(img_out)
                 @test eltype(res) == RGB{N0f8}
             end

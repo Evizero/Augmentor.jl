@@ -17,7 +17,20 @@
     @test eltype(img) == eltype(v)
     @test img !== square
     @test img == square
+    # Identidy ranges
+    v = view(square, IdentityRange(1:3), IdentityRange(1:3))
+    img = @inferred Augmentor.applyeager(CacheImage(), v)
+    @test typeof(img) <: OffsetArray
+    @test eltype(img) == eltype(v)
+    @test img == OffsetArray(square, 0, 0)
+    # Affine
+    v = Augmentor.prepareaffine(square)
+    img = @inferred Augmentor.applyeager(CacheImage(), v)
+    @test typeof(img) <: OffsetArray
+    @test eltype(img) == eltype(v)
+    @test img == OffsetArray(square, 0, 0)
     # Array and SubArray
+    v = view(square, :, :)
     tmp,img = @inferred Augmentor.applyeager(CacheImage(), (square,v))
     @test typeof(img) <: Array
     @test eltype(img) == eltype(v)

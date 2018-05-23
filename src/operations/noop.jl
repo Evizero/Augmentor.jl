@@ -15,7 +15,7 @@ struct NoOp <: AffineOperation end
 
 # TODO: implement method for n-dim arrays
 toaffinemap(::NoOp, img::AbstractMatrix) = AffineMap(@SMatrix([1. 0; 0 1.]), @SVector([0.,0.]))
-applyeager(::NoOp, img::AbstractArray) = plain_array(img)
+applyeager(::NoOp, img::AbstractArray) = maybe_copy(img)
 applylazy(::NoOp, img::AbstractArray) = img
 
 function applyview(::NoOp, img::AbstractArray)

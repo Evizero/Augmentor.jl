@@ -53,11 +53,7 @@ pl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)
 """
 struct CacheImage <: ImageOperation end
 
-applyeager(op::CacheImage, img::Array) = img
-applyeager(op::CacheImage, img::OffsetArray) = img
-applyeager(op::CacheImage, img::SubArray) = copy(img)
-applyeager(op::CacheImage, img::InvWarpedView) = copy(img)
-applyeager(op::CacheImage, img::AbstractArray) = collect(img)
+applyeager(op::CacheImage, img::AbstractArray) = maybe_copy(img)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
@@ -86,7 +82,6 @@ CacheImage(buffer::AbstractArray) = CacheImageInto(buffer)
 CacheImage(buffers::AbstractArray...) = CacheImageInto(buffers)
 CacheImage(buffers::NTuple{N,AbstractArray}) where {N} = CacheImageInto(buffers)
 
-# TODO: figure out why I decided to say it supports lazy
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
 applyeager(op::CacheImageInto, img::AbstractArray) = applylazy(op, img)

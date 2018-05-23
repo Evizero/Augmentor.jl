@@ -74,6 +74,7 @@
                 @test_throws MethodError Augmentor.applylazy(PermuteDims(3,2,1), img_in)
                 res = @inferred(Augmentor.applylazy(PermuteDims(2,1), img_in))
                 @test res == img_out
+                @test res == Augmentor.applyeager(PermuteDims(2,1), img_in)
                 @test typeof(res) == typeof(img_out)
             end
         end
@@ -175,6 +176,7 @@ end
             for img_in in imgs
                 img_out = reshape(Augmentor.plain_indices(img_in), (3,2,1))
                 res = @inferred(Augmentor.applylazy(Reshape(3,2,1), img_in))
+                @test res == Augmentor.applyeager(Reshape(3,2,1), img_in)
                 @test res == img_out
                 @test typeof(res) == typeof(img_out)
             end

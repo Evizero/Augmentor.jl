@@ -8,9 +8,23 @@ end
 @testset "eager" begin
     @test_throws MethodError Augmentor.applyeager(NoOp(), nothing)
     @test Augmentor.supports_eager(NoOp) === false
-    @test @inferred(Augmentor.applyeager(NoOp(), rect)) === rect
-    @test @inferred(Augmentor.applyeager(NoOp(), view(rect,:,:))) == rect
-    @test @inferred(Augmentor.applyeager(NoOp(), OffsetArray(rect, (-1,-2)))) === rect
+    res1 = rect
+    res2 = OffsetArray(rect, -2, -1)
+    res3 = OffsetArray(rect, 0, 0)
+    imgs = [
+        (rect, res1),
+        (view(rect, :, :), res1),
+        (Augmentor.prepareaffine(rect), res3),
+        (OffsetArray(rect, -2, -1), res2),
+        (view(rect, IdentityRange(1:2), IdentityRange(1:3)), res3),
+    ]
+    @testset "single image" begin
+        for (img_in, img_out) in imgs
+            res = @inferred(Augmentor.applyeager(NoOp(), img_in))
+            @test res == img_out
+            @test typeof(res) == typeof(img_out)
+        end
+    end
 end
 @testset "affine" begin
     @test_throws MethodError Augmentor.toaffinemap(NoOp(), nothing)
@@ -31,8 +45,26 @@ end
 @testset "lazy" begin
     @test Augmentor.supports_lazy(NoOp) === true
     @test @inferred(Augmentor.applylazy(NoOp(), rect)) === rect
+    oa = OffsetArray(rect, -2, -1)
+    @test @inferred(Augmentor.applylazy(NoOp(), oa)) === oa
     wv = Augmentor.prepareaffine(rect)
     @test @inferred(Augmentor.applylazy(NoOp(), wv)) === wv
+    res1 = rect
+    res2 = OffsetArray(rect, -2, -1)
+    res3 = OffsetArray(rect, 0, 0)
+    imgs = [
+        (rect, res1),
+        (view(rect, :, :), res1),
+        (Augmentor.prepareaffine(rect), res3),
+        (OffsetArray(rect, -2, -1), res2),
+        (view(rect, IdentityRange(1:2), IdentityRange(1:3)), res3),
+    ]
+    @testset "single image" begin
+        for (img_in, img_out) in imgs
+            res = @inferred(Augmentor.applylazy(NoOp(), img_in))
+            @test res == img_out
+        end
+    end
 end
 @testset "view" begin
     @test Augmentor.supports_view(NoOp) === true
