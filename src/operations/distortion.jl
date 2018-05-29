@@ -132,17 +132,11 @@ end
 @inline supports_eager(::Type{<:ElasticDistortion}) = false
 @inline supports_lazy(::Type{<:ElasticDistortion})  = true
 
-function applyeager(op::ElasticDistortion, imgs::Tuple)
-    plain_array(applylazy(op, imgs))
+function randparam(op::ElasticDistortion, img)
+    gaussian_field(op.gridheight, op.gridwidth, op.scale, op.sigma, op.iterations, op.border, op.normalize)
 end
 
-function applylazy(op::ElasticDistortion, imgs::Tuple)
-    field = gaussian_field(op.gridheight, op.gridwidth, op.scale, op.sigma, op.iterations, op.border, op.normalize)
-    map(img -> DistortedView(img, field), imgs)
-end
-
-function applylazy(op::ElasticDistortion, img::AbstractArray)
-    field = gaussian_field(op.gridheight, op.gridwidth, op.scale, op.sigma, op.iterations, op.border, op.normalize)
+function applylazy(op::ElasticDistortion, img::AbstractArray, field)
     DistortedView(img, field)
 end
 

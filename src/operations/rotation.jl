@@ -60,22 +60,22 @@ Rotate90(p::Number) = Either(Rotate90(), p)
 @inline supports_permute(::Type{Rotate90}) = true
 
 toaffinemap(::Rotate90, img::AbstractMatrix) = recenter(RotMatrix(pi/2), center(img))
-applyeager(::Rotate90, img::AbstractMatrix) = plain_array(rotl90(img))
-applylazy_fallback(op::Rotate90, img::AbstractMatrix) = applypermute(op, img)
+applyeager(::Rotate90, img::AbstractMatrix, param) = plain_array(rotl90(img))
+applylazy_fallback(op::Rotate90, img::AbstractMatrix, param) = applypermute(op, img, param)
 
-function applypermute(::Rotate90, img::AbstractMatrix{T}) where T
+function applypermute(::Rotate90, img::AbstractMatrix{T}, param) where T
     idx = map(StepRange, indices(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, reverse(idx[2]), idx[1])
 end
 
-function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
+function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
     idx = map(StepRange, sub.indexes)
     img = parent(parent(sub))
     view(img, reverse(idx[2]), idx[1])
 end
 
-function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}) where {T,IT}
+function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT}
     idx = map(StepRange, sub.indexes)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
@@ -143,10 +143,10 @@ Rotate180(p::Number) = Either(Rotate180(), p)
 @inline supports_stepview(::Type{Rotate180}) = true
 
 toaffinemap(::Rotate180, img::AbstractMatrix) = recenter(RotMatrix(pi), center(img))
-applyeager(::Rotate180, img::AbstractMatrix) = plain_array(rot180(img))
-applylazy_fallback(op::Rotate180, img::AbstractMatrix) = applystepview(op, img)
+applyeager(::Rotate180, img::AbstractMatrix, param) = plain_array(rot180(img))
+applylazy_fallback(op::Rotate180, img::AbstractMatrix, param) = applystepview(op, img, param)
 
-function applystepview(::Rotate180, img::AbstractMatrix)
+function applystepview(::Rotate180, img::AbstractMatrix, param)
     idx = map(i->1:1:length(i), indices(img))
     indirect_view(img, (reverse(idx[1]), reverse(idx[2])))
 end
@@ -214,22 +214,22 @@ Rotate270(p::Number) = Either(Rotate270(), p)
 @inline supports_permute(::Type{Rotate270}) = true
 
 toaffinemap(::Rotate270, img::AbstractMatrix) = recenter(RotMatrix(-pi/2), center(img))
-applyeager(::Rotate270, img::AbstractMatrix) = plain_array(rotr90(img))
-applylazy_fallback(op::Rotate270, img::AbstractMatrix) = applypermute(op, img)
+applyeager(::Rotate270, img::AbstractMatrix, param) = plain_array(rotr90(img))
+applylazy_fallback(op::Rotate270, img::AbstractMatrix, param) = applypermute(op, img, param)
 
-function applypermute(::Rotate270, img::AbstractMatrix{T}) where T
+function applypermute(::Rotate270, img::AbstractMatrix{T}, param) where T
     idx = map(StepRange, indices(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, idx[2], reverse(idx[1]))
 end
 
-function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
+function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
     idx = map(StepRange, sub.indexes)
     img = parent(parent(sub))
     view(img, idx[2], reverse(idx[1]))
 end
 
-function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}) where {T,IT}
+function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT}
     idx = map(StepRange, sub.indexes)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
@@ -320,8 +320,10 @@ Rotate(degree::Real) = Rotate(degree:degree)
 
 @inline supports_eager(::Type{<:Rotate}) = false
 
-function toaffinemap(op::Rotate, img::AbstractMatrix)
-    recenter(RotMatrix(deg2rad(Float64(safe_rand(op.degree)))), center(img))
+randparam(op::Rotate, img) = Float64(safe_rand(op.degree))
+
+function toaffinemap(op::Rotate, img::AbstractMatrix, angle)
+    recenter(RotMatrix(deg2rad(Float64(angle))), center(img))
 end
 
 function Base.show(io::IO, op::Rotate)

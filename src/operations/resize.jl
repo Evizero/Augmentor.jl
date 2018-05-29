@@ -66,24 +66,24 @@ function toaffinemap(op::Resize{2}, img::AbstractMatrix)
     tscale ∘ ttrans
 end
 
-function applyeager(op::Resize, img::AbstractArray)
+function applyeager(op::Resize, img::AbstractArray, param)
     plain_array(imresize(img, op.size))
 end
 
-function applylazy(op::Resize, img::AbstractArray)
-    applyaffineview(op, prepareaffine(img))
+function applylazy(op::Resize, img::AbstractArray, param)
+    applyaffineview(op, prepareaffine(img), param)
 end
 
 function padrange(range::AbstractUnitRange, pad)
     first(range)-pad:last(range)+pad
 end
 
-function applyaffineview(op::Resize{N}, img::AbstractArray{T,N}) where {T,N}
+function applyaffineview(op::Resize{N}, img::AbstractArray{T,N}, param) where {T,N}
     Rin, Rout = CartesianRange(indices(img)), CartesianRange(op.size)
     sf = map(/, (last(Rout)-first(Rout)+1).I, (last(Rin)-first(Rin)+1).I)
     # We have to extrapolate if the image is upscaled,
     # otherwise the original border will only cause a single pixel
-    tinv = toaffinemap(op, img)
+    tinv = toaffinemap(op, img, param)
     inds = ImageTransformations.autorange(img, tinv)
     pad_inds = map((s,r)-> s>=1 ? padrange(r,ceil(Int,s/2)) : r, sf, inds)
     wv = invwarpedview(img, tinv, pad_inds)

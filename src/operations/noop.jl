@@ -15,15 +15,15 @@ struct NoOp <: AffineOperation end
 
 # TODO: implement method for n-dim arrays
 toaffinemap(::NoOp, img::AbstractMatrix) = AffineMap(@SMatrix([1. 0; 0 1.]), @SVector([0.,0.]))
-applyeager(::NoOp, img::AbstractArray) = maybe_copy(img)
-applylazy(::NoOp, img::AbstractArray) = img
+applyeager(::NoOp, img::AbstractArray, param) = maybe_copy(img)
+applylazy(::NoOp, img::AbstractArray, param) = img
 
-function applyview(::NoOp, img::AbstractArray)
+function applyview(::NoOp, img::AbstractArray, param)
     idx = map(i->1:length(i), indices(img))
     indirect_view(img, idx)
 end
 
-function applystepview(::NoOp, img::AbstractArray)
+function applystepview(::NoOp, img::AbstractArray, param)
     idx = map(i->1:1:length(i), indices(img))
     indirect_view(img, idx)
 end

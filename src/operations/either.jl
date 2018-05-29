@@ -131,25 +131,6 @@ end
 # Note: We prefer "affine" only if "img" already is some
 #   "InvWarpedView", otherwise the preference is
 #   view > stepview > permute > affine > affineview
-@generated function applylazy(op::Either, img::AbstractArray)
-    if isinvwarpedview(img) && supports_affine(op)
-        :(applyaffine(op, img))
-    elseif isinvwarpedview(img) && supports_affineview(op)
-        :(applyaffineview(op, img))
-    elseif supports_view(op)
-        :(applyview(op, img))
-    elseif supports_stepview(op)
-        :(applystepview(op, img))
-    elseif supports_permute(op)
-        :(applypermute(op, img))
-    elseif supports_affine(op)
-        :(applyaffine(op, prepareaffine(img)))
-    elseif supports_affineview(op)
-        :(applyaffineview(op, prepareaffine(img)))
-    else
-        :(throw(MethodError(applylazy, (op, img))))
-    end
-end
 @generated function applylazy(op::Either, imgs::Tuple)
     if isinvwarpedview(imgs[1]) && supports_affine(op)
         :(applyaffine(op, imgs))
@@ -170,16 +151,36 @@ end
     end
 end
 
+@generated function applylazy(op::Either, img::AbstractArray, param)
+    if isinvwarpedview(img) && supports_affine(op)
+        :(applyaffine(op, img, param))
+    elseif isinvwarpedview(img) && supports_affineview(op)
+        :(applyaffineview(op, img, param))
+    elseif supports_view(op)
+        :(applyview(op, img, param))
+    elseif supports_stepview(op)
+        :(applystepview(op, img, param))
+    elseif supports_permute(op)
+        :(applypermute(op, img, param))
+    elseif supports_affine(op)
+        :(applyaffine(op, prepareaffine(img), param))
+    elseif supports_affineview(op)
+        :(applyaffineview(op, prepareaffine(img), param))
+    else
+        :(throw(MethodError(applylazy, (op, img, param))))
+    end
+end
+
 @inline isinvwarpedview(::Type{SubArray{T,N,P,I,L}}) where {T,N,P<:InvWarpedView,I,L} = true
 @inline isinvwarpedview(::Type{<:InvWarpedView}) = true
 @inline isinvwarpedview(::Type) = false
 
-function toaffinemap(op::Either, img)
-    supports_affine(typeof(op)) || throw(MethodError(toaffinemap, (op, img)))
+function toaffinemap(op::Either, img, param)
+    supports_affine(typeof(op)) || throw(MethodError(toaffinemap, (op, img, param)))
     p = safe_rand()
     for (i, p_i) in enumerate(op.cum_chances)
         if p <= p_i
-            return toaffinemap_common(op.operations[i], img)
+            return toaffinemap_common(op.operations[i], img, param)
         end
     end
     error("unreachable code reached")
@@ -195,17 +196,25 @@ for KIND in (:eager, :permute, :view, :stepview, :affine, :affineview)
     FUN = Symbol(:apply, KIND)
     SUP = Symbol(:supports_, KIND)
     APP = startswith(String(KIND),"affine") ? Symbol(FUN, :_common) : FUN
-    for T in (:AbstractArray, :Tuple)
-        @eval function ($FUN)(op::Either, img::($T))
-            ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
-            p = safe_rand()
-            for (i, p_i) in enumerate(op.cum_chances)
-                if p <= p_i
-                    return ($APP)(op.operations[i], img)
-                end
+    @eval function ($FUN)(op::Either, img::Tuple)
+        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
+        p = safe_rand()
+        for (i, p_i) in enumerate(op.cum_chances)
+            if p <= p_i
+                return ($APP)(op.operations[i], img)
             end
-            error("unreachable code reached")
         end
+        error("unreachable code reached")
+    end
+    @eval function ($FUN)(op::Either, img::AbstractArray, param)
+        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img, param)))
+        p = safe_rand()
+        for (i, p_i) in enumerate(op.cum_chances)
+            if p <= p_i
+                return ($APP)(op.operations[i], img, param)
+            end
+        end
+        error("unreachable code reached")
     end
 end
 

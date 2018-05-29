@@ -67,11 +67,11 @@ PermuteDims(perm::Vararg{Int,N}) where {N} = PermuteDims{N,perm,invperm(perm)}()
 @inline supports_eager(::Type{<:PermuteDims}) = true
 @inline supports_lazy(::Type{<:PermuteDims}) = true
 
-function applyeager(op::PermuteDims{N,perm}, img::AbstractArray{T,N}) where {T,N,perm}
+function applyeager(op::PermuteDims{N,perm}, img::AbstractArray{T,N}, param) where {T,N,perm}
     permutedims(img, perm)
 end
 
-function applylazy(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N}) where {T,N,perm,iperm}
+function applylazy(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N}, param) where {T,N,perm,iperm}
     PermutedDimsArray{T,N,perm,iperm,typeof(img)}(img)
 end
 
@@ -144,7 +144,7 @@ Reshape(dims::Int...) = Reshape(dims)
 @inline supports_eager(::Type{<:Reshape}) = false
 @inline supports_lazy(::Type{<:Reshape}) = true
 
-applylazy(op::Reshape, img::AbstractArray) = reshape(plain_indices(img), op.dims)
+applylazy(op::Reshape, img::AbstractArray, param) = reshape(plain_indices(img), op.dims)
 
 function showconstruction(io::IO, op::Reshape)
     print(io, typeof(op).name.name, '(', join(map(string, op.dims),", "), ')')

@@ -85,8 +85,9 @@ end
 
 @inline supports_eager(::Type{<:Scale}) = false
 
-function toaffinemap(op::Scale{2}, img::AbstractMatrix)
-    idx = safe_rand(1:length(op.factors[1]))
+randparam(op::Scale, img) = safe_rand(1:length(op.factors[1]))
+
+function toaffinemap(op::Scale{2}, img::AbstractMatrix, idx)
     @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
     tfm
 end
