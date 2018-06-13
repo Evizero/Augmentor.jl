@@ -15,23 +15,9 @@ ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
 # The 1 is from plain_indices with a Tuple{} (so its spurious)
 @test length(setdiff(ambs, refambs)) == 1
 
-function str_show(obj)
-    io = IOBuffer()
-    Base.show(io, obj)
-    readstring(seek(io, 0))
-end
-
-function str_showcompact(obj)
-    io = IOBuffer()
-    Base.showcompact(io, obj)
-    readstring(seek(io, 0))
-end
-
-function str_showconst(obj)
-    io = IOBuffer()
-    Augmentor.showconstruction(io, obj)
-    readstring(seek(io, 0))
-end
+str_show(obj) = @io2str Base.show(::IO, obj)
+str_showcompact(obj) = @io2str Base.showcompact(::IO, obj)
+str_showconst(obj) = @io2str Augmentor.showconstruction(::IO, obj)
 
 camera = testimage("cameraman")
 cameras = similar(camera, size(camera)..., 2)
