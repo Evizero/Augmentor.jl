@@ -65,7 +65,7 @@ ShearX(degree::Real) = ShearX(degree:degree)
 randparam(op::ShearX, img) = Float64(safe_rand(op.degree))
 
 function toaffinemap(op::ShearX, img::AbstractMatrix, angle)
-    recenter(@SMatrix([1. 0.; tan(-deg2rad(angle)) 1.]), center(img))
+    recenter(@SMatrix([1. 0.; tan(-deg2rad(Float64(angle))) 1.]), center(img))
 end
 
 function Base.show(io::IO, op::ShearX)
@@ -150,7 +150,7 @@ ShearY(degree::Real) = ShearY(degree:degree)
 randparam(op::ShearY, img) = Float64(safe_rand(op.degree))
 
 function toaffinemap(op::ShearY, img::AbstractMatrix, angle)
-    recenter(@SMatrix([1. tan(-deg2rad(angle)); 0. 1.]), center(img))
+    recenter(@SMatrix([1. tan(-deg2rad(Float64(angle))); 0. 1.]), center(img))
 end
 
 function Base.show(io::IO, op::ShearY)
