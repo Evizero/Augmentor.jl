@@ -142,7 +142,7 @@ toaffinemap(::FlipY, img::AbstractMatrix) = recenter(@SMatrix([-1. 0; 0 1.]), ce
 # Base.flipdim not type-stable for AbstractArray's
 applyeager(::FlipY, img::Array, param) = plain_array(flipdim(img,1))
 applyeager(op::FlipY, img::AbstractArray, param) = plain_array(applystepview(op, img, param))
-applylazy_fallback(op::FlipY, img::AbstractMatrix) = applystepview(op, img, param)
+applylazy_fallback(op::FlipY, img::AbstractMatrix, param) = applystepview(op, img, param)
 
 function applystepview(::FlipY, img::AbstractMatrix, param)
     idx = map(i->1:1:length(i), indices(img))
