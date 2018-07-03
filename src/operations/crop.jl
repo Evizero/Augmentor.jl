@@ -173,10 +173,6 @@ CropNative(indexes::Range...) = CropNative(indexes)
 
 @inline applylazy(op::CropNative, img::AbstractArray, param) = applyview(op, img, param)
 
-function applyeager(op::CropNative, img::AbstractArray, param)
-    plain_array(img[op.indexes...])
-end
-
 function applyaffineview(op::CropNative, img::AbstractArray, param)
     applyview(op, prepareaffine(img), param)
 end
@@ -518,10 +514,6 @@ end
 
 randparam(op::RCropRatio, imgs::Tuple) = rcropratio_indices(op, imgs[1])
 randparam(op::RCropRatio, img::AbstractArray) = rcropratio_indices(op, img)
-
-function applyeager(op::RCropRatio, img::AbstractArray, inds)
-    plain_array(applyview(op, img, inds))
-end
 
 function applylazy(op::RCropRatio, img::AbstractArray, inds)
     applyview(op, img, inds)

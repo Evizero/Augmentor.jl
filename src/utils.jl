@@ -117,6 +117,7 @@ function direct_indices(::Tuple{}, ::Tuple{})
     throw(MethodError(direct_indices, ((),())))
 end
 
+# TODO: Figure out why this method exists
 function direct_indices(O::NTuple{N,IdentityRange}, I::NTuple{N,StepRange}) where N
     throw(MethodError(direct_indices, (O, I)))
 end
