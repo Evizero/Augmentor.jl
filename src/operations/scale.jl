@@ -85,10 +85,15 @@ end
 
 @inline supports_eager(::Type{<:Scale}) = false
 
-randparam(op::Scale, img) = safe_rand(1:length(op.factors[1]))
+randparam(op::Scale, imgs::Tuple) = randparam(op, imgs[1])
+
+function randparam(op::Scale, img::AbstractArray{T,N}) where {T,N}
+    i = safe_rand(1:length(op.factors[1]))
+    ntuple(j -> Float64(op.factors[j][i]), Val{N})
+end
 
 function toaffinemap(op::Scale{2}, img::AbstractMatrix, idx)
-    @inbounds tfm = recenter(@SMatrix([Float64(op.factors[1][idx]) 0.; 0. Float64(op.factors[2][idx])]), center(img))
+    @inbounds tfm = recenter(@SMatrix([Float64(idx[1]) 0.; 0. Float64(idx[2])]), center(img))
     tfm
 end
 
