@@ -100,7 +100,14 @@ end
 
 @testset "eager" begin
     @test_throws MethodError Augmentor.applyeager(Either(Rotate90(),NoOp()), nothing)
-    for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
+    imgs = [
+        (rect),
+        (view(rect, :, :)),
+        (Augmentor.prepareaffine(rect)),
+        (OffsetArray(rect, -2, -1)),
+        (view(rect, IdentityRange(1:2), IdentityRange(1:3))),
+    ]
+    for img in imgs
         let op = @inferred Either((Rotate90(),ElasticDistortion(5)), (1,0))
             @test_throws MethodError Augmentor.applylazy(op, img)
             @test Augmentor.supports_eager(op) === true
@@ -111,30 +118,33 @@ end
             @test Augmentor.supports_stepview(op) === false
             @test Augmentor.supports_permute(op) === false
             @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            res1, res2 = @inferred(Augmentor.applyeager(op, (square2, img)))
+            @test res1 == rotl90(square2)
+            @test res2 == rotl90(rect)
         end
         let op = @inferred Either((Rotate90(),Rotate270()), (1,0))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,1,0))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == rotr90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Rotate90(),Rotate270(),NoOp()), (0,0,1))
             @test Augmentor.supports_eager(op) === true
-            if typeof(img) <: SubArray
-                @test @inferred(Augmentor.applyeager(op, img)) == rect
-                @test typeof(Augmentor.applyeager(op, img)) <: Array
+            if img isa Union{Array,OffsetArray}
+                @test parent(@inferred(Augmentor.applyeager(op, img))) === rect
             else
-                @test @inferred(Augmentor.applyeager(op, img)) === rect
+                @test @inferred(Augmentor.applyeager(op, img)) == rect
+                @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
             end
         end
         let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,0,1))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == rect[1:2,2:3]
+            @test collect(@inferred(Augmentor.applyeager(op, img))) == rect[1:2,2:3]
             @test_throws MethodError Augmentor.applyaffine(op, rect)
             @test_throws MethodError Augmentor.applyview(op, rect)
             @test_throws MethodError Augmentor.applystepview(op, rect)
@@ -143,32 +153,37 @@ end
         let op = @inferred Either((Rotate90(),Zoom(.8)), (1,0))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Rotate90(),FlipX()), (1,0))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Rotate90(),FlipX()), (0,1))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,2)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Rotate90(),FlipY()), (0,1))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == flipdim(rect,1)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Rotate90(),Resize(5,5)), (0,1))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
         end
         let op = @inferred Either((Crop(1:2,1:2),Resize(5,5)), (0,1))
             @test Augmentor.supports_eager(op) === true
             @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
-            @test typeof(Augmentor.applyeager(op, img)) <: Array
+            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+        end
+        let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)))
+            @test Augmentor.supports_eager(op) === true
+            res1, res2 = @inferred(Augmentor.applyeager(op, (N0f8.(img), img)))
+            @test res1 == res2
         end
     end
 end
@@ -182,11 +197,14 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect, 1)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+        res1, res2 = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine.((square2, square)))
+        @test res1 == rotl90(square2)
+        @test res2 == rotl90(square)
     end
     let op = @inferred Either((Rotate90(),Rotate270()), (1,0))
         @test Augmentor.supports_affine(op) === true
@@ -196,7 +214,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === true
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect, 1)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
@@ -210,7 +228,7 @@ end
         @test Augmentor.supports_stepview(op) === true
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([1. 0.; 0. -1.], [0,4])
+        @test @inferred(Augmentor.toaffinemap(op, rect, 2)) ≈ AffineMap([1. 0.; 0. -1.], [0,4])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == flipdim(square,2)
@@ -224,7 +242,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([-1. 0.; 0. 1.], [3,0])
+        @test @inferred(Augmentor.toaffinemap(op, rect, 2)) ≈ AffineMap([-1. 0.; 0. 1.], [3,0])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == flipdim(square,1)
@@ -238,7 +256,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === true
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect, 2)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
@@ -252,7 +270,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.applyaffine(op, nothing)
-        @test @inferred(Augmentor.toaffinemap(op, rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(op, rect, 1)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
@@ -261,6 +279,12 @@ end
         @test parent(wv2).itp.coefs === square
         @test wv2 == rotl90(square)
         @test typeof(wv2) == typeof(wv)
+    end
+    let op = @inferred Either((Rotate180(),FlipX(),FlipY()))
+        res1, res2 = @inferred(Augmentor.applyaffine(op, (N0f8.(square), square)))
+        @test res1 == res2
+        @test typeof(res1) <: InvWarpedView{N0f8,2}
+        @test typeof(res2) <: InvWarpedView{eltype(square),2}
     end
 end
 
@@ -273,7 +297,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.toaffinemap(op, nothing)
-        @test_throws MethodError Augmentor.toaffinemap(op, rect)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect, 1)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
@@ -284,6 +308,9 @@ end
         @test typeof(wv) == typeof(wv2)
         @test parent(parent(wv2)).itp.coefs === square
         @test wv2 == wv
+        res1, res2 = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine.((square2,square)))
+        @test res1 == rotl90(square2)
+        @test res2 == rotl90(square)
     end
     let op = @inferred Either((Rotate90(),Rotate270(),CropSize(2,2)),(0,0,1))
         @test Augmentor.supports_affine(op) === false
@@ -293,7 +320,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.toaffinemap(op, nothing)
-        @test_throws MethodError Augmentor.toaffinemap(op, rect)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect, 1)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
@@ -313,7 +340,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.toaffinemap(op, nothing)
-        @test_throws MethodError Augmentor.toaffinemap(op, rect)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect, 1)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
@@ -332,7 +359,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.toaffinemap(op, nothing)
-        @test_throws MethodError Augmentor.toaffinemap(op, rect)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect, 1)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
@@ -352,7 +379,7 @@ end
         @test Augmentor.supports_stepview(op) === false
         @test Augmentor.supports_permute(op) === false
         @test_throws MethodError Augmentor.toaffinemap(op, nothing)
-        @test_throws MethodError Augmentor.toaffinemap(op, rect)
+        @test_throws MethodError Augmentor.toaffinemap(op, rect, 1)
         @test_throws MethodError Augmentor.applyaffine(op, Augmentor.prepareaffine(square))
         wv = @inferred Augmentor.applyaffineview(op, Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
@@ -363,6 +390,18 @@ end
         @test typeof(wv) == typeof(wv2)
         @test parent(parent(wv2)).itp.coefs === square
         @test wv2 == wv
+    end
+    let op = @inferred Either((Rotate90(),Rotate(45),Crop(1:2,1:2)))
+        @test Augmentor.supports_affine(op) === false
+        @test Augmentor.supports_lazy(op) === true
+        @test Augmentor.supports_affineview(op) === true
+        @test Augmentor.supports_view(op) === false
+        @test Augmentor.supports_stepview(op) === false
+        @test Augmentor.supports_permute(op) === false
+        res1, res2 = @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine.((N0f8.(square), square))))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:InvWarpedView}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:InvWarpedView}
     end
 end
 
@@ -377,6 +416,9 @@ end
         @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
+        res1, res2 = @inferred(Augmentor.applylazy(op, (square2, rect)))
+        @test res1 === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        @test res2 === view(rect, IdentityRange(1:2), IdentityRange(1:3))
     end
     let op = @inferred Either((NoOp(),Crop(1:2,2:3)), (0,1))
         @test Augmentor.supports_affine(op) === false
@@ -400,6 +442,18 @@ end
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
     end
+    let op = @inferred Either((Crop(1:2,2:4),CropSize(2,3),CropRatio(1)))
+        tres1, tres2 = @inferred(Augmentor.applylazy(op, (N0f8.(square2), square2)))
+        res1, res2 = @inferred(Augmentor.applyview(op, (N0f8.(square2), square2)))
+        @test typeof((tres1,tres2)) == typeof((res1,res2))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:Array}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:Array}
+        res1, res2 = @inferred(Augmentor.applyview(op, (N0f8.(square2), Augmentor.prepareaffine(square2))))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:Array}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:InvWarpedView}
+    end
 end
 
 @testset "stepview" begin
@@ -417,6 +471,9 @@ end
         @test v === view(rect,2:-1:1,3:-1:1)
         @test v == rot180(rect)
         @test typeof(v) <: SubArray
+        res1, res2 = @inferred Augmentor.applystepview(op, (square2, rect))
+        @test res1 === view(square2,4:-1:1,4:-1:1)
+        @test res2 === view(rect,2:-1:1,3:-1:1)
     end
     let op = @inferred Either((Rotate180(),FlipX()), (0,1))
         @test Augmentor.supports_affine(op) === true
@@ -511,6 +568,18 @@ end
         @test v === view(square,1:1:2,1:1:3)
         @test typeof(v) <: SubArray
     end
+    let op = @inferred Either((Rotate180(),NoOp(),Crop(1:2,2:3)))
+        tres1, tres2 = @inferred(Augmentor.applylazy(op, (N0f8.(square2), square2)))
+        res1, res2 = @inferred(Augmentor.applystepview(op, (N0f8.(square2), square2)))
+        @test typeof((tres1,tres2)) == typeof((res1,res2))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:Array}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:Array}
+        res1, res2 = @inferred(Augmentor.applystepview(op, (N0f8.(square2), Augmentor.prepareaffine(square2))))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:Array}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:InvWarpedView}
+    end
 end
 
 @testset "permute" begin
@@ -528,6 +597,9 @@ end
         @test v === view(permuteddimsview(rect,(2,1)),3:-1:1,1:1:2)
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
+        res1, res2 = @inferred Augmentor.applylazy(op, (square2, rect))
+        @test res1 == rotl90(square2)
+        @test res2 == rotl90(rect)
     end
     let op = @inferred Either((Rotate90(),Rotate270()), (0,1))
         @test Augmentor.supports_affine(op) === true
@@ -543,5 +615,18 @@ end
         @test v === view(permuteddimsview(rect,(2,1)),1:1:3,2:-1:1)
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
+    end
+    let op = @inferred Either((Rotate90(),Rotate270()))
+        tres1, tres2 = @inferred(Augmentor.applylazy(op, (N0f8.(square2), square2)))
+        res1, res2 = @inferred(Augmentor.applypermute(op, (N0f8.(square2), square2)))
+        @test typeof((tres1,tres2)) == typeof((res1,res2))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:PermutedDimsArray}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:PermutedDimsArray}
+        res1, res2 = @inferred(Augmentor.applypermute(op, (N0f8.(square2), Augmentor.prepareaffine(square2))))
+        @test res1 == res2
+        @test typeof(res1) <: SubArray{N0f8,2,<:PermutedDimsArray}
+        @test typeof(res2) <: SubArray{eltype(square),2,<:PermutedDimsArray}
+        @test typeof(parent(parent(res2))) <: InvWarpedView
     end
 end

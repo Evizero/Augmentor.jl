@@ -127,47 +127,37 @@ for FUN in (:supports_view,
         all($FUN, T.types)
 end
 
+function randparam(op::Either, img)
+    p = safe_rand()
+    for (i, p_i) in enumerate(op.cum_chances)
+        if p <= p_i
+            return i
+        end
+    end
+    error("unreachable code reached")
+end
+
 # Choose lazy strategy based on shared support of operations.
 # Note: We prefer "affine" only if "img" already is some
 #   "InvWarpedView", otherwise the preference is
 #   view > stepview > permute > affine > affineview
-@generated function applylazy(op::Either, imgs::Tuple)
-    if isinvwarpedview(imgs[1]) && supports_affine(op)
-        :(applyaffine(op, imgs))
-    elseif isinvwarpedview(imgs[1]) && supports_affineview(op)
-        :(applyaffineview(op, imgs))
-    elseif supports_view(op)
-        :(applyview(op, imgs))
-    elseif supports_stepview(op)
-        :(applystepview(op, imgs))
-    elseif supports_permute(op)
-        :(applypermute(op, imgs))
-    elseif supports_affine(op)
-        :(applyaffine(op, map(prepareaffine, imgs)))
-    elseif supports_affineview(op)
-        :(applyaffineview(op, map(prepareaffine, imgs)))
-    else
-        :(throw(MethodError(applylazy, (op, imgs))))
-    end
-end
-
-@generated function applylazy(op::Either, img::AbstractArray, param)
+@generated function applylazy(op::Either, img::AbstractArray, idx)
     if isinvwarpedview(img) && supports_affine(op)
-        :(applyaffine(op, img, param))
+        :(applyaffine(op, img, idx))
     elseif isinvwarpedview(img) && supports_affineview(op)
-        :(applyaffineview(op, img, param))
+        :(applyaffineview(op, img, idx))
     elseif supports_view(op)
-        :(applyview(op, img, param))
+        :(applyview(op, img, idx))
     elseif supports_stepview(op)
-        :(applystepview(op, img, param))
+        :(applystepview(op, img, idx))
     elseif supports_permute(op)
-        :(applypermute(op, img, param))
+        :(applypermute(op, img, idx))
     elseif supports_affine(op)
-        :(applyaffine(op, prepareaffine(img), param))
+        :(applyaffine(op, prepareaffine(img), idx))
     elseif supports_affineview(op)
-        :(applyaffineview(op, prepareaffine(img), param))
+        :(applyaffineview(op, prepareaffine(img), idx))
     else
-        :(throw(MethodError(applylazy, (op, img, param))))
+        :(throw(MethodError(applylazy, (op, img, idx))))
     end
 end
 
@@ -175,15 +165,19 @@ end
 @inline isinvwarpedview(::Type{<:InvWarpedView}) = true
 @inline isinvwarpedview(::Type) = false
 
-function toaffinemap(op::Either, img, param)
-    supports_affine(typeof(op)) || throw(MethodError(toaffinemap, (op, img, param)))
-    p = safe_rand()
-    for (i, p_i) in enumerate(op.cum_chances)
-        if p <= p_i
-            return toaffinemap_common(op.operations[i], img, param)
-        end
-    end
-    error("unreachable code reached")
+# Only provided for the sake of interface completeness (not used)
+function toaffinemap(op::Either, img, idx)
+    supports_affine(typeof(op)) || throw(MethodError(toaffinemap, (op, img, idx)))
+    op_inner = op.operations[idx]
+    toaffinemap_common(op_inner, img, randparam(op_inner, img))
+end
+
+# To preserve type stability of "applyeager", always promote
+# arrays to offset arrays
+@inline _offsetarray(A::Array) = OffsetArray(A, 0, 0)
+@inline _offsetarray(A::OffsetArray) = A
+function applyeager(op::Either, img::AbstractArray, idx)
+    _offsetarray(applyeager(op.operations[idx], img))
 end
 
 # Sample a random operation and pass the function call along.
@@ -192,29 +186,13 @@ end
 #   "AffineMap" may differ from one operation to the next
 #   (e.g. "Rotate" uses a "RotMatrix" by default, while "Scale"
 #   for obvious reasons does not)
-for KIND in (:eager, :permute, :view, :stepview, :affine, :affineview)
+for KIND in (:permute, :view, :stepview, :affine, :affineview)
     FUN = Symbol(:apply, KIND)
     SUP = Symbol(:supports_, KIND)
     APP = startswith(String(KIND),"affine") ? Symbol(FUN, :_common) : FUN
-    @eval function ($FUN)(op::Either, img::Tuple)
-        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img)))
-        p = safe_rand()
-        for (i, p_i) in enumerate(op.cum_chances)
-            if p <= p_i
-                return ($APP)(op.operations[i], img)
-            end
-        end
-        error("unreachable code reached")
-    end
-    @eval function ($FUN)(op::Either, img::AbstractArray, param)
-        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img, param)))
-        p = safe_rand()
-        for (i, p_i) in enumerate(op.cum_chances)
-            if p <= p_i
-                return ($APP)(op.operations[i], img, param)
-            end
-        end
-        error("unreachable code reached")
+    @eval function ($FUN)(op::Either, img::AbstractArray, idx)
+        ($SUP)(typeof(op)) || throw(MethodError($FUN, (op, img, idx)))
+        ($APP)(op.operations[idx], img)
     end
 end
 
