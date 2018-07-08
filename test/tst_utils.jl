@@ -1,14 +1,3 @@
-# Things that need to be tested
-# [x] testpattern and use_testpattern
-# [x] safe_rand and the mutex
-# [x] plain_array
-# [x] match_idx
-# [x] indirect_view
-# [x] direct_view
-# [x] vectorize
-# [x] round_if_float
-# [x] unionrange
-
 @testset "testpattern" begin
     tp = testpattern()
     @test typeof(tp) <: Matrix
@@ -34,41 +23,133 @@ end
     @test typeof(num) <: Vector{Float64}
 end
 
+@testset "maybe_copy" begin
+    A = [1 2 3; 4 5 6; 7 8 9]
+    Ao = OffsetArray(A, (-2,-1))
+    @test @inferred(Augmentor.maybe_copy(A)) === A
+    @test @inferred(Augmentor.maybe_copy(Ao)) === Ao
+    let Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
+        @test @inferred(Augmentor.maybe_copy(Ast)) === Ast
+    end
+    let v = view(A, 2:3, 1:2)
+        @test @inferred(Augmentor.maybe_copy(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.maybe_copy(v)) <: Array
+    end
+    let v = view(OffsetArray(A, (-2,-1)), 0:1, 0:1)
+        @test @inferred(Augmentor.maybe_copy(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.maybe_copy(v)) <: Array
+    end
+    let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
+        @test @inferred(Augmentor.maybe_copy(v)) == OffsetArray(A[2:3,1:2], (1, 0))
+        @test typeof(Augmentor.maybe_copy(v)) <: OffsetArray
+    end
+    let v = ChannelView(rect)
+        @test @inferred(Augmentor.maybe_copy(v)) == channelview(rect)
+        @test typeof(Augmentor.maybe_copy(v)) <: Array
+    end
+    let p = permuteddimsview(A, (2,1))
+        @test @inferred(Augmentor.maybe_copy(p)) == A'
+        @test typeof(Augmentor.maybe_copy(p)) <: Array
+    end
+    let p = permuteddimsview(Ao, (2,1))
+        @test @inferred(Augmentor.maybe_copy(p)) == Ao'
+        @test typeof(Augmentor.maybe_copy(p)) <: OffsetArray
+    end
+    let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
+        @test @inferred(Augmentor.maybe_copy(p)) == OffsetArray(A'[2:3, 1:2],1,0)
+        @test typeof(Augmentor.maybe_copy(p)) <: OffsetArray
+    end
+    let Aa = Augmentor.prepareaffine(A)
+        @test @inferred(Augmentor.maybe_copy(Aa)) == OffsetArray(A, (0,0))
+        @test typeof(Augmentor.maybe_copy(Aa)) <: OffsetArray
+    end
+    let Ar = reshape(view(A,:,:),1,3,3)
+        @test @inferred(Augmentor.maybe_copy(Ar)) == reshape(A,1,3,3)
+        @test typeof(Augmentor.maybe_copy(Ar)) <: Array{Int,3}
+    end
+    let Ar = reshape(view(Ao,:,:),1,3,3)
+        @test @inferred(Augmentor.maybe_copy(Ar)) == reshape(A,1,3,3)
+        @test typeof(Augmentor.maybe_copy(Ar)) <: Array{Int,3}
+    end
+end
+
 @testset "plain_array" begin
     A = [1 2 3; 4 5 6; 7 8 9]
     @test @inferred(Augmentor.plain_array(A)) === A
     @test @inferred(Augmentor.plain_array(OffsetArray(A, (-2,-1)))) === A
-    let As = sparse(A)
-        @test @inferred(Augmentor.plain_array(As)) == A
-        @test typeof(Augmentor.plain_array(As)) == typeof(A)
-        Ar = reshape(As, 3, 3, 1)
-        @test typeof(Ar) <: Base.ReshapedArray
-        @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
-        @test typeof(Augmentor.plain_array(Ar)) <: Array
-    end
+    # Sparse arrays for now undefined
+    #let As = sparse(A)
+    #    @test @inferred(Augmentor.plain_array(As)) == A
+    #    @test typeof(Augmentor.plain_array(As)) <: Array
+    #    Ar = reshape(As, 3, 3, 1)
+    #    @test typeof(Ar) <: Base.ReshapedArray
+    #    @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
+    #    @test typeof(Augmentor.plain_array(Ar)) <: Array
+    #end
     let Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
-        @test @inferred(Augmentor.plain_array(Ast)) == A
-        @test typeof(Augmentor.plain_array(Ast)) == typeof(A)
+        @test @inferred(Augmentor.plain_array(Ast)) === Ast
     end
     let v = view(A, 2:3, 1:2)
-        @test typeof(Augmentor.plain_array(v)) <: Array
         @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.plain_array(v)) <: Array
     end
     let v = view(OffsetArray(A, (-2,-1)), 0:1, 0:1)
-        @test typeof(Augmentor.plain_array(v)) <: Array
         @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.plain_array(v)) <: Array
     end
     let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
-        @test typeof(Augmentor.plain_array(v)) <: Array
         @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.plain_array(v)) <: Array
+    end
+    let v = ChannelView(rect)
+        @test @inferred(Augmentor.plain_array(v)) == channelview(rect)
+        @test typeof(Augmentor.plain_array(v)) <: Array
     end
     let p = permuteddimsview(A, (2,1))
-        @test typeof(Augmentor.plain_array(p)) <: Array
         @test @inferred(Augmentor.plain_array(p)) == A'
+        @test typeof(Augmentor.plain_array(p)) <: Array
     end
     let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
-        @test typeof(Augmentor.plain_array(p)) <: Array
         @test @inferred(Augmentor.plain_array(p)) == A'[2:3, 1:2]
+        @test typeof(Augmentor.plain_array(p)) <: Array
+    end
+    let Aa = Augmentor.prepareaffine(A)
+        @test @inferred(Augmentor.plain_array(Aa)) == A
+        @test typeof(Augmentor.plain_array(Aa)) <: Array
+    end
+    let Ar = reshape(view(A,:,:),1,3,3)
+        @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,1,3,3)
+        @test typeof(Augmentor.plain_array(Ar)) <: Array{Int,3}
+    end
+end
+
+@testset "plain_indices" begin
+    A = [1 2 3; 4 5 6; 7 8 9]
+    @test @inferred(Augmentor.plain_indices(A)) === A
+    @test @inferred(Augmentor.plain_indices(OffsetArray(A, (-2,-1)))) === A
+    let v = view(A, 2:3, 1:2)
+        @test @inferred(Augmentor.plain_indices(v)) === v
+    end
+    let v = view(OffsetArray(A, (-2,-1)), 0:1, 0:1)
+        @test @inferred(Augmentor.plain_indices(v)) === v
+    end
+    let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
+        @test @inferred(Augmentor.plain_indices(v)) === view(A, 2:3, 1:2)
+    end
+    let v = ChannelView(rect)
+        @test @inferred(Augmentor.plain_indices(v)) === v
+    end
+    let p = permuteddimsview(A, (2,1))
+        @test @inferred(Augmentor.plain_indices(p)) === p
+    end
+    let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
+        @test @inferred(Augmentor.plain_indices(p)) === view(parent(p), 2:3, 1:2)
+    end
+    let Aa = Augmentor.prepareaffine(A)
+        @test @inferred(Augmentor.plain_indices(Aa)) === view(Aa, indices(Aa)...)
+    end
+    let Ar = reshape(view(A,:,:),1,3,3)
+        @test @inferred(Augmentor.plain_indices(Ar)) === Ar
     end
 end
 

@@ -6,5 +6,5 @@ ConvertEltype
 
 ```@eval
 include("optable.jl")
-@optable ConvertEltype(GrayA)
+@optable ConvertEltype(GrayA{N0f8})
 ```

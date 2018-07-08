@@ -35,6 +35,7 @@ prepareaffine(img) = invwarpedview(img, toaffinemap(NoOp(), img), Flat())
 prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffinemap(NoOp(), img))
 @inline prepareaffine(img::SubArray{T,N,<:InvWarpedView}) where {T,N} = img
 @inline prepareaffine(img::InvWarpedView) = img
+prepareaffine(imgs::Tuple) = map(prepareaffine, imgs)
 
 # currently unused
 @inline preparelazy(img) = img
@@ -42,47 +43,67 @@ prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffinemap(NoOp(
 # --------------------------------------------------------------------
 # Operation and AffineOperation fallbacks
 
-function applyeager(op::Operation, img)
-    plain_array(applylazy(op, img))
+# discard param if operations doesn't need it
+@inline randparam(op::Operation, img) = nothing
+@inline toaffinemap(op::Operation, img, param) = toaffinemap(op, img)
+
+for FUN in (:applyeager, :applylazy, :applypermute,
+            :applyaffine, :applyaffineview,
+            :applyaffine_common, :applyaffineview_common,
+            :applyview, :applystepview)
+    @eval begin
+        function ($FUN)(op::Operation, imgs::Tuple)
+            param = randparam(op, imgs)
+            map(img -> ($FUN)(op, img, param), imgs)
+        end
+        @inline function ($FUN)(op::Operation, img::AbstractArray)
+            ($FUN)(op, img, randparam(op, img))
+        end
+    end
 end
 
-function applyaffine(op::AffineOperation, img)
-    invwarpedview(img, toaffinemap(op, img))
+function applyeager(op::Operation, img::AbstractArray, param)
+    maybe_copy(applylazy(op, img, param))
 end
 
-function applyaffineview(op::Operation, img)
-    wv = applyaffine(op, img)
+function applyaffineview(op::Operation, img::AbstractArray, param)
+    wv = applyaffine(op, img, param)
     direct_view(wv, indices(wv))
+end
+
+function applyaffine(op::AffineOperation, img::AbstractArray, param)
+    invwarpedview(img, toaffinemap(op, img, param))
 end
 
 # Allow affine operations to omit specifying a custom
 # "applylazy". On the other hand this also makes sure that a
 # custom implementation of "applylazy" is preferred over
 # "applylazy_fallback" which by default just calls "applyaffine".
-function applylazy(op::AffineOperation, img)
-    _applylazy(op, img)
+function applylazy(op::AffineOperation, img::AbstractArray, param)
+    _applylazy(op, img, param)
 end
 
 # The purpose of having a separate "_applylazy" is to not
-# force "applylazy" implementations to specify the type of "img".
-function _applylazy(op::AffineOperation, img::InvWarpedView)
-    applyaffine(op, img)
+# force "applylazy" implementations to specify the type of "img",
+# when typeof(img) <: AbstractArray.
+function _applylazy(op::AffineOperation, img::InvWarpedView, param)
+    applyaffine(op, img, param)
 end
 
-function _applylazy(op::AffineOperation, img::SubArray{T,N,<:InvWarpedView}) where {T,N}
-    applyaffine(op, img)
+function _applylazy(op::AffineOperation, img::SubArray{T,N,<:InvWarpedView}, param) where {T,N}
+    applyaffine(op, img, param)
 end
 
-function _applylazy(op::AffineOperation, img)
-    applylazy_fallback(op, img)
+function _applylazy(op::AffineOperation, img, param)
+    applylazy_fallback(op, img, param)
 end
 
 # Defining "applylazy_fallback" instead of "applylazy" will
 # make sure that the custom implementation is only used if
 # "img" is not already an "InvWarpedView", in which case
 # "applyaffine" would be called instead of "applylazy_fallback".
-function applylazy_fallback(op::AffineOperation, img)
-    applyaffine(op, prepareaffine(img))
+function applylazy_fallback(op::AffineOperation, img, param)
+    applyaffine(op, prepareaffine(img), param)
 end
 
 # --------------------------------------------------------------------
@@ -92,24 +113,26 @@ end
 # we need a way to force a common "AffineMap" type using only
 # "SArray" internally (i.e. no "RotMatrix" or other special types).
 
-@generated function toaffinemap_common(op::AffineOperation, img::AbstractArray{T,N}) where {T,N}
+@generated function toaffinemap_common(op::AffineOperation, img::AbstractArray{T,N}, param) where {T,N}
     quote
-        tfm = toaffinemap(op, img)
+        tfm = toaffinemap(op, img, param)
         AffineMap(SMatrix(tfm.m), SVector(tfm.v))::AffineMap{SArray{Tuple{$N,$N},Float64,$N,$(N*N)},SVector{$N,Float64}}
     end
 end
 
-function applyaffine_common(op::AffineOperation, img)
-    invwarpedview(img, toaffinemap_common(op, img))
+function applyaffine_common(op::AffineOperation, img::AbstractArray, param)
+    invwarpedview(img, toaffinemap_common(op, img, param))
 end
 
-function applyaffineview_common(op::AffineOperation, img)
-    wv = applyaffine_common(op, img)
+function applyaffineview_common(op::AffineOperation, img::AbstractArray, param)
+    wv = applyaffine_common(op, img, param)
     direct_view(wv, indices(wv))
 end
 
 # We trust that non-affine operations use SArray-only AffineMap.
-applyaffineview_common(op::Operation, img) = applyaffineview(op, img)
+function applyaffineview_common(op::Operation, img::AbstractArray, param)
+    applyaffineview(op, img, param)
+end
 
 # --------------------------------------------------------------------
 # Functions to unroll sequences of Operation. These are called by

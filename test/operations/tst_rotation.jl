@@ -9,19 +9,37 @@
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate90(), nothing)
         @test Augmentor.supports_eager(Rotate90) === true
-        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
-            @test @inferred(Augmentor.applyeager(Rotate90(), img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(Rotate90(), img)) <: Array
+        imgs = [
+            (rect),
+            (view(rect, :, :)),
+            (Augmentor.prepareaffine(rect)),
+            (OffsetArray(rect, -2, -1)),
+            (view(rect, IdentityRange(1:2), IdentityRange(1:3))),
+        ]
+        @testset "single image" begin
+            for (img_in) in imgs
+                res = @inferred(Augmentor.applyeager(Rotate90(), img_in))
+                @test res == rotl90(rect)
+                @test typeof(res) <: Array
+            end
+            res1, res2 = @inferred(Augmentor.applyeager(Rotate90(), (square, square2)))
+            @test res1 == rotl90(square)
+            @test res2 == rotl90(square2)
         end
     end
     @testset "affine" begin
         @test Augmentor.supports_affine(Rotate90) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate90(), nothing)
         @test @inferred(Augmentor.toaffinemap(Rotate90(), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(Rotate90(), rect, 90)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(Rotate90(), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+        # check that the affine map is computed for each image
+        res1, res2 = @inferred(Augmentor.applyaffine(Rotate90(), (Augmentor.prepareaffine(square), Augmentor.prepareaffine(square2))))
+        @test res1 == OffsetArray(rotl90(square), 0, 0)
+        @test res2 == OffsetArray(rotl90(square2), 0, 0)
     end
     @testset "affineview" begin
         @test Augmentor.supports_affineview(Rotate90) === true
@@ -46,6 +64,9 @@
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
+        res1, res2 = @inferred(Augmentor.applylazy(Rotate90(), (square, square2)))
+        @test res1 == rotl90(square)
+        @test res2 == rotl90(square2)
     end
     @testset "view" begin
         @test Augmentor.supports_view(Rotate90) === false
@@ -78,9 +99,19 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate180(), nothing)
         @test Augmentor.supports_eager(Rotate180) === true
-        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
-            @test @inferred(Augmentor.applyeager(Rotate180(), img)) == rot180(rect)
-            @test typeof(Augmentor.applyeager(Rotate180(), img)) <: Array
+        imgs = [
+            (rect),
+            (view(rect, :, :)),
+            (Augmentor.prepareaffine(rect)),
+            (OffsetArray(rect, -2, -1)),
+            (view(rect, IdentityRange(1:2), IdentityRange(1:3))),
+        ]
+        @testset "single image" begin
+            for (img_in) in imgs
+                res = @inferred(Augmentor.applyeager(Rotate180(), img_in))
+                @test res == rot180(rect)
+                @test typeof(res) <: Array
+            end
         end
     end
     @testset "affine" begin
@@ -145,9 +176,19 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate270(), nothing)
         @test Augmentor.supports_eager(Rotate270) === true
-        for img in (rect, OffsetArray(rect, -2, -1), view(rect, IdentityRange(1:2), IdentityRange(1:3)))
-            @test @inferred(Augmentor.applyeager(Rotate270(), img)) == rotr90(rect)
-            @test typeof(Augmentor.applyeager(Rotate270(), img)) <: Array
+        imgs = [
+            (rect),
+            (view(rect, :, :)),
+            (Augmentor.prepareaffine(rect)),
+            (OffsetArray(rect, -2, -1)),
+            (view(rect, IdentityRange(1:2), IdentityRange(1:3))),
+        ]
+        @testset "single image" begin
+            for (img_in) in imgs
+                res = @inferred(Augmentor.applyeager(Rotate270(), img_in))
+                @test res == rotr90(rect)
+                @test typeof(res) <: Array
+            end
         end
     end
     @testset "affine" begin
@@ -228,23 +269,68 @@ end
         @test str_showconst(op) == "Rotate([2, 30])"
         @test str_showcompact(op) == "Rotate by θ ∈ [2, 30] degree"
     end
+    @testset "randparam" begin
+        @test @inferred(Augmentor.randparam(Rotate(45), rect)) === 45.0
+        @test @inferred(Augmentor.randparam(Rotate(90), rect)) === 90.0
+        @test @inferred(Augmentor.randparam(Rotate(1:10), rect)) in 1:10
+        @test_throws MethodError Augmentor.toaffinemap(Rotate(45), rect)
+        @test @inferred(Augmentor.toaffinemap(Rotate(45), rect, 45)) ≈ AffineMap([0.70710678118 -0.70710678118; 0.70710678118 0.70710678118], [1.85355339059,-0.47487373415])
+        @test @inferred(Augmentor.toaffinemap(Rotate(1:90), rect, 45)) ≈ AffineMap([0.70710678118 -0.70710678118; 0.70710678118 0.70710678118], [1.85355339059,-0.47487373415])
+        @test @inferred(Augmentor.toaffinemap(Rotate(90), rect, 90)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
+        @test @inferred(Augmentor.toaffinemap(Rotate(-90:1:90), rect, -90)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
+    end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate(10), nothing)
         @test Augmentor.supports_eager(Rotate) === false
-        # TODO: more tests
-        for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
-            @test @inferred(Augmentor.applyeager(Rotate(90), img)) == rotl90(square)
-            @test typeof(Augmentor.applyeager(Rotate(90), img)) <: Array
-            @test @inferred(Augmentor.applyeager(Rotate(-90), img)) == rotr90(square)
-            @test typeof(Augmentor.applyeager(Rotate(-90), img)) <: Array
+        res1 = OffsetArray(rotl90(square), 0, 0)
+        res2 = OffsetArray(rotl90(square), -1, -1)
+        res3 = OffsetArray(rotr90(square), 0, 0)
+        res4 = OffsetArray(rotr90(square), -1, -1)
+        imgs = [
+            (square, res1, res3),
+            (view(square, :, :), res1, res3),
+            (Augmentor.prepareaffine(square), res1, res3),
+            (OffsetArray(square, -1, -1), res2, res4),
+            (view(square, IdentityRange(1:3), IdentityRange(1:3)), res1, res3),
+        ]
+        @testset "fixed parameter" begin
+            for (img_in, img_out1, img_out2) in imgs
+                res = @inferred(Augmentor.applyeager(Rotate(90), img_in))
+                @test res == img_out1
+                @test typeof(res) == typeof(img_out1)
+                res = @inferred(Augmentor.applyeager(Rotate(-90), img_in))
+                @test res == img_out2
+                @test typeof(res) == typeof(img_out2)
+                # test same with tuple of images
+                res1, res2 = @inferred(Augmentor.applyeager(Rotate(90), (img_in, N0f8.(img_in))))
+                @test res1 == img_out1
+                @test res2 == img_out1
+                @test typeof(res1) == typeof(img_out1)
+                @test typeof(res2) <: OffsetArray{N0f8}
+                res1, res2 = @inferred(Augmentor.applyeager(Rotate(-90), (img_in, N0f8.(img_in))))
+                @test res1 == img_out2
+                @test res2 == img_out2
+                @test typeof(res1) == typeof(img_out2)
+                @test typeof(res2) <: OffsetArray{N0f8}
+            end
+            # check that the affine map is computed for each image
+            res1, res2 = @inferred(Augmentor.applyeager(Rotate(90), (square, square2)))
+            @test res1 == OffsetArray(rotl90(square), 0, 0)
+            @test res2 == OffsetArray(rotl90(square2), 0, 0)
+        end
+        @testset "random parameter" begin
+            for (img_in, img_out_type, _) in imgs
+                res1, res2 = @inferred(Augmentor.applyeager(Rotate(1:90), (img_in, N0f8.(img_in))))
+                # make sure same angle is used
+                @test res1 == res2
+                @test typeof(res1) == typeof(img_out_type)
+                @test typeof(res2) <: OffsetArray{N0f8}
+            end
         end
     end
     @testset "affine" begin
         @test Augmentor.supports_affine(Rotate) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate(90), nothing)
-        @test @inferred(Augmentor.toaffinemap(Rotate(45), rect)) ≈ AffineMap([0.70710678118 -0.70710678118; 0.70710678118 0.70710678118], [1.85355339059,-0.47487373415])
-        @test @inferred(Augmentor.toaffinemap(Rotate(90), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
-        @test @inferred(Augmentor.toaffinemap(Rotate(-90), rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
         wv = @inferred Augmentor.applyaffine(Rotate(90), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)

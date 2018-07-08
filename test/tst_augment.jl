@@ -1,14 +1,29 @@
 @testset "single op" begin
+    @test_throws MethodError augment!(rand(2,2), (rect,), Rotate90())
+    @test_throws MethodError augment!((rand(2,2),), rect, Rotate90())
+    @test_throws MethodError augment!((rand(2,2),rand(2,2)), (rect,), Rotate90())
     @test_throws BoundsError augment!(rand(2,2), rect, Rotate90())
     for pl in (Augmentor.ImmutablePipeline(Rotate90()), (Rotate90(),))
         img = @inferred Augmentor._augment(rect, pl)
         @test typeof(img) <: Array
-        @test typeof(img) == typeof(@inferred(augment(rect, Rotate90())))
-        @test typeof(img) == typeof(@inferred(augment(rect, (Rotate90(),))))
+        @test img == @inferred(augment(rect, Rotate90()))
+        @test img == @inferred(augment(rect, (Rotate90(),)))
         @test eltype(img) <: eltype(rect)
         @test img == rotl90(rect)
+        img1, img2 = @inferred augment((square2, rect), pl)
+        @test img1 == rotl90(square2)
+        @test img2 == img
+        @test typeof(img2) == typeof(img)
+        img3 = @inferred augment(rect, Rotate90())
+        @test img2 == img3
+        @test typeof(img3) == typeof(img2)
         out = similar(img)
         @test @inferred(augment!(out, rect, pl)) == img
+        outs = (similar(square2), similar(img))
+        res = @inferred(augment!(outs, (square2, rect), pl))
+        @test res === outs
+        @test outs[1] == img1
+        @test outs[2] == img2
         out = similar(img)
         @test @inferred(augment!(out, rect, Rotate90())) == img
         @test_throws BoundsError augment!(rand(2,2), rect, pl)
@@ -18,14 +33,22 @@ end
 ops = Augmentor.ImmutablePipeline(Rotate(90),Rotate(-90)) # forces affine
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor._augment(camera, ops)
-    @test typeof(wv) === typeof(invwarpedview(rect, Augmentor.toaffinemap(NoOp(),rect), Flat()))
+    @test typeof(wv) === typeof(invwarpedview(camera, Augmentor.toaffinemap(NoOp(),rect), Flat()))
     @test wv == camera
+    wv1, wv2 = @inferred Augmentor._augment((rgb_rect,camera), ops)
+    @test typeof(wv1) === typeof(invwarpedview(rgb_rect, Augmentor.toaffinemap(NoOp(),rect), Flat()))
+    @test typeof(wv2) === typeof(invwarpedview(camera, Augmentor.toaffinemap(NoOp(),rect), Flat()))
+    @test wv1 == rgb_rect
+    @test wv2 == camera
 end
 
 ops = (CacheImage(),CacheImage()) # forces eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(camera, ops)
     @test img === camera
+    img1, img2 = @inferred Augmentor._augment((camera, square2), ops)
+    @test img1 === camera
+    @test img2 === square2
 end
 
 ops = (ElasticDistortion(4,4),CacheImage()) # forces lazy then eager
@@ -33,6 +56,10 @@ ops = (ElasticDistortion(4,4),CacheImage()) # forces lazy then eager
     img = @inferred Augmentor._augment(camera, ops)
     @test size(img) == size(camera)
     @test typeof(img) == typeof(camera)
+    img1, img2 = @inferred Augmentor._augment((camera, N0f8.(camera)), ops)
+    @test img1 isa Array{Gray{N0f8}}
+    @test img2 isa Array{N0f8}
+    @test img1 == img2
 end
 
 ops = (ShearX(45),ShearX(-45)) # forces affine
@@ -285,6 +312,12 @@ ops = (Rotate(45),Zoom(2))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
     @test_reference "reference/rot45_zoom.txt" img
+    img1, img2 = @inferred augment((N0f8.(camera),camera), ops)
+    @test img1 == img2
+    @test img2 == img
+    @test img1 isa Array{N0f8}
+    @test img2 isa Array{Gray{N0f8}}
+    @test_reference "reference/rot45_zoom.txt" img2
 end
 
 ops = (Rotate(45),CropSize(200,200),Zoom(1.1),ConvertEltype(RGB{Float64}),SplitChannels())
@@ -292,9 +325,12 @@ ops = (Rotate(45),CropSize(200,200),Zoom(1.1),ConvertEltype(RGB{Float64}),SplitC
     wv1 = @inferred Augmentor._augment(camera, ops[1:3])
     wv2 = @inferred Augmentor._augment(camera, ops[1:4])
     wv3 = @inferred Augmentor._augment(camera, ops)
+    _, wv4 = @inferred Augmentor._augment((rotl90(camera), camera), ops)
+    @test wv3 == wv4
+    @test typeof(wv3) == typeof(wv4)
     img = colorview(RGB{Float64}, wv3)
-    @test RGB{Float64}.(collect(wv1)) ≈ wv2
-    @test wv1 ≈ img
+    @test RGB{Float64}.(copy(wv1)) ≈ wv2
+    @test collect(wv1) ≈ img
     @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
 end
 

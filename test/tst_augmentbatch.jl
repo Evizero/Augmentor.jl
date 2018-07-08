@@ -34,6 +34,29 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
     @test_reference "reference/rot_crop_either_crop.txt" out[1,:,:]
     @test_reference "reference/rot_crop_either_crop.txt" out[2,:,:]
 end
+@testset "$(str_showcompact(ops)) multiple images" begin
+    outs = (similar(N0f8.(camera), 250, 150, 2), similar(camera, 250, 150, 2))
+    @test @inferred(augmentbatch!(outs, (N0f8.(cameras), cameras), ops)) === outs
+    @test typeof(outs) <: Tuple{Array{N0f8,3},Array{Gray{N0f8},3}}
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][:,:,1])
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][:,:,2])
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][:,:,1]
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][:,:,2]
+    @test @inferred(augmentbatch!(outs, obsview((N0f8.(cameras), cameras)), ops)) === outs
+    @test typeof(outs) <: Tuple{Array{N0f8,3},Array{Gray{N0f8},3}}
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][:,:,1])
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][:,:,2])
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][:,:,1]
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][:,:,2]
+    outs = (similar(N0f8.(camera), 2, 250, 150), similar(camera, 2, 250, 150))
+    cameras_t = permutedims(cameras, (3,1,2))
+    @test @inferred(augmentbatch!(outs, (N0f8.(cameras_t), cameras_t), ops, ObsDim.First())) === outs
+    @test typeof(outs) <: Tuple{Array{N0f8,3},Array{Gray{N0f8},3}}
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][1,:,:])
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][2,:,:])
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][1,:,:]
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][2,:,:]
+end
 
 @testset "Multithreaded: $(str_showcompact(ops))" begin
     @test_throws ArgumentError augmentbatch!(CPUThreads(), similar(camera, 250, 150, 3), cameras, ops)
@@ -71,9 +94,28 @@ end
     @test_reference "reference/rot_crop_either_crop.txt" out[1,:,:]
     @test_reference "reference/rot_crop_either_crop.txt" out[2,:,:]
 end
+@testset "Multithreaded: $(str_showcompact(ops)) multiple images" begin
+    outs = (similar(N0f8.(camera), 250, 150, 2), similar(camera, 250, 150, 2))
+    @test @inferred(augmentbatch!(CPUThreads(), outs, (N0f8.(cameras), cameras), ops)) === outs
+    @test typeof(outs) <: Tuple{Array{N0f8,3},Array{Gray{N0f8},3}}
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][:,:,1])
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][:,:,2])
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][:,:,1]
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][:,:,2]
+    outs = (similar(N0f8.(camera), 2, 250, 150), similar(camera, 2, 250, 150))
+    cameras_t = permutedims(cameras, (3,1,2))
+    @test @inferred(augmentbatch!(CPUThreads(), outs, (N0f8.(cameras_t), cameras_t), ops, ObsDim.First())) === outs
+    @test typeof(outs) <: Tuple{Array{N0f8,3},Array{Gray{N0f8},3}}
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][1,:,:])
+    @test_reference "reference/rot_crop_either_crop.txt" Gray.(outs[1][2,:,:])
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][1,:,:]
+    @test_reference "reference/rot_crop_either_crop.txt" outs[2][2,:,:]
+end
 
 ops = Rotate90()
 @testset "$(str_showcompact(ops))" begin
     out = similar(camera, 512, 512, 2)
     @test @inferred(augmentbatch!(out, cameras, ops)) === out
+    outs = (similar(camera, 512, 512, 2), similar(camera, 512, 512, 2))
+    @test @inferred(augmentbatch!(outs, (N0f8.(cameras), cameras), ops)) === outs
 end

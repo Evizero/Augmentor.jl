@@ -33,13 +33,41 @@ end
 
 # --------------------------------------------------------------------
 
+@inline maybe_copy(A::OffsetArray) = A
+@inline maybe_copy(A::Array) = A
+@inline maybe_copy(A::SArray) = A
+@inline maybe_copy(A::MArray) = A
+@inline maybe_copy(A::AbstractArray) = match_idx(collect(A), indices(A))
+@inline maybe_copy(A::Tuple) = map(maybe_copy, A)
+
+# --------------------------------------------------------------------
+
 @inline _plain_array(A::OffsetArray) = parent(A)
 @inline _plain_array(A::Array) = A
-@inline plain_array(A::OffsetArray) = parent(A)
-@inline plain_array(A::Array) = A
+@inline _plain_array(A::SArray) = A
+@inline _plain_array(A::MArray) = A
+@inline _plain_array(A::Tuple) = map(_plain_array, A)
 # avoid recursion
-@inline plain_array(A::SubArray) = _plain_array(copy(A))
-@inline plain_array(A::AbstractArray) = _plain_array(collect(A))
+@inline plain_array(A) = _plain_array(maybe_copy(A))
+
+# --------------------------------------------------------------------
+
+@inline plain_indices(A::Array) = A
+@inline plain_indices(A::OffsetArray) = parent(A)
+@inline plain_indices(A::AbstractArray) = _plain_indices(A, indices(A))
+@inline plain_indices(A::SubArray) = _plain_indices(A, A.indexes)
+
+@inline function _plain_indices(A::AbstractArray{T,N}, ids::NTuple{N,Base.OneTo}) where {T, N}
+    A
+end
+
+@inline function _plain_indices(A::AbstractArray{T,N}, ids::NTuple{N,Any}) where {T, N}
+    view(A, indices(A)...)
+end
+
+@inline function _plain_indices(A::SubArray{T,N}, ids::NTuple{N,IdentityRange}) where {T, N}
+    view(parent(A), indices(A)...)
+end
 
 # --------------------------------------------------------------------
 
@@ -89,6 +117,7 @@ function direct_indices(::Tuple{}, ::Tuple{})
     throw(MethodError(direct_indices, ((),())))
 end
 
+# TODO: Figure out why this method exists
 function direct_indices(O::NTuple{N,IdentityRange}, I::NTuple{N,StepRange}) where N
     throw(MethodError(direct_indices, (O, I)))
 end

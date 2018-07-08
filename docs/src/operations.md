@@ -27,7 +27,7 @@ save("assets/tiny_CropRatio.png", augment(pattern, CropRatio(1)))
 srand(1337)
 save("assets/tiny_RCropRatio.png", augment(pattern, RCropRatio(1)))
 # Conversion
-save("assets/tiny_ConvertEltype.png", augment(pattern, ConvertEltype(GrayA)))
+save("assets/tiny_ConvertEltype.png", augment(pattern, ConvertEltype(GrayA{N0f8})))
 nothing;
 ```
 

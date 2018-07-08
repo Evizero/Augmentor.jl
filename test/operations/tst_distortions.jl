@@ -84,13 +84,29 @@
             @test str_showcompact(op) == "Distort using a 2-times smoothed 3×4 grid with pinned border"
         end
     end
+    imgs = [
+        (rect),
+        (Augmentor.prepareaffine(rect)),
+        (OffsetArray(rect, -2, -1)),
+        (view(rect, IdentityRange(1:2), IdentityRange(1:3))),
+    ]
     @testset "eager" begin
         @test Augmentor.supports_eager(ElasticDistortion) === false
-        for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
-            dv = @inferred Augmentor.applyeager(ElasticDistortion(4,4), img)
-            # TODO: better tests
-            @test size(dv) == size(square)
-            @test typeof(dv) <: Array
+        # TODO: better tests
+        @testset "single image" begin
+            for img_in in imgs
+                res = @inferred(Augmentor.applyeager(ElasticDistortion(4,4), img_in))
+                @test size(res) == size(rect)
+                @test typeof(res) <: Array{eltype(img_in),2}
+            end
+        end
+        @testset "multiple images" begin
+            for img_in1 in imgs, img_in2 in imgs
+                img_in = (img_in1, img_in2)
+                res = @inferred(Augmentor.applyeager(ElasticDistortion(4,4), img_in))
+                @test res[1] == res[2]
+                @test typeof(res) <: NTuple{2,Array{eltype(img_in1),2}}
+            end
         end
     end
     @testset "affine" begin
@@ -101,12 +117,22 @@
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(ElasticDistortion) === true
-        for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
-            dv = @inferred Augmentor.applylazy(ElasticDistortion(4,4), img)
-            # TODO: better tests
-            @test size(dv) == size(square)
-            @test typeof(dv) <: Augmentor.DistortedView{eltype(square)}
-            @test parent(dv) === img
+        @testset "single image" begin
+            for img in imgs
+                res = @inferred(Augmentor.applylazy(ElasticDistortion(4,4), img))
+                @test size(res) == size(rect)
+                @test typeof(res) <: Augmentor.DistortedView{eltype(rect)}
+                @test parent(res) === img
+            end
+        end
+        @testset "multiple images" begin
+            for img_in1 in imgs, img_in2 in imgs
+                img_in = (img_in1, img_in2)
+                res = @inferred(Augmentor.applylazy(ElasticDistortion(4,4), img_in))
+                @test res[1] == res[2]
+                @test res[1].field.itp.coefs === res[2].field.itp.coefs
+                @test typeof(res) <: NTuple{2,Augmentor.DistortedView{eltype(img_in1)}}
+            end
         end
     end
     @testset "view" begin

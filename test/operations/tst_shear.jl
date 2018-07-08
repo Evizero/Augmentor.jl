@@ -29,24 +29,69 @@
         @test str_showconst(op) == "ShearX([2, 30])"
         @test str_showcompact(op) == "ShearX by ϕ ∈ [2, 30] degree"
     end
+    @testset "randparam" begin
+        @test @inferred(Augmentor.randparam(ShearX(45), rect)) === 45.0
+        @test @inferred(Augmentor.randparam(ShearX(20.0), rect)) === 20.0
+        @test @inferred(Augmentor.randparam(ShearX(1:10), rect)) in 1:10
+        @test_throws MethodError Augmentor.toaffinemap(ShearX(45), rect)
+        @test @inferred(Augmentor.toaffinemap(ShearX(45), rect, 45)) ≈ AffineMap([1. 0.; -1. 1.], [0.,1.5])
+        @test @inferred(Augmentor.toaffinemap(ShearX(-60:60), rect, 45)) ≈ AffineMap([1. 0.; -1. 1.], [0.,1.5])
+        @test @inferred(Augmentor.toaffinemap(ShearX(-45), rect, -45)) ≈ AffineMap([1. 0.; 1. 1.], [0.,-1.5])
+        @test @inferred(Augmentor.toaffinemap(ShearX(-60:1:60), rect, -45)) ≈ AffineMap([1. 0.; 1. 1.], [0.,-1.5])
+    end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(ShearX(10), nothing)
         @test Augmentor.supports_eager(ShearX) === false
-        # TODO: more tests
-        for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
-            wv = @inferred Augmentor.applyeager(ShearX(45), img)
-            @test size(wv) == (3,5)
-            @test typeof(wv) <: Array
-            wv = @inferred Augmentor.applyeager(ShearX(45), img)
-            @test size(wv) == (3,5)
-            @test typeof(wv) <: Array
+        # TODO: actual content tests (maybe test_reference)
+        img_out1 = @inferred Augmentor.applyeager(ShearX(45), square)
+        img_out2 = @inferred Augmentor.applyeager(ShearX(-45), square)
+        @test indices(img_out1) == (1:3, 0:4)
+        @test indices(img_out1) == indices(img_out2)
+        imgs = [
+            (square),
+            (view(square, :, :)),
+            (Augmentor.prepareaffine(square)),
+            (OffsetArray(square, -1, -1)),
+            (view(square, IdentityRange(1:3), IdentityRange(1:3))),
+        ]
+        @testset "fixed parameter" begin
+            for img_in in imgs
+                res = @inferred(Augmentor.applyeager(ShearX(45), img_in))
+                @test parent(res) == parent(img_out1)
+                @test typeof(res) == typeof(img_out1)
+                res = @inferred(Augmentor.applyeager(ShearX(-45), img_in))
+                @test parent(res) == parent(img_out2)
+                @test typeof(res) == typeof(img_out2)
+                # test same with tuple of images
+                res1, res2 = @inferred(Augmentor.applyeager(ShearX(45), (img_in, N0f8.(img_in))))
+                @test parent(res1) == parent(img_out1)
+                @test parent(res2) == parent(img_out1)
+                @test typeof(res1) == typeof(img_out1)
+                @test typeof(res2) <: OffsetArray{N0f8}
+                res1, res2 = @inferred(Augmentor.applyeager(ShearX(-45), (img_in, N0f8.(img_in))))
+                @test parent(res1) == parent(img_out2)
+                @test parent(res2) == parent(img_out2)
+                @test typeof(res1) == typeof(img_out2)
+                @test typeof(res2) <: OffsetArray{N0f8}
+            end
+            # check that the affine map is computed for each image
+            res1, res2 = @inferred(Augmentor.applyeager(ShearX(45), (square, OffsetArray(square,-5,-5))))
+            @test collect(res1) == collect(res2)
+            @test indices(res1) != indices(res2)
+        end
+        @testset "random parameter" begin
+            for img_in in imgs
+                res1, res2 = @inferred(Augmentor.applyeager(ShearX(1:60), (img_in, N0f8.(img_in))))
+                # make sure same angle is used
+                @test res1 == res2
+                @test typeof(res1) == typeof(img_out1)
+                @test typeof(res2) <: OffsetArray{N0f8}
+            end
         end
     end
     @testset "affine" begin
         @test Augmentor.supports_affine(ShearX) === true
         @test_throws MethodError Augmentor.applyaffine(ShearX(45), nothing)
-        @test @inferred(Augmentor.toaffinemap(ShearX(45), rect)) ≈ AffineMap([1. 0.; -1. 1.], [0.,1.5])
-        @test @inferred(Augmentor.toaffinemap(ShearX(-45), rect)) ≈ AffineMap([1. 0.; 1. 1.], [0.,-1.5])
         wv = @inferred Augmentor.applyaffine(ShearX(45), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test indices(wv) == (1:3,0:4)
@@ -125,24 +170,69 @@ end
         @test str_showconst(op) == "ShearY([2, 30])"
         @test str_showcompact(op) == "ShearY by ψ ∈ [2, 30] degree"
     end
+    @testset "randparam" begin
+        @test @inferred(Augmentor.randparam(ShearY(45), rect)) === 45.0
+        @test @inferred(Augmentor.randparam(ShearY(20.0), rect)) === 20.0
+        @test @inferred(Augmentor.randparam(ShearY(1:10), rect)) in 1:10
+        @test_throws MethodError Augmentor.toaffinemap(ShearY(45), rect)
+        @test @inferred(Augmentor.toaffinemap(ShearY(45), rect, 45)) ≈ AffineMap([1. -1.; 0. 1.], [2.,0.])
+        @test @inferred(Augmentor.toaffinemap(ShearY(-60:60), rect, 45)) ≈ AffineMap([1. -1.; 0. 1.], [2.,0.])
+        @test @inferred(Augmentor.toaffinemap(ShearY(-45), rect, -45)) ≈ AffineMap([1. 1.; 0. 1.], [-2.,0.])
+        @test @inferred(Augmentor.toaffinemap(ShearY(-60:1:60), rect, -45)) ≈ AffineMap([1. 1.; 0. 1.], [-2.,0.])
+    end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(ShearY(10), nothing)
         @test Augmentor.supports_eager(ShearY) === false
-        # TODO: more tests
-        for img in (square, OffsetArray(square, 0, 0), view(square, IdentityRange(1:3), IdentityRange(1:3)))
-            wv = @inferred Augmentor.applyeager(ShearY(45), img)
-            @test size(wv) == (5,3)
-            @test typeof(wv) <: Array
-            wv = @inferred Augmentor.applyeager(ShearY(45), img)
-            @test size(wv) == (5,3)
-            @test typeof(wv) <: Array
+        # TODO: actual content tests (maybe test_reference)
+        img_out1 = @inferred Augmentor.applyeager(ShearY(45), square)
+        img_out2 = @inferred Augmentor.applyeager(ShearY(-45), square)
+        @test indices(img_out1) == (0:4, 1:3)
+        @test indices(img_out1) == indices(img_out2)
+        imgs = [
+            (square),
+            (view(square, :, :)),
+            (Augmentor.prepareaffine(square)),
+            (OffsetArray(square, -1, -1)),
+            (view(square, IdentityRange(1:3), IdentityRange(1:3))),
+        ]
+        @testset "fixed parameter" begin
+            for img_in in imgs
+                res = @inferred(Augmentor.applyeager(ShearY(45), img_in))
+                @test parent(res) == parent(img_out1)
+                @test typeof(res) == typeof(img_out1)
+                res = @inferred(Augmentor.applyeager(ShearY(-45), img_in))
+                @test parent(res) == parent(img_out2)
+                @test typeof(res) == typeof(img_out2)
+                # test same with tuple of images
+                res1, res2 = @inferred(Augmentor.applyeager(ShearY(45), (img_in, N0f8.(img_in))))
+                @test parent(res1) == parent(img_out1)
+                @test parent(res2) == parent(img_out1)
+                @test typeof(res1) == typeof(img_out1)
+                @test typeof(res2) <: OffsetArray{N0f8}
+                res1, res2 = @inferred(Augmentor.applyeager(ShearY(-45), (img_in, N0f8.(img_in))))
+                @test parent(res1) == parent(img_out2)
+                @test parent(res2) == parent(img_out2)
+                @test typeof(res1) == typeof(img_out2)
+                @test typeof(res2) <: OffsetArray{N0f8}
+            end
+            # check that the affine map is computed for each image
+            res1, res2 = @inferred(Augmentor.applyeager(ShearY(45), (square, OffsetArray(square,-5,-5))))
+            @test collect(res1) == collect(res2)
+            @test indices(res1) != indices(res2)
+        end
+        @testset "random parameter" begin
+            for img_in in imgs
+                res1, res2 = @inferred(Augmentor.applyeager(ShearY(1:60), (img_in, N0f8.(img_in))))
+                # make sure same angle is used
+                @test res1 == res2
+                @test typeof(res1) == typeof(img_out1)
+                @test typeof(res2) <: OffsetArray{N0f8}
+            end
         end
     end
     @testset "affine" begin
         @test Augmentor.supports_affine(ShearY) === true
         @test_throws MethodError Augmentor.applyaffine(ShearY(45), nothing)
-        @test @inferred(Augmentor.toaffinemap(ShearY(45), rect)) ≈ AffineMap([1. -1.; 0. 1.], [2.,0.])
-        @test @inferred(Augmentor.toaffinemap(ShearY(-45), rect)) ≈ AffineMap([1. 1.; 0. 1.], [-2.,0.])
         wv = @inferred Augmentor.applyaffine(ShearY(45), Augmentor.prepareaffine(square))
         @test parent(wv).itp.coefs === square
         @test indices(wv) == (0:4,1:3)

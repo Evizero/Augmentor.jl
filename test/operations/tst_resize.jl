@@ -30,9 +30,30 @@
         @test_throws MethodError Augmentor.applyeager(Resize(10,10), nothing)
         @test Augmentor.supports_eager(Resize) === true
         ref = Gray{N0f8}[0.624 0.686 0.733 0.686 0.612; 0.667 0.055 0.71 0.675 0.596; 0.639 0.043 0.227 0.631 0.604; 0.569 0.031 0.518 0.553 0.529; 0.392 0.145 0.392 0.443 0.369]
-        for img in (camera, OffsetArray(camera, -10, 30), view(camera, IdentityRange(1:512), IdentityRange(1:512)))
-            @test @inferred(Augmentor.applyeager(Resize(5,5), img)) == ref
-            @test typeof(Augmentor.applyeager(Resize(5,5), img)) <: Array
+        imgs = [
+            (camera),
+            (Augmentor.prepareaffine(camera)),
+            (OffsetArray(camera, -10, -30)),
+            (view(camera, IdentityRange(1:512), IdentityRange(1:512))),
+        ]
+        @testset "single image" begin
+            for img_in in imgs
+                res = @inferred(Augmentor.applyeager(Resize(5,5), img_in))
+                @test res == ref
+                @test typeof(res) == typeof(ref)
+            end
+        end
+        @testset "multiple images" begin
+            for img_in1 in imgs
+                img_in2 = N0f8.(img_in1)
+                img_out1 = ref
+                img_out2 = N0f8.(ref)
+                img_in = (img_in1, img_in2)
+                img_out = (img_out1, img_out2)
+                res = @inferred(Augmentor.applyeager(Resize(5,5), img_in))
+                @test res == img_out
+                @test typeof(res) == typeof(img_out)
+            end
         end
     end
     @testset "affine" begin
@@ -75,14 +96,31 @@
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Resize) === true
-        wv = @inferred Augmentor.applylazy(Resize(2,3), square)
-        @test eltype(wv) == eltype(square)
-        @test typeof(wv) <: SubArray
-        @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
-        @test typeof(parent(wv)) <: InvWarpedView
-        @test typeof(parent(parent(wv))) <: Interpolations.Extrapolation
-        @test parent(parent(wv)).itp.coefs === square
-        @test wv == imresize(square, 2, 3)
+        @testset "single image" begin
+            wv = @inferred Augmentor.applylazy(Resize(2,3), square)
+            @test eltype(wv) == eltype(square)
+            @test typeof(wv) <: SubArray
+            @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(parent(wv)) <: InvWarpedView
+            @test typeof(parent(parent(wv))) <: Interpolations.Extrapolation
+            @test parent(parent(wv)).itp.coefs === square
+            @test wv == imresize(square, 2, 3)
+        end
+        @testset "multiple images" begin
+            wv1, wv2 = @inferred Augmentor.applylazy(Resize(2,3), (square, square2))
+            @test typeof(wv1) <: SubArray
+            @test typeof(wv1.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(parent(wv1)) <: InvWarpedView
+            @test typeof(parent(parent(wv1))) <: Interpolations.Extrapolation
+            @test parent(parent(wv1)).itp.coefs === square
+            @test wv1 == imresize(square, 2, 3)
+            @test typeof(wv2) <: SubArray
+            @test typeof(wv2.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(parent(wv2)) <: InvWarpedView
+            @test typeof(parent(parent(wv2))) <: Interpolations.Extrapolation
+            @test parent(parent(wv2)).itp.coefs === square2
+            @test wv2 == imresize(square2, 2, 3)
+        end
     end
     @testset "view" begin
         @test Augmentor.supports_view(Resize) === false

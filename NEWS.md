@@ -1,3 +1,27 @@
+# v0.5.0
+
+New functionality:
+
+- Add support for multiple images per observation (represented as
+  tuples), in which case all images of an observation are
+  processed the same way (even when randomness is involved).
+  See #23 for more information.
+
+# v0.4.0
+
+New operations:
+
+- `MapFun`: Maps the given function over all individual array
+  elements.
+
+- `AggregateThenMapFun`: Compute some aggregated value of the
+  current image using some given function `aggfun`, and map that
+  value over the current image using some given function `mapfun`.
+
+Online documentation:
+
+- Replace tensorflow tutorial with Knet tutorial
+
 # v0.3.1
 
 Small fixes:
