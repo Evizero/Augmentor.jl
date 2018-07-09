@@ -5,7 +5,6 @@
         @test_throws MethodError Crop(())
         @test typeof(@inferred(Crop(1:10))) <: Crop{1} <: Crop <: Augmentor.ImageOperation
         @test typeof(@inferred(Crop(1:10,3:5))) <: Crop{2} <: Crop <: Augmentor.ImageOperation
-        @test @inferred(Crop(1,4,10,5)) === @inferred(Crop((4:8,1:10)))
         @test @inferred(Crop(Base.OneTo(10), Base.OneTo(5))) === @inferred(Crop((1:10,1:5)))
         @test @inferred(Crop(Base.OneTo(10), 1:5)) === @inferred(Crop((1:10,1:5)))
         @test str_show(Crop(3:4)) == "Augmentor.Crop{1}((3:4,))"
@@ -124,7 +123,6 @@ end
         @test_throws MethodError CropNative(())
         @test typeof(@inferred(CropNative(1:10))) <: CropNative{1} <: CropNative <: Augmentor.ImageOperation
         @test typeof(@inferred(CropNative(1:10,3:5))) <: CropNative{2} <: CropNative <: Augmentor.ImageOperation
-        @test @inferred(CropNative(1,4,10,5)) === @inferred(CropNative((4:8,1:10)))
         @test @inferred(CropNative(Base.OneTo(10), Base.OneTo(5))) === @inferred(CropNative((1:10,1:5)))
         @test @inferred(CropNative(Base.OneTo(10), 1:5)) === @inferred(CropNative((1:10,1:5)))
         @test str_show(CropNative(3:4)) == "Augmentor.CropNative{1}((3:4,))"

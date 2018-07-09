@@ -61,8 +61,6 @@ end
 Crop(::Tuple{}) = throw(MethodError(Crop, ((),)))
 Crop(indexes::Range...) = Crop(indexes)
 
-@deprecate Crop(x, y, width, height) Crop(y:y+height-1, x:x+width-1)
-
 @inline supports_eager(::Type{<:Crop})      = false
 @inline supports_affineview(::Type{<:Crop}) = true
 @inline supports_view(::Type{<:Crop})       = true
@@ -163,8 +161,6 @@ function CropNative(indexes::NTuple{N,AbstractUnitRange}) where N
 end
 CropNative(::Tuple{}) = throw(MethodError(CropNative, ((),)))
 CropNative(indexes::Range...) = CropNative(indexes)
-
-@deprecate CropNative(x, y, width, height) CropNative(y:y+height-1, x:x+width-1)
 
 @inline supports_eager(::Type{<:CropNative})      = false
 @inline supports_affineview(::Type{<:CropNative}) = true

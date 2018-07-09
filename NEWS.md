@@ -7,6 +7,12 @@ New functionality:
   processed the same way (even when randomness is involved).
   See #23 for more information.
 
+Other changes:
+
+- Remove deprecated `Crop` and `CropNative` constructors.
+
+- Update code for the benchmarks.
+
 # v0.4.0
 
 New operations:
