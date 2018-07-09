@@ -1,12 +1,4 @@
-# Things that needs to be tested
-# [x] Utility functions work properly and type stable
-# [x] Individual operations do what they should
-# [x] Individual operations are always type stable
-# [x] Lazy Either works correctly and type stable
-# [x] Operations accept AbstractArray as input (esp. Array and SubArray)
-
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ReferenceTests, Base.Test
-using ImageInTerminal
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, ReferenceTests, Base.Test
 
 # check for ambiguities
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
