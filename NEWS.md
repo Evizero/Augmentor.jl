@@ -11,6 +11,8 @@ Other changes:
 
 - Remove deprecated `Crop` and `CropNative` constructors.
 
+- Update code for the benchmarks.
+
 # v0.4.0
 
 New operations:
