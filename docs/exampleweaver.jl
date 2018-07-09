@@ -116,8 +116,9 @@ function weave_notebook(scriptname; overwrite=false, execute=true)
     convert_doc(processed_scriptpath, jppath)
     # execute notebook
     if execute
+        sleep(1)
         info("executing and overwrite notebook \"$(name*".ipynb")\"")
-        run(`jupyter nbconvert --ExecutePreprocessor.timeout=-1 --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
+        run(`jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
     end
     # cleanup temporary files
     rm(processed_scriptpath)

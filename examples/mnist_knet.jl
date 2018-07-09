@@ -355,7 +355,8 @@ println(pl) #jl-only
 #' apply the pipeline multiple times to the first training image
 #' and look at what kind of results it produces.
 
-[MNIST.convert2image(reshape(augment(train_x[:,:,:,1], pl), (28, 28))) for i in 1:8, j in 1:2]
+#jp [MNIST.convert2image(reshape(augment(train_x[:,:,:,1], pl), (28, 28))) for i in 1:2, j in 1:8]
+#md [MNIST.convert2image(reshape(augment(train_x[:,:,:,1], pl), (28, 28))) for i in 1:8, j in 1:2]
 #md tmp = vcat(hcat(ans[:,1]...), hcat(ans[:,2]...)) # hide
 #md save("mnist_knet_aug.png",repeat(tmp, inner=(4,4))) # hide
 #md nothing # hide
