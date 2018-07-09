@@ -5,10 +5,6 @@ julia&gt; A = rand(RGB, 10, 10) # three color channels
 10×10 Array{RGB{Float64},2}:
 [...]
 
-julia&gt; augment(A, ConvertEltype(Gray)) # convert to grayscale
-10×10 Array{Gray{Float64},2}:
-[...]
-
-julia&gt; augment(A, ConvertEltype(Gray{Float32})) # more specific
+julia&gt; augment(A, ConvertEltype(Gray{Float32})) # convert to grayscale
 10×10 Array{Gray{Float32},2}:
-[...]</code></pre></div><a class="source-link" target="_blank" href="https://github.com/Evizero/Augmentor.jl/blob/cbb8a23419653bc0d522c4644f786dc74c5e066a/src/operations/convert.jl#L1-L51">source</a></section><div><table><tr><th>Input</th><th><code>ConvertEltype(GrayA)</code></th></tr><tr><td><img src="../../assets/testpattern.png" alt="input"/></td><td><img src="../../assets/ConvertEltype.png" alt="output"/></td></tr></table></div><footer><hr/><a class="previous" href="../resize/"><span class="direction">Previous</span><span class="title">Resize: Set static image size</span></a><a class="next" href="../mapfun/"><span class="direction">Next</span><span class="title">MapFun: Map function over Image</span></a></footer></article></body></html>
+[...]</code></pre></div><a class="source-link" target="_blank" href="https://github.com/Evizero/Augmentor.jl/blob/ee8d925c9d544bc3ca2e9e7e7fef88beb4a7fcbc/src/operations/convert.jl#L1-L47">source</a></section><div><table><tr><th>Input</th><th><code>ConvertEltype(GrayA{N0f8})</code></th></tr><tr><td><img src="../../assets/testpattern.png" alt="input"/></td><td><img src="../../assets/ConvertEltype.png" alt="output"/></td></tr></table></div><footer><hr/><a class="previous" href="../resize/"><span class="direction">Previous</span><span class="title">Resize: Set static image size</span></a><a class="next" href="../mapfun/"><span class="direction">Next</span><span class="title">MapFun: Map function over Image</span></a></footer></article></body></html>
