@@ -61,7 +61,7 @@ end
     A
 end
 
-@inline function _plain_indices(A::AbstractArray{T,N}, ids::NTuple{N,Any}) where {T, N}
+@inline function _plain_indices(A::AbstractArray, ids::Tuple{Vararg{Any}})
     view(A, indices(A)...)
 end
 
