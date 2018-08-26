@@ -79,7 +79,7 @@ Zoom(::Tuple{}) = throw(MethodError(Zoom, ((),)))
 Zoom(factors...) = Zoom(factors)
 Zoom(factor::Union{AbstractVector,Real}) = Zoom((factor, factor))
 Zoom(factors::NTuple{N,Any}) where {N} = Zoom(map(vectorize, factors))
-Zoom(factors::NTuple{N,Range}) where {N} = Zoom{N}(promote(factors...))
+Zoom(factors::NTuple{N,AbstractRange}) where {N} = Zoom{N}(promote(factors...))
 function Zoom(factors::NTuple{N,AbstractVector}) where N
     Zoom{N}(map(Vector{Float64}, factors))
 end
@@ -107,16 +107,16 @@ function applylazy(op::Zoom, img::AbstractArray, idx)
 end
 
 function applyaffineview(op::Zoom{N}, img::AbstractArray{T,N}, idx) where {T,N}
-    wv = invwarpedview(img, toaffinemap(op, img, idx), indices(img))
-    direct_view(wv, indices(img))
+    wv = invwarpedview(img, toaffinemap(op, img, idx), axes(img))
+    direct_view(wv, axes(img))
 end
 
 function applyaffineview(op::Zoom{N}, v::SubArray{T,N,<:InvWarpedView}, idx) where {T,N}
     tinv = toaffinemap(op, v, idx)
     img = parent(v)
     nidx = ImageTransformations.autorange(img, tinv)
-    wv = InvWarpedView(img, tinv, map(unionrange, nidx, indices(img)))
-    view(wv, v.indexes...)
+    wv = InvWarpedView(img, tinv, map(unionrange, nidx, axes(img)))
+    view(wv, v.indices...)
 end
 
 function showconstruction(io::IO, op::Zoom)

@@ -68,7 +68,7 @@ end
 
 function applyaffineview(op::Operation, img::AbstractArray, param)
     wv = applyaffine(op, img, param)
-    direct_view(wv, indices(wv))
+    direct_view(wv, axes(wv))
 end
 
 function applyaffine(op::AffineOperation, img::AbstractArray, param)
@@ -126,7 +126,7 @@ end
 
 function applyaffineview_common(op::AffineOperation, img::AbstractArray, param)
     wv = applyaffine_common(op, img, param)
-    direct_view(wv, indices(wv))
+    direct_view(wv, axes(wv))
 end
 
 # We trust that non-affine operations use SArray-only AffineMap.

@@ -63,7 +63,7 @@ applyeager(op::FlipX, img::AbstractArray, param) = plain_array(applystepview(op,
 applylazy_fallback(op::FlipX, img::AbstractMatrix, param) = applystepview(op, img, param)
 
 function applystepview(::FlipX, img::AbstractMatrix, param)
-    idx = map(i->1:1:length(i), indices(img))
+    idx = map(i->1:1:length(i), axes(img))
     indirect_view(img, (idx[1], reverse(idx[2])))
 end
 
@@ -145,7 +145,7 @@ applyeager(op::FlipY, img::AbstractArray, param) = plain_array(applystepview(op,
 applylazy_fallback(op::FlipY, img::AbstractMatrix, param) = applystepview(op, img, param)
 
 function applystepview(::FlipY, img::AbstractMatrix, param)
-    idx = map(i->1:1:length(i), indices(img))
+    idx = map(i->1:1:length(i), axes(img))
     indirect_view(img, (reverse(idx[1]), idx[2]))
 end
 

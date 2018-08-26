@@ -5,7 +5,7 @@ images by applying various transformations.
 
 | **Package Status** | **Package Evaluator** | **Build Status**  |
 |:------------------:|:---------------------:|:-----------------:|
-| [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md) [![Documentation Status](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](https://evizero.github.io/Augmentor.jl/) | [![Julia Pkg 0.5](http://pkg.julialang.org/badges/Augmentor_0.5.svg)](http://pkg.julialang.org/?pkg=Augmentor) [![Julia Pkg 0.6](http://pkg.julialang.org/badges/Augmentor_0.6.svg)](http://pkg.julialang.org/?pkg=Augmentor) | [![Travis Status](https://travis-ci.org/Evizero/Augmentor.jl.svg?branch=master)](https://travis-ci.org/Evizero/Augmentor.jl) [![AppVeyor status](https://ci.appveyor.com/api/projects/status/stfgx2856r8ckskw?svg=true)](https://ci.appveyor.com/project/Evizero/augmentor-jl) [![Coverage Status](https://coveralls.io/repos/github/Evizero/Augmentor.jl/badge.svg?branch=master)](https://coveralls.io/github/Evizero/Augmentor.jl?branch=master) |
+| [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md) [![Documentation Status](https://img.shields.io/badge/docs-latest-blue.svg?style=flat)](https://evizero.github.io/Augmentor.jl/) | [![Julia Pkg 0.6](http://pkg.julialang.org/badges/Augmentor_0.6.svg)](http://pkg.julialang.org/?pkg=Augmentor) [![Julia Pkg 0.7](http://pkg.julialang.org/badges/Augmentor_0.7.svg)](http://pkg.julialang.org/?pkg=Augmentor) | [![Travis Status](https://travis-ci.org/Evizero/Augmentor.jl.svg?branch=master)](https://travis-ci.org/Evizero/Augmentor.jl) [![AppVeyor status](https://ci.appveyor.com/api/projects/status/stfgx2856r8ckskw?svg=true)](https://ci.appveyor.com/project/Evizero/augmentor-jl) [![Coverage Status](https://coveralls.io/repos/github/Evizero/Augmentor.jl/badge.svg?branch=master)](https://coveralls.io/github/Evizero/Augmentor.jl?branch=master) |
 
 Augmentor is a real-time image augmentation library designed to
 render the process of artificial dataset enlargement more
@@ -304,16 +304,9 @@ package manager. Once installed the Augmentor package can be
 imported just as any other Julia package.
 
 ```julia
+import Pkg
 Pkg.add("Augmentor")
 using Augmentor
-```
-
-Additionally, for example if you encounter any sudden issues, you
-can manually choose to be on the latest (untagged) development
-version.
-
-```julia
-Pkg.checkout("Augmentor")
 ```
 
 ## License

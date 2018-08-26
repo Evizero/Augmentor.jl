@@ -19,12 +19,12 @@ applyeager(::NoOp, img::AbstractArray, param) = maybe_copy(img)
 applylazy(::NoOp, img::AbstractArray, param) = img
 
 function applyview(::NoOp, img::AbstractArray, param)
-    idx = map(i->1:length(i), indices(img))
+    idx = map(i->1:length(i), axes(img))
     indirect_view(img, idx)
 end
 
 function applystepview(::NoOp, img::AbstractArray, param)
-    idx = map(i->1:1:length(i), indices(img))
+    idx = map(i->1:1:length(i), axes(img))
     indirect_view(img, idx)
 end
 

@@ -13,31 +13,17 @@ struct DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: Abstra
 end
 
 Base.parent(A::DistortedView) = A.parent
-Base.size(A::DistortedView) = map(length, indices(A.parent))
+Base.size(A::DistortedView) = map(length, axes(A.parent))
 
-function ShowItLikeYouBuildIt.showarg(io::IO, A::DistortedView)
+function Base.showarg(io::IO, A::DistortedView, toplevel)
     print(io, typeof(A).name, '(')
-    showarg(io, parent(A))
+    Base.showarg(io, parent(A), false)
     print(io, ", ")
-    showarg(io, A.grid)
+    Base.showarg(io, A.grid, false)
     print(io, " as ", size(A.field,2), '×', size(A.field,3), " vector field")
     print(io, ')')
+    toplevel && print(io, " with eltype ", eltype(v))
 end
-
-# showargs for SubArray{<:Colorant} is already implemented by ImageCore
-function ShowItLikeYouBuildIt.showarg(io::IO, A::SubArray{<:Number,N,<:DistortedView}) where N
-    print(io, "view(")
-    showarg(io, parent(A))
-    print(io, ", ")
-    for (i, el) in enumerate(A.indexes)
-        print(io, el)
-        i < length(A.indexes) && print(io, ", ")
-    end
-    print(io, ')')
-end
-
-Base.summary(A::DistortedView) = summary_build(A)
-Base.summary(A::SubArray{<:Number,N,<:DistortedView}) where {N} = summary_build(A)
 
 # inline speeds up ~30%
 @inline function Base.getindex(A::DistortedView, i::Int, j::Int)
@@ -46,9 +32,9 @@ Base.summary(A::SubArray{<:Number,N,<:DistortedView}) where {N} = summary_build(
     etp    = A.etp
     field  = A.field
     # size of the parent array
-    indsy, indsx = indices(parent)
+    indsy, indsx = axes(parent)
     leny,  lenx  = length(indsy), length(indsx)
-    # grid size of the field field
+    # grid size of the field
     _, gh, gw = size(field)
     # map array indices to grid indices
     gi, gj = (i-1)/(leny-1)*(gh-1)+1, (j-1)/(lenx-1)*(gw-1)+1

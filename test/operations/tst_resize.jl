@@ -67,7 +67,7 @@
             wv = @inferred Augmentor.applyaffineview(Resize(h,w), Augmentor.prepareaffine(square))
             @test eltype(wv) == eltype(square)
             @test typeof(wv) <: SubArray
-            @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
             @test typeof(parent(wv)) <: InvWarpedView
             @test parent(parent(wv)).itp.coefs === square
             # round because `imresize` computes as float space,
@@ -78,7 +78,7 @@
             wv = @inferred Augmentor.applyaffineview(Resize(h,w), Augmentor.prepareaffine(checkers))
             @test eltype(wv) == eltype(checkers)
             @test typeof(wv) <: SubArray
-            @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
             @test typeof(parent(wv)) <: InvWarpedView
             @test parent(parent(wv)).itp.coefs === checkers
             @test wv == imresize(checkers, h, w)
@@ -88,7 +88,7 @@
             wv = @inferred Augmentor.applyaffineview(Resize(h,w), Augmentor.prepareaffine(camera))
             @test eltype(wv) == eltype(camera)
             @test typeof(wv) <: SubArray
-            @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
             @test typeof(parent(wv)) <: InvWarpedView
             @test parent(parent(wv)).itp.coefs === camera
             @test wv == imresize(camera, h, w)
@@ -100,7 +100,7 @@
             wv = @inferred Augmentor.applylazy(Resize(2,3), square)
             @test eltype(wv) == eltype(square)
             @test typeof(wv) <: SubArray
-            @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
             @test typeof(parent(wv)) <: InvWarpedView
             @test typeof(parent(parent(wv))) <: Interpolations.Extrapolation
             @test parent(parent(wv)).itp.coefs === square
@@ -109,13 +109,13 @@
         @testset "multiple images" begin
             wv1, wv2 = @inferred Augmentor.applylazy(Resize(2,3), (square, square2))
             @test typeof(wv1) <: SubArray
-            @test typeof(wv1.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(wv1.indices) <: Tuple{Vararg{IdentityRange}}
             @test typeof(parent(wv1)) <: InvWarpedView
             @test typeof(parent(parent(wv1))) <: Interpolations.Extrapolation
             @test parent(parent(wv1)).itp.coefs === square
             @test wv1 == imresize(square, 2, 3)
             @test typeof(wv2) <: SubArray
-            @test typeof(wv2.indexes) <: Tuple{Vararg{IdentityRange}}
+            @test typeof(wv2.indices) <: Tuple{Vararg{IdentityRange}}
             @test typeof(parent(wv2)) <: InvWarpedView
             @test typeof(parent(parent(wv2))) <: Interpolations.Extrapolation
             @test parent(parent(wv2)).itp.coefs === square2

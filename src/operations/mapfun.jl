@@ -59,7 +59,7 @@ function applylazy(op::MapFun, img::AbstractArray, param)
 end
 
 function showconstruction(io::IO, op::MapFun)
-    print(io, typeof(op).name.name, '(', op.fun, ')')
+    print(io, nameof(typeof(op)), '(', op.fun, ')')
 end
 
 function Base.show(io::IO, op::MapFun)
@@ -139,7 +139,7 @@ function applylazy(op::AggregateThenMapFun, img::AbstractArray, param)
 end
 
 function showconstruction(io::IO, op::AggregateThenMapFun)
-    print(io, typeof(op).name.name, '(', op.aggfun, ", ", op.mapfun, ')')
+    print(io, nameof(typeof(op)), '(', op.aggfun, ", ", op.mapfun, ')')
 end
 
 function Base.show(io::IO, op::AggregateThenMapFun)
