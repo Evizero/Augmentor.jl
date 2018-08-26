@@ -1,7 +1,6 @@
 module Augmentor
 
 using ColorTypes
-using ColorTypes: AbstractGray
 using MappedArrays
 using ImageCore
 using ImageTransformations
@@ -15,7 +14,6 @@ using IdentityRanges
 using MLDataPattern
 using ComputationalResources
 using FileIO
-using ShowItLikeYouBuildIt
 using Base.PermutedDimsArrays: PermutedDimsArray
 
 export
