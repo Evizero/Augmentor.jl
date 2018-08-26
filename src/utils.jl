@@ -97,7 +97,7 @@ function indirect_axes(O::NTuple{N,AbstractUnitRange}, I::NTuple{N,StepRange}) w
     map((i1,i2) -> UnitRange(i1)[i2], O, I)
 end
 
-function indirect_axes(O::NTuple{N,StepRange}, I::NTuple{N,Range}) where N
+function indirect_axes(O::NTuple{N,StepRange}, I::NTuple{N,AbstractRange}) where N
     map((i1,i2) -> i1[i2], O, I)
 end
 
@@ -107,7 +107,7 @@ function indirect_view(A::AbstractArray, I::Tuple)
     view(A, indirect_axes(axes(A), I)...)
 end
 
-function indirect_view(A::SubArray{T,N,TA,<:NTuple{N,Range}}, I::Tuple) where {T,N,TA}
+function indirect_view(A::SubArray{T,N,TA,<:NTuple{N,AbstractRange}}, I::Tuple) where {T,N,TA}
     view(parent(A), indirect_axes(A.indices, I)...)
 end
 
@@ -122,21 +122,21 @@ function direct_axes(O::NTuple{N,IdentityRange}, I::NTuple{N,StepRange}) where N
     throw(MethodError(direct_axes, (O, I)))
 end
 
-@inline function direct_axes(O::NTuple{N,Range}, I::NTuple{N,AbstractUnitRange}) where N
+@inline function direct_axes(O::NTuple{N,AbstractRange}, I::NTuple{N,AbstractUnitRange}) where N
     map(IdentityRange, I)
 end
 
-@inline function direct_axes(O::NTuple{N,Range}, I::NTuple{N,StepRange}) where N
+@inline function direct_axes(O::NTuple{N,AbstractRange}, I::NTuple{N,StepRange}) where N
     I
 end
 
 # --------------------------------------------------------------------
 
-function direct_view(A::AbstractArray{T,N}, I::NTuple{N,Range}) where {T,N}
+function direct_view(A::AbstractArray{T,N}, I::NTuple{N,AbstractRange}) where {T,N}
     view(A, direct_axes(axes(A), I)...)
 end
 
-function direct_view(A::SubArray{T,N,TA,<:NTuple{N,Range}}, I::NTuple{N,Range}) where {T,N,TA}
+function direct_view(A::SubArray{T,N,TA,<:NTuple{N,AbstractRange}}, I::NTuple{N,AbstractRange}) where {T,N,TA}
     view(A, direct_axes(A.indices, I)...)
 end
 

@@ -79,7 +79,7 @@ Zoom(::Tuple{}) = throw(MethodError(Zoom, ((),)))
 Zoom(factors...) = Zoom(factors)
 Zoom(factor::Union{AbstractVector,Real}) = Zoom((factor, factor))
 Zoom(factors::NTuple{N,Any}) where {N} = Zoom(map(vectorize, factors))
-Zoom(factors::NTuple{N,Range}) where {N} = Zoom{N}(promote(factors...))
+Zoom(factors::NTuple{N,AbstractRange}) where {N} = Zoom{N}(promote(factors...))
 function Zoom(factors::NTuple{N,AbstractVector}) where N
     Zoom{N}(map(Vector{Float64}, factors))
 end
