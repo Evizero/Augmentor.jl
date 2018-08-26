@@ -1,4 +1,4 @@
-julia 0.6
+julia 0.7
 MappedArrays 0.0.3
 ImageCore 0.5.0
 ImageTransformations 0.3.0
@@ -14,4 +14,3 @@ MLDataPattern 0.1.2
 ComputationalResources 0.0.2
 ShowItLikeYouBuildIt
 FileIO
-Compat 0.17
