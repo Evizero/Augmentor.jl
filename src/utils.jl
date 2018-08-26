@@ -11,7 +11,7 @@ makes it easy to see what kind of effects one can achieve with it.
 testpattern() = load(joinpath(@__DIR__, "..", "resources", "testpattern.png"))
 
 function use_testpattern()
-    info("No custom image specifed. Using \"testpattern()\" for demonstration.")
+    @info("No custom image specifed. Using \"testpattern()\" for demonstration.")
     testpattern()
 end
 
@@ -72,7 +72,7 @@ end
 # --------------------------------------------------------------------
 
 @inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
-@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,UnitRange}) where {N} =
+@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,Union{UnitRange,Base.Slice{<:UnitRange}}}) where {N} =
     OffsetArray(buffer, inds)
 
 # --------------------------------------------------------------------
@@ -146,7 +146,7 @@ end
 @inline vectorize(A::Real) = A:A
 
 @inline round_if_float(num::Integer, d) = num
-round_if_float(num::AbstractFloat, d) = round(num,d)
+round_if_float(num::AbstractFloat, d) = round(num, digits=d)
 round_if_float(nums::Tuple, d) = map(num->round_if_float(num,d), nums)
 
 function unionrange(i1::AbstractUnitRange, i2::AbstractUnitRange)

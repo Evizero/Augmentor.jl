@@ -1,10 +1,11 @@
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, ReferenceTests, Base.Test
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, ReferenceTests, Test
 
 # check for ambiguities
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
 # The 1 is from plain_axes with a Tuple{} (so its spurious)
+#@test Set(setdiff(ambs, refambs)) == Set{Tuple{Method,Method}}()
 @test length(setdiff(ambs, refambs)) == 1
 
 str_show(obj) = @io2str Base.show(::IO, obj)
@@ -13,8 +14,8 @@ str_showconst(obj) = @io2str Augmentor.showconstruction(::IO, obj)
 
 camera = testimage("cameraman")
 cameras = similar(camera, size(camera)..., 2)
-copy!(view(cameras,:,:,1), camera)
-copy!(view(cameras,:,:,2), camera)
+copyto!(view(cameras,:,:,1), camera)
+copyto!(view(cameras,:,:,2), camera)
 square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]
 square2 = rand(Gray{N0f8}, 4, 4)
 rect = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6]

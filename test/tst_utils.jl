@@ -43,7 +43,7 @@ end
         @test @inferred(Augmentor.maybe_copy(v)) == OffsetArray(A[2:3,1:2], (1, 0))
         @test typeof(Augmentor.maybe_copy(v)) <: OffsetArray
     end
-    let v = ChannelView(rect)
+    let v = channelview(rect)
         @test @inferred(Augmentor.maybe_copy(v)) == channelview(rect)
         @test typeof(Augmentor.maybe_copy(v)) <: Array
     end
@@ -101,7 +101,7 @@ end
         @test @inferred(Augmentor.plain_array(v)) == A[2:3, 1:2]
         @test typeof(Augmentor.plain_array(v)) <: Array
     end
-    let v = ChannelView(rect)
+    let v = channelview(rect)
         @test @inferred(Augmentor.plain_array(v)) == channelview(rect)
         @test typeof(Augmentor.plain_array(v)) <: Array
     end
@@ -136,7 +136,7 @@ end
     let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
         @test @inferred(Augmentor.plain_axes(v)) === view(A, 2:3, 1:2)
     end
-    let v = ChannelView(rect)
+    let v = channelview(rect)
         @test @inferred(Augmentor.plain_axes(v)) === v
     end
     let p = permuteddimsview(A, (2,1))
@@ -157,7 +157,7 @@ end
     A = [1 2 3; 4 5 6; 7 8 9]
     @test @inferred(Augmentor.match_idx(A, axes(A))) === A
     let img = @inferred Augmentor.match_idx(A, (2:4, 2:4))
-        @test axes(img) === (2:4, 2:4)
+        @test axes(img) === Base.Slice.((2:4, 2:4))
         @test typeof(img) <: OffsetArray
     end
     let B = view(A,1:3,1:3)
@@ -165,11 +165,11 @@ end
     end
     let B = view(A,1:3,1:3)
         img = @inferred(Augmentor.match_idx(B, B.indices))
-        @test axes(img) === (1:3, 1:3)
+        @test axes(img) === Base.Slice.((1:3, 1:3))
         @test typeof(img) <: OffsetArray
     end
     let img = @inferred Augmentor.match_idx(view(A,1:3,1:3), (2:4,2:4))
-        @test axes(img) === (2:4, 2:4)
+        @test axes(img) === Base.Slice.((2:4, 2:4))
         @test typeof(img) <: OffsetArray
     end
     let C = Augmentor.prepareaffine(A)
