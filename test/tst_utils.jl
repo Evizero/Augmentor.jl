@@ -123,53 +123,53 @@ end
     end
 end
 
-@testset "plain_indices" begin
+@testset "plain_axes" begin
     A = [1 2 3; 4 5 6; 7 8 9]
-    @test @inferred(Augmentor.plain_indices(A)) === A
-    @test @inferred(Augmentor.plain_indices(OffsetArray(A, (-2,-1)))) === A
+    @test @inferred(Augmentor.plain_axes(A)) === A
+    @test @inferred(Augmentor.plain_axes(OffsetArray(A, (-2,-1)))) === A
     let v = view(A, 2:3, 1:2)
-        @test @inferred(Augmentor.plain_indices(v)) === v
+        @test @inferred(Augmentor.plain_axes(v)) === v
     end
     let v = view(OffsetArray(A, (-2,-1)), 0:1, 0:1)
-        @test @inferred(Augmentor.plain_indices(v)) === v
+        @test @inferred(Augmentor.plain_axes(v)) === v
     end
     let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
-        @test @inferred(Augmentor.plain_indices(v)) === view(A, 2:3, 1:2)
+        @test @inferred(Augmentor.plain_axes(v)) === view(A, 2:3, 1:2)
     end
     let v = ChannelView(rect)
-        @test @inferred(Augmentor.plain_indices(v)) === v
+        @test @inferred(Augmentor.plain_axes(v)) === v
     end
     let p = permuteddimsview(A, (2,1))
-        @test @inferred(Augmentor.plain_indices(p)) === p
+        @test @inferred(Augmentor.plain_axes(p)) === p
     end
     let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
-        @test @inferred(Augmentor.plain_indices(p)) === view(parent(p), 2:3, 1:2)
+        @test @inferred(Augmentor.plain_axes(p)) === view(parent(p), 2:3, 1:2)
     end
     let Aa = Augmentor.prepareaffine(A)
-        @test @inferred(Augmentor.plain_indices(Aa)) === view(Aa, indices(Aa)...)
+        @test @inferred(Augmentor.plain_axes(Aa)) === view(Aa, axes(Aa)...)
     end
     let Ar = reshape(view(A,:,:),1,3,3)
-        @test @inferred(Augmentor.plain_indices(Ar)) === Ar
+        @test @inferred(Augmentor.plain_axes(Ar)) === Ar
     end
 end
 
 @testset "match_idx" begin
     A = [1 2 3; 4 5 6; 7 8 9]
-    @test @inferred(Augmentor.match_idx(A, indices(A))) === A
+    @test @inferred(Augmentor.match_idx(A, axes(A))) === A
     let img = @inferred Augmentor.match_idx(A, (2:4, 2:4))
-        @test indices(img) === (2:4, 2:4)
+        @test axes(img) === (2:4, 2:4)
         @test typeof(img) <: OffsetArray
     end
     let B = view(A,1:3,1:3)
-        @test @inferred(Augmentor.match_idx(B, indices(B))) === B
+        @test @inferred(Augmentor.match_idx(B, axes(B))) === B
     end
     let B = view(A,1:3,1:3)
         img = @inferred(Augmentor.match_idx(B, B.indexes))
-        @test indices(img) === (1:3, 1:3)
+        @test axes(img) === (1:3, 1:3)
         @test typeof(img) <: OffsetArray
     end
     let img = @inferred Augmentor.match_idx(view(A,1:3,1:3), (2:4,2:4))
-        @test indices(img) === (2:4, 2:4)
+        @test axes(img) === (2:4, 2:4)
         @test typeof(img) <: OffsetArray
     end
     let C = Augmentor.prepareaffine(A)
@@ -181,8 +181,8 @@ end
     A = [1 2 3; 4 5 6; 7 8 9]
     Av = view(A, IdentityRange(2:3), IdentityRange(1:2))
     As = view(A, 3:-1:2, 1:1:2)
-    @test_throws MethodError Augmentor.indirect_indices((), ())
-    @test_throws MethodError Augmentor.direct_indices((), ())
+    @test_throws MethodError Augmentor.indirect_axes((), ())
+    @test_throws MethodError Augmentor.direct_axes((), ())
     @test_throws MethodError Augmentor.direct_view(A, ())
     @test @inferred(Augmentor.direct_view(A, (2:3,1:2))) === Av
     @test @inferred(Augmentor.indirect_view(A, (2:3,1:2))) === Av

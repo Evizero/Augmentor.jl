@@ -1,4 +1,3 @@
-__precompile__()
 module Augmentor
 
 using ColorTypes
@@ -17,7 +16,6 @@ using MLDataPattern
 using ComputationalResources
 using FileIO
 using ShowItLikeYouBuildIt
-using Compat
 using Base.PermutedDimsArrays: PermutedDimsArray
 
 export

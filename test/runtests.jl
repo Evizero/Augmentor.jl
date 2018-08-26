@@ -4,7 +4,7 @@ using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
-# The 1 is from plain_indices with a Tuple{} (so its spurious)
+# The 1 is from plain_axes with a Tuple{} (so its spurious)
 @test length(setdiff(ambs, refambs)) == 1
 
 str_show(obj) = @io2str Base.show(::IO, obj)

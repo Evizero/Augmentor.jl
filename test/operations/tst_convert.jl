@@ -57,33 +57,33 @@
         let img = @inferred(Augmentor.applylazy(ConvertEltype(Gray{Float32}), OffsetArray(rect,-2,-1)))
             @test parent(parent(img)) === rect
             @test typeof(img) <: ReadonlyMappedArray{Gray{Float32},2}
-            @test indices(img) === (-1:0, 0:2)
+            @test axes(img) === (-1:0, 0:2)
             @test img[0,0] isa Gray{Float32}
             @test collect(img) == convert.(Gray{Float32}, rect)
         end
         let img = @inferred(Augmentor.applylazy(ConvertEltype(Gray{Float32}), Augmentor.prepareaffine(rect)))
             @test parent(parent(parent(parent(img)))) === rect
             @test typeof(img) <: ReadonlyMappedArray{Gray{Float32},2}
-            @test indices(img) === (1:2, 1:3)
+            @test axes(img) === (1:2, 1:3)
             @test img[1,1] isa Gray{Float32}
             @test collect(img) == convert.(Gray{Float32}, rect)
         end
         let img = @inferred(Augmentor.applylazy(ConvertEltype(Gray{Float32}), view(rect, IdentityRange(1:2), IdentityRange(1:3))))
             @test parent(parent(img)) === rect
             @test typeof(img) <: ReadonlyMappedArray{Gray{Float32},2}
-            @test indices(img) === (1:2, 1:3)
+            @test axes(img) === (1:2, 1:3)
             @test img[1,1] isa Gray{Float32}
             @test collect(img) == convert.(Gray{Float32}, rect)
         end
         let img = @inferred(Augmentor.applylazy(ConvertEltype(Gray{Float32}), rgb_rect))
             @test parent(img) === rgb_rect
-            @test indices(img) === (Base.OneTo(2), Base.OneTo(3))
+            @test axes(img) === (Base.OneTo(2), Base.OneTo(3))
             @test typeof(img) <: ReadonlyMappedArray{Gray{Float32},2}
             @test img == convert.(Gray{Float32}, rgb_rect)
         end
         let img = @inferred(Augmentor.applylazy(ConvertEltype(Float32), checkers))
             @test parent(img) === checkers
-            @test indices(img) === (Base.OneTo(3), Base.OneTo(5))
+            @test axes(img) === (Base.OneTo(3), Base.OneTo(5))
             @test typeof(img) <: ReadonlyMappedArray{Float32,2}
             @test img == convert(Array{Float32}, checkers)
         end

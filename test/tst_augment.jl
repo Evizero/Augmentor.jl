@@ -80,7 +80,7 @@ ops = (ShearY(45),ShearX(-2),CacheImage()) # forces affine then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(camera, ops)
     @test typeof(img) <: OffsetArray
-    @test indices(img) == (-255:768, 0:512)
+    @test axes(img) == (-255:768, 0:512)
 end
 
 ops = (Resize(2,2),Rotate90()) # forces affine

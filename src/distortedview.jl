@@ -13,7 +13,7 @@ struct DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: Abstra
 end
 
 Base.parent(A::DistortedView) = A.parent
-Base.size(A::DistortedView) = map(length, indices(A.parent))
+Base.size(A::DistortedView) = map(length, axes(A.parent))
 
 function ShowItLikeYouBuildIt.showarg(io::IO, A::DistortedView)
     print(io, typeof(A).name, '(')
@@ -46,9 +46,9 @@ Base.summary(A::SubArray{<:Number,N,<:DistortedView}) where {N} = summary_build(
     etp    = A.etp
     field  = A.field
     # size of the parent array
-    indsy, indsx = indices(parent)
+    indsy, indsx = axes(parent)
     leny,  lenx  = length(indsy), length(indsx)
-    # grid size of the field field
+    # grid size of the field
     _, gh, gw = size(field)
     # map array indices to grid indices
     gi, gj = (i-1)/(leny-1)*(gh-1)+1, (j-1)/(lenx-1)*(gw-1)+1

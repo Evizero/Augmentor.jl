@@ -92,12 +92,12 @@ function applylazy(op::CacheImageInto, img::Tuple)
 end
 
 function applylazy(op::CacheImageInto{<:AbstractArray}, img::AbstractArray, param)
-    copy!(match_idx(op.buffer, indices(img)), img)
+    copy!(match_idx(op.buffer, axes(img)), img)
 end
 
 function applylazy(op::CacheImageInto{<:Tuple}, imgs::Tuple)
     map(op.buffer, imgs) do buffer, img
-        copy!(match_idx(buffer, indices(img)), img)
+        copy!(match_idx(buffer, axes(img)), img)
     end
 end
 
@@ -105,7 +105,7 @@ function _showconstruction(io::IO, array::AbstractArray)
     print(io, "Array{")
     _showcolor(io, eltype(array))
     print(io, "}(")
-    print(io, join(map(i->string(length(i)), indices(array)), ", "))
+    print(io, join(map(i->string(length(i)), axes(array)), ", "))
     print(io, ")")
 end
 

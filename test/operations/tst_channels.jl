@@ -52,7 +52,7 @@
         @test @inferred(Augmentor.supports_lazy(typeof(SplitChannels()))) === true
         @test_throws MethodError Augmentor.applylazy(SplitChannels(), rand(2,2))
         f1 = img->reshape(channelview(img), 1, 2, 3)
-        f2 = img->Augmentor.plain_indices(channelview(img))
+        f2 = img->Augmentor.plain_axes(channelview(img))
         imgs = [
             (rect, f1),
             (Augmentor.prepareaffine(rect), f1),
@@ -197,7 +197,7 @@ end
         rect_split = reshape(channelview(rect), 1, 2, 3)
         rgb_rect_split = channelview(rgb_rect)
         f1 = (T, img) -> colorview(T, reshape(img, 2, 3))
-        f2 = (T, img) -> colorview(T, Augmentor.plain_indices(img))
+        f2 = (T, img) -> colorview(T, Augmentor.plain_axes(img))
         imgs = [
             (rect_split),
             (reshape(channelview(Augmentor.prepareaffine(rect)), 1, 2, 3)),

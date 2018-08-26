@@ -107,15 +107,15 @@ function applylazy(op::Zoom, img::AbstractArray, idx)
 end
 
 function applyaffineview(op::Zoom{N}, img::AbstractArray{T,N}, idx) where {T,N}
-    wv = invwarpedview(img, toaffinemap(op, img, idx), indices(img))
-    direct_view(wv, indices(img))
+    wv = invwarpedview(img, toaffinemap(op, img, idx), axes(img))
+    direct_view(wv, axes(img))
 end
 
 function applyaffineview(op::Zoom{N}, v::SubArray{T,N,<:InvWarpedView}, idx) where {T,N}
     tinv = toaffinemap(op, v, idx)
     img = parent(v)
     nidx = ImageTransformations.autorange(img, tinv)
-    wv = InvWarpedView(img, tinv, map(unionrange, nidx, indices(img)))
+    wv = InvWarpedView(img, tinv, map(unionrange, nidx, axes(img)))
     view(wv, v.indexes...)
 end
 

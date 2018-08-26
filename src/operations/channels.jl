@@ -50,11 +50,11 @@ struct SplitChannels <: Operation end
 @inline supports_lazy(::Type{SplitChannels}) = true
 
 function applylazy(op::SplitChannels, img::AbstractArray{<:Colorant}, param)
-    plain_indices(channelview(img))
+    plain_axes(channelview(img))
 end
 
 function applylazy(op::SplitChannels, img::AbstractArray{<:AbstractGray}, param)
-    ns = (1, map(length, indices(img))...)
+    ns = (1, map(length, axes(img))...)
     reshape(channelview(img), ns)
 end
 
@@ -137,12 +137,12 @@ end
 @inline supports_lazy(::Type{<:CombineChannels}) = true
 
 function applylazy(op::CombineChannels, img::AbstractArray{<:Number}, param)
-    colorview(op.colortype, plain_indices(img))
+    colorview(op.colortype, plain_axes(img))
 end
 
 function applylazy(op::CombineChannels{<:AbstractGray}, img::AbstractArray{<:Number}, param)
-    length(indices(img,1)) == 1 || throw(ArgumentError("The given image must have a singleton colorchannel in the first dimension in order to combine the channels to a AbstractGray colorant"))
-    ns = Base.tail(map(length, indices(img)))
+    length(axes(img,1)) == 1 || throw(ArgumentError("The given image must have a singleton colorchannel in the first dimension in order to combine the channels to a AbstractGray colorant"))
+    ns = Base.tail(map(length, axes(img)))
     colorview(op.colortype, reshape(img, ns))
 end
 

@@ -31,7 +31,7 @@
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(Crop(1:2,2:3), img_in))
                 @test collect(res) == rect[1:2, 2:3]
-                @test indices(res) == inds
+                @test axes(res) == inds
                 @test typeof(res) <: OffsetArray{eltype(img_in),2}
             end
         end
@@ -149,7 +149,7 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(CropNative(inds), img_in))
                 @test collect(res) == rect[1:2, 2:3]
-                @test indices(res) == inds
+                @test axes(res) == inds
                 @test typeof(res) <: OffsetArray{eltype(img_in),2}
             end
         end
@@ -251,13 +251,13 @@ end
         @test str_showconst(op) == "CropSize(20, 30, 40)"
         @test str_showcompact(op) == "Crop a 20×30×40 window around the center"
     end
-    @testset "cropsize_indices" begin
-        @test @inferred(Augmentor.cropsize_indices(CropSize(2,2), square)) === (1:2, 1:2)
-        @test @inferred(Augmentor.cropsize_indices(CropSize(2,2), square2)) === (2:3, 2:3)
-        @test @inferred(Augmentor.cropsize_indices(CropSize(2,2), checkers)) === (1:2, 2:3)
-        @test @inferred(Augmentor.cropsize_indices(CropSize(1,3), checkers)) === (2:2, 2:4)
-        @test @inferred(Augmentor.cropsize_indices(CropSize(3,3), checkers)) === (1:3, 2:4)
-        @test @inferred(Augmentor.cropsize_indices(CropSize(2,2), OffsetArray(rect, -2, -1))) === (-1:0, 0:1)
+    @testset "cropsize_axes" begin
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), square)) === (1:2, 1:2)
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), square2)) === (2:3, 2:3)
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), checkers)) === (1:2, 2:3)
+        @test @inferred(Augmentor.cropsize_axes(CropSize(1,3), checkers)) === (2:2, 2:4)
+        @test @inferred(Augmentor.cropsize_axes(CropSize(3,3), checkers)) === (1:3, 2:4)
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), OffsetArray(rect, -2, -1))) === (-1:0, 0:1)
     end
     imgs = [
         (rect, (1:2, 1:2)),
@@ -278,7 +278,7 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(CropSize(2,2), img_in))
                 @test collect(res) == img_in[inds...]
-                @test indices(res) == inds
+                @test axes(res) == inds
                 @test typeof(res) <: OffsetArray{eltype(img_in),2}
             end
         end
@@ -305,8 +305,8 @@ end
                 res1, res2 = @inferred(Augmentor.applyaffineview(CropSize(2,2), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == inds
-                @test indices(res2) == inds
+                @test axes(res1) == inds
+                @test axes(res2) == inds
                 @test typeof(res1) <: SubArray{Gray{N0f8}}
                 @test typeof(res2) <: SubArray{N0f8}
                 @test typeof(parent(res1)) <: InvWarpedView
@@ -323,8 +323,8 @@ end
                 res1, res2 = @inferred(Augmentor.applylazy(CropSize(2,2), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == inds
-                @test indices(res2) == inds
+                @test axes(res1) == inds
+                @test axes(res2) == inds
                 @test typeof(res1) <: SubArray{Gray{N0f8}}
                 @test typeof(res2) <: SubArray{N0f8}
             end
@@ -339,8 +339,8 @@ end
                 res1, res2 = @inferred(Augmentor.applyview(CropSize(2,2), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == inds
-                @test indices(res2) == inds
+                @test axes(res1) == inds
+                @test axes(res2) == inds
                 @test typeof(res1) <: SubArray{Gray{N0f8}}
                 @test typeof(res2) <: SubArray{N0f8}
             end
@@ -387,14 +387,14 @@ end
         op = @inferred(CropRatio(sqrt(2)))
         @test str_showcompact(op) == "Crop to 1.41 aspect ratio"
     end
-    @testset "cropratio_indices" begin
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(1), square)) === (1:3, 1:3)
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(2), square)) === (2:2, 1:3)
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(1), square2)) === (1:4, 1:4)
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(1), rect)) === (1:2, 1:2)
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(1), checkers)) === (1:3, 2:4)
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(1), rotl90(checkers))) === (2:4, 1:3)
-        @test @inferred(Augmentor.cropratio_indices(CropRatio(1), OffsetArray(rect, -2, -1))) === (-1:0, 0:1)
+    @testset "cropratio_axes" begin
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(1), square)) === (1:3, 1:3)
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(2), square)) === (2:2, 1:3)
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(1), square2)) === (1:4, 1:4)
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(1), rect)) === (1:2, 1:2)
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(1), checkers)) === (1:3, 2:4)
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(1), rotl90(checkers))) === (2:4, 1:3)
+        @test @inferred(Augmentor.cropratio_axes(CropRatio(1), OffsetArray(rect, -2, -1))) === (-1:0, 0:1)
     end
     imgs = [
         (rect, (1:2, 1:2)),
@@ -417,7 +417,7 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(CropRatio(1), img_in))
                 @test collect(res) == img_in[inds...]
-                @test indices(res) == inds
+                @test axes(res) == inds
                 @test typeof(res) <: OffsetArray{eltype(img_in),2}
             end
         end
@@ -445,8 +445,8 @@ end
                 res1, res2 = @inferred(Augmentor.applyaffineview(CropRatio(1), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == inds
-                @test indices(res2) == inds
+                @test axes(res1) == inds
+                @test axes(res2) == inds
                 @test typeof(res1) <: SubArray{Gray{N0f8}}
                 @test typeof(res2) <: SubArray{N0f8}
                 @test typeof(parent(res1)) <: InvWarpedView
@@ -464,8 +464,8 @@ end
                 res1, res2 = @inferred(Augmentor.applylazy(CropRatio(1), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == inds
-                @test indices(res2) == inds
+                @test axes(res1) == inds
+                @test axes(res2) == inds
                 @test typeof(res1) <: SubArray{Gray{N0f8}}
                 @test typeof(res2) <: SubArray{N0f8}
             end
@@ -481,8 +481,8 @@ end
                 res1, res2 = @inferred(Augmentor.applyview(CropRatio(1), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == inds
-                @test indices(res2) == inds
+                @test axes(res1) == inds
+                @test axes(res2) == inds
                 @test typeof(res1) <: SubArray{Gray{N0f8}}
                 @test typeof(res2) <: SubArray{N0f8}
             end
@@ -553,7 +553,7 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(RCropRatio(3/2), img_in))
                 @test collect(res) == img_in[inds...]
-                @test indices(res) == inds
+                @test axes(res) == inds
                 @test typeof(res) <: OffsetArray{eltype(img_in),2}
             end
         end
@@ -562,7 +562,7 @@ end
                 res1, res2 = @inferred(Augmentor.applyeager(RCropRatio(1), (img_in, N0f8.(img_in))))
                 # make sure both images are processed
                 @test res1 == res2
-                @test indices(res1) == indices(res2)
+                @test axes(res1) == axes(res2)
                 @test typeof(res1) <: OffsetArray{Gray{N0f8}}
                 @test typeof(res2) <: OffsetArray{N0f8}
             end

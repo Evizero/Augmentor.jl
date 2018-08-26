@@ -174,7 +174,7 @@ end
         ]
         @testset "single image" begin
             for img_in in imgs
-                img_out = reshape(Augmentor.plain_indices(img_in), (3,2,1))
+                img_out = reshape(Augmentor.plain_axes(img_in), (3,2,1))
                 res = @inferred(Augmentor.applylazy(Reshape(3,2,1), img_in))
                 @test res == Augmentor.applyeager(Reshape(3,2,1), img_in)
                 @test res == img_out
@@ -183,8 +183,8 @@ end
         end
         @testset "multiple images" begin
             for img_in1 in imgs, img_in2 in imgs
-                img_out1 = reshape(Augmentor.plain_indices(img_in1), (3,2,1))
-                img_out2 = reshape(Augmentor.plain_indices(img_in2), (3,2,1))
+                img_out1 = reshape(Augmentor.plain_axes(img_in1), (3,2,1))
+                img_out2 = reshape(Augmentor.plain_axes(img_in2), (3,2,1))
                 img_in = (img_in1, img_in2)
                 img_out = (img_out1, img_out2)
                 res = @inferred(Augmentor.applylazy(Reshape(3,2,1), img_in))
