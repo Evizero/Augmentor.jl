@@ -164,7 +164,7 @@ end
         @test @inferred(Augmentor.match_idx(B, axes(B))) === B
     end
     let B = view(A,1:3,1:3)
-        img = @inferred(Augmentor.match_idx(B, B.indexes))
+        img = @inferred(Augmentor.match_idx(B, B.indices))
         @test axes(img) === (1:3, 1:3)
         @test typeof(img) <: OffsetArray
     end

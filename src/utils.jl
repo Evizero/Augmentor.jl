@@ -55,7 +55,7 @@ end
 @inline plain_axes(A::Array) = A
 @inline plain_axes(A::OffsetArray) = parent(A)
 @inline plain_axes(A::AbstractArray) = _plain_axes(A, axes(A))
-@inline plain_axes(A::SubArray) = _plain_axes(A, A.indexes)
+@inline plain_axes(A::SubArray) = _plain_axes(A, A.indices)
 
 @inline function _plain_axes(A::AbstractArray{T,N}, ids::NTuple{N,Base.OneTo}) where {T, N}
     A
@@ -108,7 +108,7 @@ function indirect_view(A::AbstractArray, I::Tuple)
 end
 
 function indirect_view(A::SubArray{T,N,TA,<:NTuple{N,Range}}, I::Tuple) where {T,N,TA}
-    view(parent(A), indirect_axes(A.indexes, I)...)
+    view(parent(A), indirect_axes(A.indices, I)...)
 end
 
 # --------------------------------------------------------------------
@@ -137,7 +137,7 @@ function direct_view(A::AbstractArray{T,N}, I::NTuple{N,Range}) where {T,N}
 end
 
 function direct_view(A::SubArray{T,N,TA,<:NTuple{N,Range}}, I::NTuple{N,Range}) where {T,N,TA}
-    view(A, direct_axes(A.indexes, I)...)
+    view(A, direct_axes(A.indices, I)...)
 end
 
 # --------------------------------------------------------------------

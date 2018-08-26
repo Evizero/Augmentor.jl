@@ -70,13 +70,13 @@ function applypermute(::Rotate90, img::AbstractMatrix{T}, param) where T
 end
 
 function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
-    idx = map(StepRange, sub.indexes)
+    idx = map(StepRange, sub.indices)
     img = parent(parent(sub))
     view(img, reverse(idx[2]), idx[1])
 end
 
 function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT}
-    idx = map(StepRange, sub.indexes)
+    idx = map(StepRange, sub.indices)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, reverse(idx[2]), idx[1])
@@ -224,13 +224,13 @@ function applypermute(::Rotate270, img::AbstractMatrix{T}, param) where T
 end
 
 function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
-    idx = map(StepRange, sub.indexes)
+    idx = map(StepRange, sub.indices)
     img = parent(parent(sub))
     view(img, idx[2], reverse(idx[1]))
 end
 
 function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT}
-    idx = map(StepRange, sub.indexes)
+    idx = map(StepRange, sub.indices)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, idx[2], reverse(idx[1]))

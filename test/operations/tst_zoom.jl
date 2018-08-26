@@ -125,7 +125,7 @@
         @test wv == ref
         @test eltype(wv) == eltype(square)
         @test typeof(wv) <: SubArray
-        @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+        @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
         @test typeof(parent(wv)) <: InvWarpedView
         @test parent(parent(wv)).itp.coefs === square
     end
@@ -136,7 +136,7 @@
         @test wv == ref
         @test eltype(wv) == eltype(square)
         @test typeof(wv) <: SubArray
-        @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+        @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
         @test typeof(parent(wv)) <: InvWarpedView
         @test parent(parent(wv)).itp.coefs === square
     end

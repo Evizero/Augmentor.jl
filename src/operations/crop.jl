@@ -49,17 +49,17 @@ julia> augment(img, Crop(1:30, 361:400)) # crop upper right corner
 ```
 """
 struct Crop{N,I<:Tuple} <: ImageOperation
-    indexes::I
+    indices::I
 
-    function Crop{N}(indexes::NTuple{N,UnitRange}) where N
-        new{N,typeof(indexes)}(indexes)
+    function Crop{N}(indices::NTuple{N,UnitRange}) where N
+        new{N,typeof(indices)}(indices)
     end
 end
-function Crop(indexes::NTuple{N,AbstractUnitRange}) where N
-    Crop{N}(map(UnitRange, indexes))
+function Crop(indices::NTuple{N,AbstractUnitRange}) where N
+    Crop{N}(map(UnitRange, indices))
 end
 Crop(::Tuple{}) = throw(MethodError(Crop, ((),)))
-Crop(indexes::Range...) = Crop(indexes)
+Crop(indices::Range...) = Crop(indices)
 
 @inline supports_eager(::Type{<:Crop})      = false
 @inline supports_affineview(::Type{<:Crop}) = true
@@ -73,22 +73,22 @@ function applyaffineview(op::Crop, img::AbstractArray, param)
 end
 
 function applyview(op::Crop, img::AbstractArray, param)
-    indirect_view(img, op.indexes)
+    indirect_view(img, op.indices)
 end
 
 function applystepview(op::Crop, img::AbstractArray, param)
-    indirect_view(img, map(StepRange, op.indexes))
+    indirect_view(img, map(StepRange, op.indices))
 end
 
 function Base.show(io::IO, op::Crop{N}) where N
     if get(io, :compact, false)
         if N == 2
-            print(io, "Crop region $(op.indexes[1])×$(op.indexes[2])")
+            print(io, "Crop region $(op.indices[1])×$(op.indices[2])")
         else
-            print(io, "Crop region $(op.indexes)")
+            print(io, "Crop region $(op.indices)")
         end
     else
-        print(io, typeof(op).name, "{$N}($(op.indexes))")
+        print(io, typeof(op).name, "{$N}($(op.indices))")
     end
 end
 
@@ -150,17 +150,17 @@ augment(img, Rotate(45) |> CropNative(1:300, 1:400))
 ```
 """
 struct CropNative{N,I<:Tuple} <: ImageOperation
-    indexes::I
+    indices::I
 
-    function CropNative{N}(indexes::NTuple{N,UnitRange}) where N
-        new{N,typeof(indexes)}(indexes)
+    function CropNative{N}(indices::NTuple{N,UnitRange}) where N
+        new{N,typeof(indices)}(indices)
     end
 end
-function CropNative(indexes::NTuple{N,AbstractUnitRange}) where N
-    CropNative{N}(map(UnitRange, indexes))
+function CropNative(indices::NTuple{N,AbstractUnitRange}) where N
+    CropNative{N}(map(UnitRange, indices))
 end
 CropNative(::Tuple{}) = throw(MethodError(CropNative, ((),)))
-CropNative(indexes::Range...) = CropNative(indexes)
+CropNative(indices::Range...) = CropNative(indices)
 
 @inline supports_eager(::Type{<:CropNative})      = false
 @inline supports_affineview(::Type{<:CropNative}) = true
@@ -174,26 +174,26 @@ function applyaffineview(op::CropNative, img::AbstractArray, param)
 end
 
 function applyview(op::CropNative, img::AbstractArray, param)
-    direct_view(img, op.indexes)
+    direct_view(img, op.indices)
 end
 
 function applystepview(op::CropNative, img::AbstractArray, param)
-    direct_view(img, map(StepRange, op.indexes))
+    direct_view(img, map(StepRange, op.indices))
 end
 
 function showconstruction(io::IO, op::Union{Crop,CropNative})
-    print(io, typeof(op).name.name, '(', join(map(string, op.indexes),", "), ')')
+    print(io, typeof(op).name.name, '(', join(map(string, op.indices),", "), ')')
 end
 
 function Base.show(io::IO, op::CropNative{N}) where N
     if get(io, :compact, false)
         if N == 2
-            print(io, "Crop native region $(op.indexes[1])×$(op.indexes[2])")
+            print(io, "Crop native region $(op.indices[1])×$(op.indices[2])")
         else
-            print(io, "Crop native region $(op.indexes)")
+            print(io, "Crop native region $(op.indices)")
         end
     else
-        print(io, typeof(op).name, "{$N}($(op.indexes))")
+        print(io, typeof(op).name, "{$N}($(op.indices))")
     end
 end
 

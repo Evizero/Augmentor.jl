@@ -29,9 +29,9 @@ function ShowItLikeYouBuildIt.showarg(io::IO, A::SubArray{<:Number,N,<:Distorted
     print(io, "view(")
     showarg(io, parent(A))
     print(io, ", ")
-    for (i, el) in enumerate(A.indexes)
+    for (i, el) in enumerate(A.indices)
         print(io, el)
-        i < length(A.indexes) && print(io, ", ")
+        i < length(A.indices) && print(io, ", ")
     end
     print(io, ')')
 end

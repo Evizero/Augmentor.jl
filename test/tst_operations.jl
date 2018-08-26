@@ -139,7 +139,7 @@ ops = (Crop(1:2,2:3), Either((Rotate90(), Rotate270()), (1,0)))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.unroll_applyaffine(ops, square)
     @test typeof(wv) <: SubArray
-    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === square
     @test parent(copy(wv)) == rotl90(view(square, 1:2, 2:3))
@@ -155,7 +155,7 @@ ops = (Rotate180(), CropNative(1:2,2:3))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.unroll_applyaffine(ops, square)
     @test typeof(wv) <: SubArray
-    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === square
     @test wv == view(rot180(square), IdentityRange(1:2), IdentityRange(2:3))
@@ -179,7 +179,7 @@ ops = (Rotate180(), CropSize(2,2))
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.unroll_applyaffine(ops, square)
     @test typeof(wv) <: SubArray
-    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === square
     @test wv == view(rot180(square), IdentityRange(1:2), IdentityRange(2:3))
@@ -195,7 +195,7 @@ ops = (Either((Rotate90(),Rotate270()),(1,0)), Crop(20:30,100:150), Either((Rota
 @testset "$(str_showcompact(ops))" begin
     wv = @inferred Augmentor.unroll_applyaffine(ops, camera)
     @test typeof(wv) <: SubArray
-    @test typeof(wv.indexes) <: Tuple{Vararg{IdentityRange}}
+    @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
     @test parent(copy(wv)) == rotr90(view(rotl90(camera), 20:30, 100:150))

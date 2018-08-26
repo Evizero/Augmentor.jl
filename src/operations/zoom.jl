@@ -116,7 +116,7 @@ function applyaffineview(op::Zoom{N}, v::SubArray{T,N,<:InvWarpedView}, idx) whe
     img = parent(v)
     nidx = ImageTransformations.autorange(img, tinv)
     wv = InvWarpedView(img, tinv, map(unionrange, nidx, axes(img)))
-    view(wv, v.indexes...)
+    view(wv, v.indices...)
 end
 
 function showconstruction(io::IO, op::Zoom)
