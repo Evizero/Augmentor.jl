@@ -8,8 +8,8 @@ ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
 #@test Set(setdiff(ambs, refambs)) == Set{Tuple{Method,Method}}()
 @test length(setdiff(ambs, refambs)) == 1
 
-str_show(obj) = @io2str Base.show(::IO, obj)
-str_showcompact(obj) = @io2str Base.showcompact(::IO, obj)
+str_show(obj) = @io2str show(::IO, obj)
+str_showcompact(obj) = @io2str show(IOContext(::IO, :compact=>true), obj)
 str_showconst(obj) = @io2str Augmentor.showconstruction(::IO, obj)
 
 camera = testimage("cameraman")
