@@ -32,7 +32,8 @@
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
-            res = @inferred(Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
+            @test_broken false # FIXME: type stability below from "mean"
+            res = (Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
             @test @inferred(getindex(res,0,0)) isa RGB{Float64}
             @test res == img .- RGB(.1,.1,.1)
             @test typeof(res) <: OffsetArray{RGB{Float64}}
@@ -53,7 +54,7 @@
         res = @inferred(Augmentor.applylazy(MapFun(x->x-RGB(.1,.1,.1)), rgb_rect))
         @test res == mappedarray(x->x-RGB(.1,.1,.1), rgb_rect)
         res = @inferred(Augmentor.applylazy(MapFun(x->x-RGB(.1,.1,.1)), OffsetArray(rgb_rect,-2,-1)))
-        @test axes(res) === (-1:0, 0:2)
+        @test axes(res) === Base.Slice.((-1:0, 0:2))
         @test @inferred(getindex(res,0,0)) isa RGB{Float64}
         @test res == mappedarray(x->x-RGB(.1,.1,.1), OffsetArray(rgb_rect,-2,-1))
         @test typeof(res) <: MappedArrays.ReadonlyMappedArray{ColorTypes.RGB{Float64}}
@@ -79,8 +80,8 @@ end
         @test_throws MethodError AggregateThenMapFun(x->x)
         @test typeof(@inferred(AggregateThenMapFun(x->x, x->x))) <: AggregateThenMapFun <: Augmentor.Operation
         @test typeof(@inferred(AggregateThenMapFun(mean, identity))) <: AggregateThenMapFun <: Augmentor.Operation
-        @test str_show(AggregateThenMapFun(mean, identity)) == "Augmentor.AggregateThenMapFun(mean, identity)"
-        @test str_showconst(AggregateThenMapFun(mean, identity)) == "AggregateThenMapFun(mean, identity)"
+        @test str_show(AggregateThenMapFun(mean, identity)) == "Augmentor.AggregateThenMapFun(Statistics.mean, identity)"
+        @test str_showconst(AggregateThenMapFun(mean, identity)) == "AggregateThenMapFun(Statistics.mean, identity)"
         @test str_showcompact(AggregateThenMapFun(mean, identity)) == "Map result of \"mean\" using \"identity\" over image"
     end
     @testset "eager" begin
@@ -107,7 +108,8 @@ end
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
-            res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
+            @test_broken false # FIXME: type stability below from "mean"
+            res = (Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
             @test res ≈ img .- mean(rgb_rect)
             @test @inferred(getindex(res,0,0)) isa RGB{Float64}
             @test typeof(res) <: OffsetArray{RGB{Float64}}

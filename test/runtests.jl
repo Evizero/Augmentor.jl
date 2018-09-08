@@ -1,4 +1,4 @@
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, ReferenceTests, Test
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, Statistics, ReferenceTests, Test
 
 # check for ambiguities
 refambs = detect_ambiguities(ImageTransformations, Base, Core)

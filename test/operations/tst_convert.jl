@@ -57,7 +57,7 @@
         let img = @inferred(Augmentor.applylazy(ConvertEltype(Gray{Float32}), OffsetArray(rect,-2,-1)))
             @test parent(parent(img)) === rect
             @test typeof(img) <: ReadonlyMappedArray{Gray{Float32},2}
-            @test axes(img) === (-1:0, 0:2)
+            @test axes(img) === (Base.Slice(-1:0), Base.Slice(0:2))
             @test img[0,0] isa Gray{Float32}
             @test collect(img) == convert.(Gray{Float32}, rect)
         end
