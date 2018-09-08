@@ -59,7 +59,7 @@ function applylazy(op::SplitChannels, img::AbstractArray{<:AbstractGray}, param)
 end
 
 function showconstruction(io::IO, op::SplitChannels)
-    print(io, typeof(op).name.name, "()")
+    print(io, nameof(typeof(op)), "()")
 end
 
 function Base.show(io::IO, op::SplitChannels)
@@ -147,7 +147,7 @@ function applylazy(op::CombineChannels{<:AbstractGray}, img::AbstractArray{<:Num
 end
 
 function showconstruction(io::IO, op::CombineChannels)
-    print(io, typeof(op).name.name, '(')
+    print(io, nameof(typeof(op)), '(')
     _showcolor(io, op.colortype)
     print(io, ')')
 end
