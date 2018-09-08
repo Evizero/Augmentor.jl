@@ -4,9 +4,9 @@ using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor
 ambs = detect_ambiguities(Augmentor, ImageTransformations, Base, Core)
-# The 1 is from plain_axes with a Tuple{} (so its spurious)
+# The 3 is from plain_axes with a Tuple{} (so its spurious)
 #@test Set(setdiff(ambs, refambs)) == Set{Tuple{Method,Method}}()
-@test length(setdiff(ambs, refambs)) == 1
+@test length(setdiff(ambs, refambs)) == 3
 
 str_show(obj) = @io2str show(::IO, obj)
 str_showcompact(obj) = @io2str show(IOContext(::IO, :compact=>true), obj)

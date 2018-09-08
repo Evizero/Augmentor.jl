@@ -65,6 +65,10 @@ end
     view(A, axes(A)...)
 end
 
+@inline function _plain_axes(A::AbstractArray{T,N}, ids::NTuple{N,Base.Slice}) where {T, N}
+    view(A, map(i->i.indices, ids)...)
+end
+
 @inline function _plain_axes(A::SubArray{T,N}, ids::NTuple{N,IdentityRange}) where {T, N}
     view(parent(A), axes(A)...)
 end
