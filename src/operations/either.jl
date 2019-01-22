@@ -218,7 +218,8 @@ function Base.show(io::IO, op::Either)
         print(io, "Either:")
         for (op_i, p_i) in zip(op.operations, op.chances)
             print(io, " (", round(Int, p_i*100), "%) ")
-            Base.showcompact(io, op_i)
+            show(IOContext(io, :compact => true), op_i)
+#	    Base.showcompact(io, op_i)
             print(io, '.')
         end
     else
@@ -234,7 +235,8 @@ function Base.show(io::IO, op::Either)
         for (op_i, p_i) in zip(op.operations, percent)
             println(io)
             print(io, "  - ", lpad(string(p_i), k, " "), "% chance to: ")
-            Base.showcompact(io, op_i)
+	    show(IOContext(io, :compact => true), op_i)
+ #           Base.showcompact(io, op_i)
         end
     end
 end

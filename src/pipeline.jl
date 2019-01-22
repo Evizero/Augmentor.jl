@@ -44,7 +44,8 @@ function Base.show(io::IO, pipeline::Pipeline)
         for (i, op) in enumerate(ops)
             println(io)
             print(io, lpad(string(i), k+1, " "), ".) ")
-            Base.showcompact(io, op)
+	    show(IOContext(io, :compact => true), op)
+            #Base.showcompact(io, op)
         end
     end
 end
