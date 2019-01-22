@@ -94,7 +94,7 @@ randparam(op::Zoom, imgs::Tuple) = randparam(op, imgs[1])
 
 function randparam(op::Zoom, img::AbstractArray{T,N}) where {T,N}
     i = safe_rand(1:length(op.factors[1]))
-    ntuple(j -> Float64(op.factors[j][i]), Val{N})
+    ntuple(j -> Float64(op.factors[j][i]), Val(N))
 end
 
 function toaffinemap(op::Zoom{2}, img::AbstractMatrix, idx)

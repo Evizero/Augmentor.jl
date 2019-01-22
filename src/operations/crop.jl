@@ -260,7 +260,7 @@ CropSize(; width=64, height=64) = CropSize((height,width))
 @inline supports_stepview(::Type{<:CropSize})   = true
 
 function cropsize_axes(op::CropSize, img::AbstractArray)
-    cntr = convert(Tuple, center(img))
+    cntr = center(img)
     sze = op.size
     corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
     map((b,s)->b:(b+s-1), corner, sze)
@@ -273,7 +273,8 @@ function applyaffineview(op::CropSize, img::AbstractArray, param)
 end
 
 function applyview(op::CropSize, img::AbstractArray, param)
-    direct_view(img, cropsize_axes(op, img))
+    # EDIT: added Tuple
+    direct_view(img, Tuple(cropsize_axes(op, img)))
 end
 
 function applystepview(op::CropSize, img::AbstractArray, param)
@@ -368,7 +369,7 @@ function cropratio_axes(op::CropRatio, img::AbstractMatrix)
     nh = nh > 1 ? nh : 1
     sze = nh < h ? nh : h, nw < w ? nw : w
     # compute axes around center for given size
-    cntr = convert(Tuple, center(img))
+    cntr = center(img)
     corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
     map((b,s)->b:(b+s-1), corner, sze)
 end
