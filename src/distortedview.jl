@@ -22,7 +22,7 @@ function Base.showarg(io::IO, A::DistortedView, toplevel)
     Base.showarg(io, A.grid, false)
     print(io, " as ", size(A.field, 2), '×', size(A.field, 3), " vector field")
     print(io, ')')
-    toplevel && print(io, " with eltype ", eltype(parent(A)))
+    toplevel && print(io, " with eltype ", eltype(A))
 end
 
 # inline speeds up ~30%

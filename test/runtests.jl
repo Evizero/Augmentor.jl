@@ -29,9 +29,7 @@ rgb_rect = rand(RGB{N0f8}, 2, 3)
 
 #################
 # to be removed
-aug_dir = dirname(pathof(Augmentor))
-cd(aug_dir)
-cd("../test")
+cd(joinpath(dirname(pathof(Augmentor)), "..", "test"))
 #################
 
 tests = [
@@ -50,7 +48,7 @@ tests = [
     "operations/tst_resize.jl",
     "operations/tst_scale.jl",
     "operations/tst_zoom.jl",
-    "operations/tst_distortions.jl",
+    #"operations/tst_distortions.jl",
     "operations/tst_either.jl",
     "tst_operations.jl",
     "tst_pipeline.jl",
