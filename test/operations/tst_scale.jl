@@ -75,9 +75,7 @@
             (square2),
             (view(square2, :, :)),
             (Augmentor.prepareaffine(square2)),
-            # FIX:
             (OffsetArray(square2, -1, -1)),
-
             (view(square2, IdentityRange(1:4), IdentityRange(1:4))),
         ]
         @testset "fixed parameter" begin

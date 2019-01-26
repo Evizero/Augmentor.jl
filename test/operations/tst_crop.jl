@@ -391,15 +391,6 @@ end
         @test str_showcompact(op) == "Crop to 1.41 aspect ratio"
     end
     @testset "cropratio_axes" begin
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(1), square)) === (1:3, 1:3)
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(2), square)) === (2:2, 1:3)
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(1), square2)) === (1:4, 1:4)
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(1), rect)) === (1:2, 1:2)
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(1), checkers)) === (1:3, 2:4)
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(1), rotl90(checkers))) === (2:4, 1:3)
-        @test_skip @inferred(Augmentor.cropratio_axes(CropRatio(1), OffsetArray(rect, -2, -1))) === (-1:0, 0:1)
-
-        # FIX
         @test @inferred(Augmentor.cropratio_axes(CropRatio(1), square)) == UnitRange{Int64}[1:3, 1:3]
         @test @inferred(Augmentor.cropratio_axes(CropRatio(2), square)) == UnitRange{Int64}[2:2, 1:3]
         @test @inferred(Augmentor.cropratio_axes(CropRatio(1), square2)) == UnitRange{Int64}[1:4, 1:4]

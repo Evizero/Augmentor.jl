@@ -323,9 +323,11 @@ version = "0.3.2"
 
 [[OffsetArrays]]
 deps = ["DelimitedFiles", "Test"]
-git-tree-sha1 = "7d1442cb06fbfbc4fea936c3c56b38daffd22d3b"
+git-tree-sha1 = "7c2ae943b9d5ee41db3dcf96d0e46f6d84099b8d"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaArrays/OffsetArrays.jl.git"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "0.9.1"
+version = "0.9.1+"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
