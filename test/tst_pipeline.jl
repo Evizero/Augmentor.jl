@@ -107,5 +107,5 @@ end
  1.) Rotate 90 degree
  2.) Rotate 270 degree
  3.) No operation"""
- @test str_showcompact(Augmentor.ImmutablePipeline(Rotate90(.2),Rotate270(),NoOp())) == "(0.2=>Rotate90()) * (0.8=>NoOp()) |> Rotate270() |> NoOp()"
+@test str_showcompact(Augmentor.ImmutablePipeline(Rotate90(.2),Rotate270(),NoOp())) == "(0.2=>Rotate90()) * (0.8=>NoOp()) |> Rotate270() |> NoOp()"
 @test str_showcompact(Augmentor.ImmutablePipeline(Rotate90())) == "Rotate90()"

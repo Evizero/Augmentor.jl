@@ -70,16 +70,14 @@ function applypermute(::Rotate90, img::AbstractMatrix{T}, param) where T
 end
 
 function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
-    idx = map(StepRange, sub.indices)
     img = parent(parent(sub))
-    view(img, reverse(idx[2]), idx[1])
+    view(img, reverse(sub.indices[2]), sub.indices[1])
 end
 
 function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT}
-    idx = map(StepRange, sub.indices)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
-    view(perm_img, reverse(idx[2]), idx[1])
+    view(perm_img, reverse(sub.indices[2]), sub.indices[1])
 end
 
 # --------------------------------------------------------------------
@@ -224,16 +222,14 @@ function applypermute(::Rotate270, img::AbstractMatrix{T}, param) where T
 end
 
 function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
-    idx = map(StepRange, sub.indices)
     img = parent(parent(sub))
-    view(img, idx[2], reverse(idx[1]))
+    view(img, sub.indices[2], reverse(sub.indices[1]))
 end
 
 function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT}
-    idx = map(StepRange, sub.indices)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
-    view(perm_img, idx[2], reverse(idx[1]))
+    view(perm_img, sub.indices[2], reverse(sub.indices[1]))
 end
 
 # --------------------------------------------------------------------
@@ -247,7 +243,7 @@ for deg in (90, 180, 270)
         if get(io, :compact, false)
             print(io, "Rotate ", $deg, " degree")
         else
-            print(io, $T, "()")
+            print(io, "Augmentor.", $T, "()")
         end
     end
 end

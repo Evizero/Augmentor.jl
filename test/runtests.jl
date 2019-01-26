@@ -1,4 +1,9 @@
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, FixedPointNumbers, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, Statistics, ReferenceTests, Test
+using   ImageCore, ImageFiltering, ImageTransformations,
+        CoordinateTransformations, Interpolations, OffsetArrays,
+        StaticArrays, ColorTypes, FixedPointNumbers, TestImages,
+        IdentityRanges, MappedArrays, ComputationalResources,
+        MLDataPattern, ImageInTerminal, Statistics,
+        ReferenceTests, Test
 
 # check for ambiguities
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
@@ -22,8 +27,16 @@ rect = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6]
 checkers = Gray{N0f8}[1 0 1 0 1; 0 1 0 1 0; 1 0 1 0 1]
 rgb_rect = rand(RGB{N0f8}, 2, 3)
 
+#################
+# to be removed
+aug_dir = dirname(pathof(Augmentor))
+cd(aug_dir)
+cd("../test")
+#################
+
 tests = [
     "tst_utils.jl",
+
     "operations/tst_channels.jl",
     "operations/tst_dims.jl",
     "operations/tst_convert.jl",

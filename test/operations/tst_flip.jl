@@ -9,7 +9,7 @@
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(FlipX(), nothing)
         @test Augmentor.supports_eager(FlipX) === true
-        res1 = flipdim(rect, 2)
+        res1 = reverse(rect, dims=2)
         imgs = [
             (rect, res1),
             (Augmentor.prepareaffine(rect), res1),
@@ -40,15 +40,15 @@
         @testset "single image" begin
             wv = @inferred Augmentor.applyaffine(FlipX(), Augmentor.prepareaffine(square))
             @test parent(wv).itp.coefs === square
-            @test wv == flipdim(square,2)
+            @test wv == reverse(square, dims=2)
             @test typeof(wv) <: InvWarpedView{eltype(square),2}
         end
         @testset "multiple images" begin
             img_in = Augmentor.prepareaffine.((rgb_rect, square))
             res1, res2 = @inferred(Augmentor.applyaffine(FlipX(), img_in))
             # make sure affine map is specific to image
-            @test res1 == flipdim(rgb_rect, 2)
-            @test res2 == flipdim(square, 2)
+            @test res1 == reverse(rgb_rect, dims=2)
+            @test res2 == reverse(square, dims=2)
             @test typeof(res1) <: InvWarpedView{eltype(rgb_rect),2}
             @test typeof(res2) <: InvWarpedView{eltype(square),2}
         end
@@ -60,25 +60,25 @@
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
         @test parent(parent(wv)).itp.coefs === square
-        @test wv == flipdim(square,2)
+        @test wv == reverse(square, dims=2)
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(FlipX) === true
         @testset "single image" begin
             v = @inferred Augmentor.applylazy(FlipX(), rect)
             @test v === view(rect, 1:1:2, 3:-1:1)
-            @test v == flipdim(rect,2)
+            @test v == reverse(rect, dims=2)
             @test typeof(v) <: SubArray
             wv = @inferred Augmentor.applylazy(FlipX(), Augmentor.prepareaffine(square))
             @test parent(wv).itp.coefs === square
-            @test wv == flipdim(square,2)
+            @test wv == reverse(square, dims=2)
             @test typeof(wv) <: InvWarpedView{eltype(square),2}
         end
         @testset "multiple images" begin
             img_in = (rgb_rect, square)
             res1, res2 = @inferred(Augmentor.applylazy(FlipX(), img_in))
-            @test res1 == flipdim(rgb_rect, 2)
-            @test res2 == flipdim(square, 2)
+            @test res1 == reverse(rgb_rect, dims=2)
+            @test res2 == reverse(square, dims=2)
             @test typeof(res1) <: SubArray{eltype(rgb_rect),2}
             @test typeof(res2) <: SubArray{eltype(square),2}
         end
@@ -90,7 +90,7 @@
         @test Augmentor.supports_stepview(FlipX) === true
         v = @inferred Augmentor.applylazy(FlipX(), rect)
         @test v === view(rect, 1:1:2, 3:-1:1)
-        @test v == flipdim(rect,2)
+        @test v == reverse(rect, dims=2)
         @test typeof(v) <: SubArray
     end
     @testset "permute" begin
@@ -111,7 +111,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(FlipY(), nothing)
         @test Augmentor.supports_eager(FlipY) === true
-        res1 = flipdim(rect, 1)
+        res1 = reverse(rect, dims=1)
         imgs = [
             (rect, res1),
             (Augmentor.prepareaffine(rect), res1),
@@ -142,15 +142,15 @@ end
         @testset "single image" begin
             wv = @inferred Augmentor.applyaffine(FlipY(), Augmentor.prepareaffine(square))
             @test parent(wv).itp.coefs === square
-            @test wv == flipdim(square,1)
+            @test wv == reverse(square, dims=1)
             @test typeof(wv) <: InvWarpedView{eltype(square),2}
         end
         @testset "multiple images" begin
             img_in = Augmentor.prepareaffine.((rgb_rect, square))
             res1, res2 = @inferred(Augmentor.applyaffine(FlipY(), img_in))
             # make sure affine map is specific to image
-            @test res1 == flipdim(rgb_rect, 1)
-            @test res2 == flipdim(square, 1)
+            @test res1 == reverse(rgb_rect, dims=1)
+            @test res2 == reverse(square, dims=1)
             @test typeof(res1) <: InvWarpedView{eltype(rgb_rect),2}
             @test typeof(res2) <: InvWarpedView{eltype(square),2}
         end
@@ -162,25 +162,25 @@ end
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
         @test parent(parent(wv)).itp.coefs === square
-        @test wv == flipdim(square,1)
+        @test wv == reverse(square, dims=1)
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(FlipY) === true
         @testset "single image" begin
             v = @inferred Augmentor.applylazy(FlipY(), rect)
             @test v === view(rect, 2:-1:1, 1:1:3)
-            @test v == flipdim(rect,1)
+            @test v == reverse(rect, dims=1)
             @test typeof(v) <: SubArray
             wv = @inferred Augmentor.applylazy(FlipY(), Augmentor.prepareaffine(square))
             @test parent(wv).itp.coefs === square
-            @test wv == flipdim(square,1)
+            @test wv == reverse(square, dims=1)
             @test typeof(wv) <: InvWarpedView{eltype(square),2}
         end
         @testset "multiple images" begin
             img_in = (rgb_rect, square)
             res1, res2 = @inferred(Augmentor.applylazy(FlipY(), img_in))
-            @test res1 == flipdim(rgb_rect, 1)
-            @test res2 == flipdim(square, 1)
+            @test res1 == reverse(rgb_rect, dims=1)
+            @test res2 == reverse(square, dims=1)
             @test typeof(res1) <: SubArray{eltype(rgb_rect),2}
             @test typeof(res2) <: SubArray{eltype(square),2}
         end
@@ -192,7 +192,7 @@ end
         @test Augmentor.supports_stepview(FlipY) === true
         v = @inferred Augmentor.applylazy(FlipY(), rect)
         @test v === view(rect, 2:-1:1, 1:1:3)
-        @test v == flipdim(rect,1)
+        @test v == reverse(rect, dims=1)
         @test typeof(v) <: SubArray
     end
     @testset "permute" begin

@@ -269,7 +269,7 @@ function train_baseline(; epochs = 500, batchsize = 100, lr = .03)
             train = acc(w, train_x, train_y)
             test  = acc(w, test_x,  test_y)
             @trace log epoch train test
-            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train,3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
+            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train, digits=3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
             cancel(p, msg, :blue) #jl-only
 #md             println(msg)
 #jp             println(msg)
@@ -417,7 +417,7 @@ function train_augmented(; epochs = 500, batchsize = 100, lr = .03)
             train = acc(w, train_x, train_y)
             test  = acc(w, test_x,  test_y)
             @trace log epoch train test
-            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train,3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
+            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train, digits=3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
             cancel(p, msg, :blue) #jl-only
 #md             println(msg)
 #jp             println(msg)
@@ -510,7 +510,7 @@ function async_train_augmented(; epochs = 500, batchsize = 100, lr = .03)
             train = acc(w, train_x, train_y)
             test  = acc(w, test_x,  test_y)
             @trace log epoch train test
-            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train,3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
+            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train,digits=3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
             cancel(p, msg, :blue) #jl-only
 #md             println(msg)
 #jp             println(msg)

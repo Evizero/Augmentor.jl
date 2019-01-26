@@ -88,7 +88,7 @@ function Base.show(io::IO, op::Crop{N}) where N
             print(io, "Crop region $(op.indices)")
         end
     else
-        print(io, typeof(op).name, "{$N}($(op.indices))")
+        print(io, "Augmentor.", typeof(op).name, "{$N}($(op.indices))")
     end
 end
 
@@ -193,7 +193,7 @@ function Base.show(io::IO, op::CropNative{N}) where N
             print(io, "Crop native region $(op.indices)")
         end
     else
-        print(io, typeof(op).name, "{$N}($(op.indices))")
+        print(io, "Augmentor.", typeof(op).name, "{$N}($(op.indices))")
     end
 end
 
@@ -273,12 +273,13 @@ function applyaffineview(op::CropSize, img::AbstractArray, param)
 end
 
 function applyview(op::CropSize, img::AbstractArray, param)
-    # EDIT: added Tuple
+    # FIX: added Tuple :(
     direct_view(img, Tuple(cropsize_axes(op, img)))
 end
 
 function applystepview(op::CropSize, img::AbstractArray, param)
-    direct_view(img, map(StepRange, cropsize_axes(op, img)))
+    # FIX: added Tuple :(
+    direct_view(img, map(StepRange, Tuple(cropsize_axes(op, img))))
 end
 
 function showconstruction(io::IO, op::CropSize)
@@ -293,7 +294,7 @@ function Base.show(io::IO, op::CropSize{N}) where N
             print(io, "Crop a $(join(op.size,"×")) window around the center")
         end
     else
-        print(io, typeof(op), "($(op.size))")
+        print(io, "Augmentor.", typeof(op), "($(op.size))")
     end
 end
 
@@ -380,12 +381,14 @@ function applyaffineview(op::CropRatio, img::AbstractArray, param)
     applyview(op, prepareaffine(img), param)
 end
 
+# FIX
 function applyview(op::CropRatio, img::AbstractArray, param)
-    direct_view(img, cropratio_axes(op, img))
+    direct_view(img, Tuple(cropratio_axes(op, img)))
 end
 
+# FIX
 function applystepview(op::CropRatio, img::AbstractArray, param)
-    direct_view(img, map(StepRange, cropratio_axes(op, img)))
+    direct_view(img, Tuple(map(StepRange, cropratio_axes(op, img))))
 end
 
 function ratio2str(ratio)
@@ -398,18 +401,18 @@ function ratio2str(ratio)
     found = false
     for i = 1:20
         high = i * high0
-        if round(high) == round(high,2)
+        if round(high) == round(high, digits=2)
             low = i
             found = true
             break
         end
     end
     if !found
-        string(round(ratio,2))
+        string(round(ratio, digits=2))
     elseif ratio >= 1
-        string(round(Int,high), ':', low)
+        string(round(Int, high), ':', low)
     else
-        string(low, ':', round(Int,high))
+        string(low, ':', round(Int, high))
     end
 end
 

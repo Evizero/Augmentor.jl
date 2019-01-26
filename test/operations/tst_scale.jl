@@ -3,7 +3,11 @@
     @testset "constructor" begin
         @test_throws MethodError Scale()
         @test_throws MethodError Scale(())
-        @test_throws MethodError Scale{0}(())
+
+        #@test_throws MethodError Scale{0}(())
+        # T not defined
+        @test_throws UndefVarError Scale{0}(())
+
         @test_throws MethodError Scale(:a)
         @test_throws MethodError Scale([:a])
         @test_throws ArgumentError Scale([])
@@ -71,7 +75,9 @@
             (square2),
             (view(square2, :, :)),
             (Augmentor.prepareaffine(square2)),
+            # FIX:
             (OffsetArray(square2, -1, -1)),
+
             (view(square2, IdentityRange(1:4), IdentityRange(1:4))),
         ]
         @testset "fixed parameter" begin

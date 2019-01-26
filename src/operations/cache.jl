@@ -130,7 +130,7 @@ function Base.show(io::IO, op::CacheImageInto{<:AbstractArray})
         print(io, summary(op.buffer))
     else
         print(io, typeof(op).name, "(")
-        showarg(io, op.buffer)
+        Base.showarg(io, op.buffer, false)
         print(io, ")")
     end
 end
@@ -142,7 +142,7 @@ function Base.show(io::IO, op::CacheImageInto{<:Tuple})
     else
         print(io, typeof(op).name, "((")
         for (i, buffer) in enumerate(op.buffer)
-            showarg(io, buffer)
+            Base.showarg(io, buffer, false)
             i < length(op.buffer) && print(io, ", ")
         end
         print(io, "))")

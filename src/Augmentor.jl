@@ -14,6 +14,7 @@ using IdentityRanges
 using MLDataPattern
 using ComputationalResources
 using FileIO
+using LinearAlgebra
 using Base.PermutedDimsArrays: PermutedDimsArray
 
 export

@@ -72,7 +72,7 @@
             @test parent(parent(wv)).itp.coefs === square
             # round because `imresize` computes as float space,
             # while applyaffineview doesn't
-            @test round.(Float64.(wv),1) == round.(Float64.(imresize(square, h, w)),1)
+            @test round.(Float64.(wv), digits=1) == round.(Float64.(imresize(square, h, w)), digits=1)
         end
         for h in (1,2,3,4,5,9), w in (1,2,3,4,5,9) # bigger show drift
             wv = @inferred Augmentor.applyaffineview(Resize(h,w), Augmentor.prepareaffine(checkers))

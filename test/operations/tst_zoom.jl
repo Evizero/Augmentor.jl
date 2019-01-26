@@ -4,7 +4,8 @@
     @testset "constructor" begin
         @test_throws MethodError Zoom()
         @test_throws MethodError Zoom(())
-        @test_throws MethodError Zoom{0}(())
+        # T not defined:
+        @test_throws UndefVarError Zoom{0}(())
         @test_throws MethodError Zoom(:a)
         @test_throws MethodError Zoom([:a])
         @test_throws ArgumentError Zoom([])

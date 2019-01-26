@@ -20,9 +20,9 @@ function Base.showarg(io::IO, A::DistortedView, toplevel)
     Base.showarg(io, parent(A), false)
     print(io, ", ")
     Base.showarg(io, A.grid, false)
-    print(io, " as ", size(A.field,2), '×', size(A.field,3), " vector field")
+    print(io, " as ", size(A.field, 2), '×', size(A.field, 3), " vector field")
     print(io, ')')
-    toplevel && print(io, " with eltype ", eltype(v))
+    toplevel && print(io, " with eltype ", eltype(parent(A)))
 end
 
 # inline speeds up ~30%
@@ -39,8 +39,8 @@ end
     # map array indices to grid indices
     gi, gj = (i-1)/(leny-1)*(gh-1)+1, (j-1)/(lenx-1)*(gw-1)+1
     # compute parent indices offset
-    @inbounds dy = field[1, gi, gj] * leny
-    @inbounds dx = field[2, gi, gj] * lenx
+    @inbounds dy = field(1, gi, gj) * leny
+    @inbounds dx = field(2, gi, gj) * lenx
     # compute parent indices and return value
     # Note: we subtract instead of add, because the vector field is
     #       specified in forward mode (i.e. in reference to the source
@@ -50,6 +50,6 @@ end
     checkbounds(indsx, j)
     @inbounds y = indsy[i] - dy
     @inbounds x = indsx[j] - dx
-    @inbounds res = etp[y, x]
+    @inbounds res = etp(y, x)
     res
 end

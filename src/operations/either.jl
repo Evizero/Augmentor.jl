@@ -197,7 +197,7 @@ for KIND in (:permute, :view, :stepview, :affine, :affineview)
 end
 
 function showconstruction(io::IO, op::Either)
-    chances_float = map(c->round(c, 3), op.chances)
+    chances_float = map(c->round(c,  digits=3), op.chances)
     if all(x->x≈chances_float[1], chances_float)
         for (i, op_i) in enumerate(op.operations)
             showconstruction(io, op_i)
@@ -218,13 +218,13 @@ function Base.show(io::IO, op::Either)
         print(io, "Either:")
         for (op_i, p_i) in zip(op.operations, op.chances)
             print(io, " (", round(Int, p_i*100), "%) ")
-            Base.showcompact(io, op_i)
+            show(IOContext(io, :compact => true), op_i)
             print(io, '.')
         end
     else
-        print(io, typeof(op).name, " (1 out of ", length(op.operations), " operation(s)):")
+        print(io, "Augmentor.", typeof(op).name, " (1 out of ", length(op.operations), " operation(s)):")
         percent_int   = map(c->round(Int, c*100), op.chances)
-        percent_float = map(c->round(c*100, 1), op.chances)
+        percent_float = map(c->round(c*100, digits=1), op.chances)
         percent = if any(i != f for (i,f) in zip(percent_int,percent_float))
             percent_float
         else
@@ -234,7 +234,7 @@ function Base.show(io::IO, op::Either)
         for (op_i, p_i) in zip(op.operations, percent)
             println(io)
             print(io, "  - ", lpad(string(p_i), k, " "), "% chance to: ")
-            Base.showcompact(io, op_i)
+            show(IOContext(io, :compact => true), op_i)
         end
     end
 end
