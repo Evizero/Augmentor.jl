@@ -349,9 +349,10 @@ end
     end
     @testset "stepview" begin
         @test Augmentor.supports_stepview(CropSize) === true
-        @test_skip @inferred(Augmentor.applystepview(CropSize(2,3), rect)) === view(rect, 1:1:2, 1:1:3)
+        # FIX: inferred type of applystepview method is SubArray
+        @test_skip @inferred(Augmentor.applystepview(CropSize(2,3), rect))
         @test Augmentor.applystepview(CropSize(2,3), rect) === view(rect, 1:1:2, 1:1:3)
-        @test_skip @inferred(Augmentor.applystepview(CropSize(2,2), square2)) === view(square2, 2:1:3, 2:1:3)
+        @test_skip @inferred(Augmentor.applystepview(CropSize(2,2), square2))
         @test Augmentor.applystepview(CropSize(2,2), square2) === view(square2, 2:1:3, 2:1:3)
     end
     @testset "permute" begin

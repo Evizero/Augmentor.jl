@@ -263,7 +263,7 @@ function cropsize_axes(op::CropSize, img::AbstractArray)
     cntr = center(img)
     sze = op.size
     corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
-    map((b,s)->b:(b+s-1), corner, sze)
+    map((b,s)->b:b+s-1, corner, sze)
 end
 
 @inline applylazy(op::CropSize, img::AbstractArray, param) = applyview(op, img, param)
@@ -273,13 +273,11 @@ function applyaffineview(op::CropSize, img::AbstractArray, param)
 end
 
 function applyview(op::CropSize, img::AbstractArray, param)
-    # FIX: added Tuple :(
     direct_view(img, Tuple(cropsize_axes(op, img)))
 end
 
 function applystepview(op::CropSize, img::AbstractArray, param)
-    # FIX: added Tuple :(
-    direct_view(img, map(StepRange, Tuple(cropsize_axes(op, img))))
+    direct_view(img, Tuple(map(StepRange, cropsize_axes(op, img))))
 end
 
 function showconstruction(io::IO, op::CropSize)

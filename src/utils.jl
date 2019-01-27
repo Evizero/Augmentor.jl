@@ -176,3 +176,8 @@ function _2dborder!(A::AbstractArray{T,3}, val::T) where T
     end
     A
 end
+
+import ImageTransformations: restrict_indices
+
+restrict_indices(r::Base.IdentityUnitRange) =
+    restrict_indices(r.indices)

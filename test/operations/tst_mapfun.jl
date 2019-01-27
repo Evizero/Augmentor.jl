@@ -32,7 +32,6 @@
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
-            @test_broken false # FIXME: type stability below from "mean"
             res = (Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
             @test @inferred(getindex(res,0,0)) isa RGB{Float64}
             @test res == img .- RGB(.1,.1,.1)
@@ -99,7 +98,7 @@ end
         ]
         @testset "single image" begin
             for (img_in, img_out) in imgs
-                # FIX
+                # FIX - is this even possible?
                 #res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x), img_in))
                 res = Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x), img_in)
                 @test res == img_in
