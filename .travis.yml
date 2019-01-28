@@ -6,8 +6,10 @@ os:
 julia:
   - 1.0
   - nightly
+
 notifications:
   email: false
+
 git:
   depth: 99999999
 
@@ -16,6 +18,11 @@ git:
 matrix:
   allow_failures:
     - julia: nightly
+
+branches:
+  only:
+    - master
+    - /release-.*/
 
 ## uncomment and modify the following lines to manually install system packages
 #addons:
@@ -35,10 +42,11 @@ matrix:
 #        - julia -e 'import Pkg; Pkg.add("Documenter")'
 #        - julia -e 'import Augmentor; ENV["DOCUMENTER_DEBUG"] = "true"; include(joinpath("docs","make.jl"))'
 
-## uncomment the following lines to override the default test script
-script:
-    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia --check-bounds=yes --color=yes -e 'import Pkg; Pkg.clone(pwd()); Pkg.build("Augmentor"); Pkg.test("Augmentor"; coverage=true)';
+# use default build script:
+# https://docs.travis-ci.com/user/languages/julia/ 
+# using Pkg
+# Pkg.build() # Pkg.build(; verbose = true) for Julia 1.1 and up
+# Pkg.test(coverage=true)
 
 after_success:
-  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
+    - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
