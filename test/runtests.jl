@@ -18,7 +18,7 @@ using   ColorTypes,
 using TestImages, ReferenceTests, Test
 
 # removed
-# ComputationalResources, IdentityRanges
+# ComputationalResources
 
 # check for ambiguities
 refambs = detect_ambiguities(ImageTransformations, Base, Core)

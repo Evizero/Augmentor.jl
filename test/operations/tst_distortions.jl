@@ -87,7 +87,8 @@
     imgs = [
         (rect),
         (Augmentor.prepareaffine(rect)),
-        (OffsetArrays.no_offset_view(OffsetArray(rect, -2, -1))),
+        #(OffsetArrays.no_offset_view(OffsetArray(rect, -2, -1))),
+        (no_offset_view(OffsetArray(rect, -2, -1))),
         (view(rect, IdentityRange(1:2), IdentityRange(1:3))),
     ]
     @testset "eager" begin
