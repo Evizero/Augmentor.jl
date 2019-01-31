@@ -77,7 +77,9 @@ end
 function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT}
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
-    view(perm_img, reverse(sub.indices[2]), sub.indices[1])
+    #view(perm_img, reverse(sub.indices[2]), sub.indices[1])
+    ixs = map(StepRange, sub.indices)
+    view(perm_img, reverse(ixs[2]), ixs[1])
 end
 
 # --------------------------------------------------------------------
@@ -229,7 +231,8 @@ end
 function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT}
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
-    view(perm_img, sub.indices[2], reverse(sub.indices[1]))
+    ixs = map(StepRange, sub.indices)
+    view(perm_img, ixs[2], reverse(ixs[1]))
 end
 
 # --------------------------------------------------------------------

@@ -58,9 +58,8 @@
         @test typeof(v) <: SubArray
 
         v = @inferred Augmentor.applylazy(Rotate90(), view(square,1:2,1:3))
-        # FIX v is UnitRange while view(..., 3:-1:1, 1:1:2) is StepRange
-        @test_skip v === view(permuteddimsview(square, (2,1)), 3:-1:1, 1:1:2)
-        @test v == view(permuteddimsview(square, (2,1)), 3:-1:1, 1:1:2)
+        # FIXED
+        @test v === view(permuteddimsview(square, (2,1)), 3:-1:1, 1:1:2)
 
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
@@ -218,9 +217,8 @@ end
         @test typeof(v) <: SubArray
 
         v = @inferred Augmentor.applylazy(Rotate270(), view(square,1:2,1:3))
-        # FIX  v is UnitRange while view(..., 3:-1:1, 1:1:2) is StepRange
-        @test_skip v === view(permuteddimsview(square, (2,1)), 1:1:3, 2:-1:1)
-        @test v == view(permuteddimsview(square, (2,1)), 1:1:3, 2:-1:1)
+        # FIXED
+        @test v === view(permuteddimsview(square, (2,1)), 1:1:3, 2:-1:1)
 
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray

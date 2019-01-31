@@ -258,13 +258,12 @@ end
         @test str_showcompact(op) == "Crop a 20×30×40 window around the center"
     end
     @testset "cropsize_axes" begin
-        # FIX ?
-        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), square)) == UnitRange{Int64}[1:2, 1:2]
-        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), square2)) == UnitRange{Int64}[2:3, 2:3]
-        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), checkers)) == UnitRange{Int64}[1:2, 2:3]
-        @test @inferred(Augmentor.cropsize_axes(CropSize(1,3), checkers)) == UnitRange{Int64}[2:2, 2:4]
-        @test @inferred(Augmentor.cropsize_axes(CropSize(3,3), checkers)) == UnitRange{Int64}[1:3, 2:4]
-        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), OffsetArray(rect, -2, -1))) == UnitRange{Int64}[-1:0, 0:1]
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), square)) == [1:2, 1:2]
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), square2)) == [2:3, 2:3]
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), checkers)) == [1:2, 2:3]
+        @test @inferred(Augmentor.cropsize_axes(CropSize(1,3), checkers)) == [2:2, 2:4]
+        @test @inferred(Augmentor.cropsize_axes(CropSize(3,3), checkers)) == [1:3, 2:4]
+        @test @inferred(Augmentor.cropsize_axes(CropSize(2,2), OffsetArray(rect, -2, -1))) == [-1:0, 0:1]
     end
     imgs = [
         (rect, (1:2, 1:2)),

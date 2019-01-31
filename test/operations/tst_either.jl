@@ -565,10 +565,8 @@ end
         @test_throws MethodError Augmentor.applylazy(op, nothing)
         @test_throws MethodError Augmentor.applystepview(op, nothing)
 
-        # FIX
-        #v = @inferred Augmentor.applylazy(op, square)
-        v = Augmentor.applylazy(op, square)
-        @test_skip v === @inferred(Augmentor.applystepview(op, square))
+        v = @inferred Augmentor.applylazy(op, square)
+        @test v === @inferred(Augmentor.applystepview(op, square))
         @test v === Augmentor.applystepview(op, square)
         @test v === view(square,1:1:2,1:1:3)
         @test typeof(v) <: SubArray
