@@ -117,19 +117,13 @@ end
     @test size(dv) == size(camera)
     @test eltype(dv) == eltype(camera)
 
-    # FIX : ColorTypes.Gray{FixedPointNumbers.Normed{UInt8,8}} == Gray{Normed{UInt8,8}}?
-    # @test summary(dv) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with element type ColorTypes.Gray{FixedPointNumbers.Normed{UInt8,8}}"
-
     @test summary(dv) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with eltype Gray{Normed{UInt8,8}}"
     @test_reference "reference/distort_static.txt" dv
 
-    #camerao = OffsetArrays.no_offset_view(OffsetArray(camera, (-5,-10)))
     camerao = Augmentor.no_offset_view(OffsetArray(camera, (-5,-10)))
     dv2 = @inferred Augmentor.DistortedView(camerao, A)
     @test size(dv2) == size(camera)
     @test eltype(dv2) == eltype(camera)
-    # we lose the offset indices
-    #@test summary(dv2) == "512×512 Augmentor.DistortedView(OffsetArray(::Array{Gray{N0f8},2}, -4:507, -9:502), ::Array{Float64,3} as 3×3 vector field) with eltype Gray{Normed{UInt8,8}}"
     @test summary(dv2) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with eltype Gray{Normed{UInt8,8}}"
     @test_reference "reference/distort_static.txt" dv2
     v = view(Augmentor.DistortedView(rand(10,10), A), 2:8, 3:10)

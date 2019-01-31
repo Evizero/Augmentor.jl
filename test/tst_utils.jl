@@ -51,11 +51,13 @@ end
         @test @inferred(Augmentor.maybe_copy(p)) == A'
         @test typeof(Augmentor.maybe_copy(p)) <: Array
     end
-    # FIX: permuteddimsview, offset array, equality
-    # let p = permuteddimsview(Ao, (2,1))
-    #     @test @inferred(Augmentor.maybe_copy(p)) == Ao'
-    #     @test typeof(Augmentor.maybe_copy(p)) <: OffsetArray
-    # end
+
+    let p = permuteddimsview(Ao, (2,1))
+        pc = @inferred(Augmentor.maybe_copy(p))
+        #@test pc == Ao'
+        @test pc == Augmentor.no_offset_view(Ao')
+        @test typeof(pc) <: Array
+    end
     let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
         @test @inferred(Augmentor.maybe_copy(p)) == OffsetArray(A'[2:3, 1:2],1,0)
         @test typeof(Augmentor.maybe_copy(p)) <: OffsetArray
@@ -78,15 +80,14 @@ end
     A = [1 2 3; 4 5 6; 7 8 9]
     @test @inferred(Augmentor.plain_array(A)) === A
     @test @inferred(Augmentor.plain_array(OffsetArray(A, (-2,-1)))) === A
-    # Sparse arrays for now undefined
-    #let As = sparse(A)
-    #    @test @inferred(Augmentor.plain_array(As)) == A
-    #    @test typeof(Augmentor.plain_array(As)) <: Array
-    #    Ar = reshape(As, 3, 3, 1)
-    #    @test typeof(Ar) <: Base.ReshapedArray
-    #    @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
-    #    @test typeof(Augmentor.plain_array(Ar)) <: Array
-    #end
+    let As = sparse(A)
+       @test @inferred(Augmentor.plain_array(As)) == A
+       @test typeof(Augmentor.plain_array(As)) <: Array
+       Ar = reshape(As, 3, 3, 1)
+       @test typeof(Ar) <: Base.ReshapedArray
+       @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,3,3,1)
+       @test typeof(Augmentor.plain_array(Ar)) <: Array
+    end
     let Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
         @test @inferred(Augmentor.plain_array(Ast)) === Ast
     end

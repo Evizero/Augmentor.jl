@@ -131,7 +131,7 @@ end
         rgb_imgs = [
             (rgb_rect_split, rgb_rect),
             # FIX
-            #(channelview(Augmentor.prepareaffine(rgb_rect)), rgb_rect),
+            # (channelview(Augmentor.prepareaffine(rgb_rect)), rgb_rect),
             (OffsetArray(rgb_rect_split, 0, -2, -1), rgb_rect),
             (view(rgb_rect_split, IdentityRange(1:3), IdentityRange(1:2), IdentityRange(1:3)), rgb_rect),
         ]

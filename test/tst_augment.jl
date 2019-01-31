@@ -2,8 +2,6 @@
     @test_throws MethodError augment!(rand(2,2), (rect,), Rotate90())
     @test_throws MethodError augment!((rand(2,2),), rect, Rotate90())
     @test_throws MethodError augment!((rand(2,2),rand(2,2)), (rect,), Rotate90())
-    # FIX
-    #@test_throws BoundsError augment!(rand(2,2), rect, Rotate90())
     @test_throws ArgumentError augment!(rand(2,2), rect, Rotate90())
     for pl in (Augmentor.ImmutablePipeline(Rotate90()), (Rotate90(),))
         img = @inferred Augmentor._augment(rect, pl)
@@ -28,8 +26,6 @@
         @test outs[2] == img2
         out = similar(img)
         @test @inferred(augment!(out, rect, Rotate90())) == img
-        # FIX
-        #@test_throws BoundsError augment!(rand(2,2), rect, pl)
         @test_throws ArgumentError augment!(rand(2,2), rect, pl)
     end
 end
@@ -122,13 +118,14 @@ ops = (Resize(2,2),Rotate90(),CacheImage(buf)) # forces affine then eager
     @test parent(img) === ops[3].buffer
 end
 
-# FIX
-# Rotate90(1) introduces an Either op
 ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
 @testset "$(str_showcompact(ops))" begin
     # FIX, inferred return type is Any and not SubArray....
     #wv = @inferred Augmentor._augment(camera, ops)
     wv = Augmentor._augment(camera, ops);
+    # however this works by constraint:
+    ops2 = (Rotate180(1),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
+    wv2 = @inferred Augmentor._augment(camera, ops2)
 
     @test typeof(wv) <: SubArray
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
@@ -137,9 +134,13 @@ ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
 
     @test_reference "reference/rot_crop_either_crop.txt" wv;
 
-    # FIX
-    # img = @inferred augment(camera, ops)
+    # FIX : see above
+    #img = @inferred augment(camera, ops)
     img = augment(camera, ops)
+    # however this works:
+    ops2 = (Rotate180(1),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
+    wv2 = @inferred Augmentor.augment(camera, ops2)
+    @test img == parent(copy(wv2))
 
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
@@ -173,18 +174,15 @@ end
 ops = (Rotate180(), Crop(5:200,200:500), Rotate90(1), Crop(50:300, 50:195),
         Resize(25,15))
 @testset "$(str_showcompact(ops))" begin
-    # FIX return type Any
-    #wv = @inferred Augmentor._augment(camera, ops)
-    wv = Augmentor._augment(camera, ops)
+    wv = @inferred Augmentor._augment(camera, ops)
+
     @test typeof(wv) <: SubArray
     @test eltype(wv) <: eltype(camera)
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
     @test_reference "reference/rot_crop_rot_crop_resize.txt" wv
-    # FIX return type Any
-    # img = @inferred Augmentor.augment(camera, ops)
-    img = Augmentor.augment(camera, ops)
+    img = @inferred Augmentor.augment(camera, ops)
 
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
@@ -275,9 +273,7 @@ end
 
 ops = (ShearX(45),NoOp())
 @testset "$(str_showcompact(ops))" begin
-    # FIX
-    # wv = @inferred Augmentor._augment(camera, ops)
-    wv = Augmentor._augment(camera, ops)
+    wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: InvWarpedView
     @test parent(wv).itp.coefs === camera
     @test_reference "reference/shearx_noop.txt" wv
@@ -290,9 +286,7 @@ end
 
 ops = (ShearY(45),CropNative(1:512,1:512))
 @testset "$(str_showcompact(ops))" begin
-    # FIX
-    # wv = @inferred Augmentor._augment(camera, ops)
-    wv = Augmentor._augment(camera, ops)
+    wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
@@ -322,9 +316,7 @@ end
 
 ops = (Crop(101:200,201:350),Zoom(1.3))
 @testset "$(str_showcompact(ops))" begin
-    # FIX
-    # wv = @inferred Augmentor._augment(camera, ops)
-    wv = Augmentor._augment(camera, ops)
+    wv = @inferred Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
@@ -376,7 +368,7 @@ ops = (Rotate(45), CropSize(200,200), Zoom(1.1), ConvertEltype(RGB{Float64}),
     # @test_skip collect(wv1) ≈ img
     # however:
     @test size(collect(wv1)) === size(img)
-    # so:
+    # so (not sure if this is desired behaviour):
     @test collect(wv1) ≈ Augmentor.no_offset_view(img)
     @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
 end

@@ -235,7 +235,7 @@ function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     if typeof(sub.indices) <: NTuple{2, StepRange{Int64, Int64}}
-        view(perm_img, sub.indices[2], reverse(sub.indeices[1]))
+        view(perm_img, sub.indices[2], reverse(sub.indices[1]))
     else
         ixs = map(StepRange, sub.indices)
         view(perm_img, ixs[2], reverse(ixs[1]))

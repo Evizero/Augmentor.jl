@@ -16,6 +16,7 @@ using ComputationalResources
 using FileIO
 using LinearAlgebra
 using Base.PermutedDimsArrays: PermutedDimsArray
+using SparseArrays
 
 export
 

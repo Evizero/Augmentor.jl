@@ -380,11 +380,12 @@ function applyaffineview(op::CropRatio, img::AbstractArray, param)
     applyview(op, prepareaffine(img), param)
 end
 
-# FIX
+# FIX - convert to TUPLE expensive
 function applyview(op::CropRatio, img::AbstractArray, param)
     direct_view(img, Tuple(cropratio_axes(op, img)))
 end
 
+# FIX - convert to TUPLE expensive
 # . vs map saves 1 alloc
 function applystepview(op::CropRatio, img::AbstractArray, param)
     direct_view(img, Tuple(StepRange.(cropratio_axes(op, img))))
