@@ -368,11 +368,16 @@ ops = (Rotate(45), CropSize(200,200), Zoom(1.1), ConvertEltype(RGB{Float64}),
     wv3 = @inferred Augmentor._augment(camera, ops)
 
     _, wv4 = @inferred Augmentor._augment((rotl90(camera), camera), ops)
-    @test wv3 == wv4
-    @test typeof(wv3) == typeof(wv4)
+    @test wv3 === wv4
+    @test typeof(wv3) === typeof(wv4)
     img = colorview(RGB{Float64}, wv3)
     @test RGB{Float64}.(copy(wv1)) ≈ wv2
-    @test_skip collect(wv1) ≈ img
+    # gives dimension mismatch:
+    # @test_skip collect(wv1) ≈ img
+    # however:
+    @test size(collect(wv1)) === size(img)
+    # so:
+    @test collect(wv1) ≈ Augmentor.no_offset_view(img)
     @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
 end
 
