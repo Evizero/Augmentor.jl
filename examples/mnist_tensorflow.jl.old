@@ -41,8 +41,8 @@ info("Preparing the MNIST dataset") #jl-only
 #'   Machine Learning datasets. This will help us prepare the
 #'   MNIST data to be used with TensorFlow.
 
-using Images, MLDatasets, MLDataUtils
-srand(42);
+using Images, MLDatasets, MLDataUtils, Random
+Random.seed!(42);
 #md nothing # hide
 
 #' As you may have seen previously in the

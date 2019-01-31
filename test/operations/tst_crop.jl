@@ -57,7 +57,8 @@
     @testset "affineview" begin
         @test Augmentor.supports_affineview(Crop) === true
         @test_throws MethodError Augmentor.applyaffineview(Crop(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffineview(Crop(1:2,2:3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyaffineview(Crop(1:2,2:3), rect)) ==
+            view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
         @testset "multiple images" begin
             for img_in in imgs
                 res1, res2 = @inferred(Augmentor.applyaffineview(Crop(1:2,2:3), (img_in, N0f8.(img_in))))
@@ -72,7 +73,8 @@
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Crop) === true
-        @test @inferred(Augmentor.applylazy(Crop(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applylazy(Crop(1:2,2:3), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @testset "multiple images" begin
             for img_in in imgs
                 res1, res2 = @inferred(Augmentor.applylazy(Crop(1:2,2:3), (img_in, N0f8.(img_in))))
@@ -85,7 +87,8 @@
     end
     @testset "view" begin
         @test Augmentor.supports_view(Crop) === true
-        @test @inferred(Augmentor.applyview(Crop(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyview(Crop(1:2,2:3), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @testset "multiple images" begin
             for img_in in imgs
                 res1, res2 = @inferred(Augmentor.applyview(Crop(1:2,2:3), (img_in, N0f8.(img_in))))
@@ -163,7 +166,8 @@ end
     @testset "affineview" begin
         @test Augmentor.supports_affineview(CropNative) === true
         @test_throws MethodError Augmentor.applyaffineview(CropNative(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffineview(CropNative(1:2,2:3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyaffineview(CropNative(1:2,2:3), rect)) ==
+            view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applyaffineview(CropNative(inds), (img_in, N0f8.(img_in))))
@@ -178,7 +182,8 @@ end
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(CropNative) === true
-        @test @inferred(Augmentor.applylazy(CropNative(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applylazy(CropNative(1:2,2:3), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applylazy(CropNative(inds), (img_in, N0f8.(img_in))))
@@ -191,7 +196,8 @@ end
     end
     @testset "view" begin
         @test Augmentor.supports_view(CropNative) === true
-        @test @inferred(Augmentor.applyview(CropNative(1:2,2:3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyview(CropNative(1:2,2:3), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applyview(CropNative(inds), (img_in, N0f8.(img_in))))
@@ -206,15 +212,15 @@ end
         @test Augmentor.supports_stepview(CropNative) === true
         @test @inferred(Augmentor.applystepview(CropNative(1:2,2:3), rect)) === view(rect, 1:1:2, 2:1:3)
         # TODO: fix behaviour for stepview on IdentityRange
-        #@testset "multiple images" begin
-        #    for (img_in, inds) in imgs
-        #       res1, res2 = @inferred(Augmentor.applystepview(CropNative(inds), (img_in, N0f8.(img_in))))
-        #        # make sure both images are processed
-        #        @test res1 == res2
-        #        @test typeof(res1) <: SubArray{Gray{N0f8}}
-        #        @test typeof(res2) <: SubArray{N0f8}
-        #    end
-        #end
+        @testset "multiple images" begin
+           for (img_in, inds) in imgs[1:3]
+               res1, res2 = @inferred(Augmentor.applystepview(CropNative(inds), (img_in, N0f8.(img_in))))
+               # make sure both images are processed
+               @test res1 == res2
+               @test typeof(res1) <: SubArray{Gray{N0f8}}
+               @test typeof(res2) <: SubArray{N0f8}
+           end
+        end
     end
     @testset "permute" begin
         @test Augmentor.supports_permute(CropNative) === false
@@ -299,8 +305,10 @@ end
     @testset "affineview" begin
         @test Augmentor.supports_affineview(CropSize) === true
         @test_throws MethodError Augmentor.applyaffineview(CropSize(1:2,2:3), nothing)
-        @test @inferred(Augmentor.applyaffineview(CropSize(2,3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyaffineview(CropSize(2,2), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(2:3), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyaffineview(CropSize(2,3), rect)) ==
+            view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(CropSize(2,2), square2)) ==
+            view(Augmentor.prepareaffine(square2), IdentityRange(2:3), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applyaffineview(CropSize(2,2), (img_in, N0f8.(img_in))))
@@ -317,8 +325,10 @@ end
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(CropSize) === true
-        @test @inferred(Augmentor.applylazy(CropSize(2,3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applylazy(CropSize(2,2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(2:3))
+        @test @inferred(Augmentor.applylazy(CropSize(2,3), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(CropSize(2,2), square2)) ===
+            view(square2, IdentityRange(2:3), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applylazy(CropSize(2,2), (img_in, N0f8.(img_in))))
@@ -333,8 +343,10 @@ end
     end
     @testset "view" begin
         @test Augmentor.supports_view(CropSize) === true
-        @test @inferred(Augmentor.applyview(CropSize(2,3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyview(CropSize(2,2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyview(CropSize(2,3), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(CropSize(2,2), square2)) ===
+            view(square2, IdentityRange(2:3), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applyview(CropSize(2,2), (img_in, N0f8.(img_in))))
@@ -349,11 +361,8 @@ end
     end
     @testset "stepview" begin
         @test Augmentor.supports_stepview(CropSize) === true
-        # FIX: inferred type of applystepview method is SubArray
-        @test_skip @inferred(Augmentor.applystepview(CropSize(2,3), rect))
-        @test Augmentor.applystepview(CropSize(2,3), rect) === view(rect, 1:1:2, 1:1:3)
-        @test_skip @inferred(Augmentor.applystepview(CropSize(2,2), square2))
-        @test Augmentor.applystepview(CropSize(2,2), square2) === view(square2, 2:1:3, 2:1:3)
+        @test @inferred(Augmentor.applystepview(CropSize(2,3), rect)) === view(rect, 1:1:2, 1:1:3)
+        @test @inferred(Augmentor.applystepview(CropSize(2,2), square2)) === view(square2, 2:1:3, 2:1:3)
     end
     @testset "permute" begin
         @test Augmentor.supports_permute(CropSize) === false
@@ -441,9 +450,12 @@ end
     @testset "affineview" begin
         @test Augmentor.supports_affineview(CropRatio) === true
         @test_throws MethodError Augmentor.applyaffineview(CropRatio(1), nothing)
-        @test @inferred(Augmentor.applyaffineview(CropRatio(1), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2))
-        @test @inferred(Augmentor.applyaffineview(CropRatio(2), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(2:3), IdentityRange(1:4))
-        @test @inferred(Augmentor.applyaffineview(CropRatio(.5), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyaffineview(CropRatio(1), rect)) ==
+            view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applyaffineview(CropRatio(2), square2)) ==
+            view(Augmentor.prepareaffine(square2), IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyaffineview(CropRatio(.5), square2)) ==
+            view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applyaffineview(CropRatio(1), (img_in, N0f8.(img_in))))
@@ -460,9 +472,12 @@ end
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(CropRatio) === true
-        @test @inferred(Augmentor.applylazy(CropRatio(1), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:2))
-        @test @inferred(Augmentor.applylazy(CropRatio(2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(1:4))
-        @test @inferred(Augmentor.applylazy(CropRatio(.5), square2)) === view(square2, IdentityRange(1:4), IdentityRange(2:3))
+        @test @inferred(Augmentor.applylazy(CropRatio(1), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applylazy(CropRatio(2), square2)) ===
+            view(square2, IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applylazy(CropRatio(.5), square2)) ===
+            view(square2, IdentityRange(1:4), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applylazy(CropRatio(1), (img_in, N0f8.(img_in))))
@@ -477,9 +492,12 @@ end
     end
     @testset "view" begin
         @test Augmentor.supports_view(CropRatio) === true
-        @test @inferred(Augmentor.applyview(CropRatio(1), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:2))
-        @test @inferred(Augmentor.applyview(CropRatio(2), square2)) === view(square2, IdentityRange(2:3), IdentityRange(1:4))
-        @test @inferred(Augmentor.applyview(CropRatio(.5), square2)) === view(square2, IdentityRange(1:4), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyview(CropRatio(1), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(1:2))
+        @test @inferred(Augmentor.applyview(CropRatio(2), square2)) ===
+            view(square2, IdentityRange(2:3), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyview(CropRatio(.5), square2)) ===
+            view(square2, IdentityRange(1:4), IdentityRange(2:3))
         @testset "multiple images" begin
             for (img_in, inds) in imgs
                 res1, res2 = @inferred(Augmentor.applyview(CropRatio(1), (img_in, N0f8.(img_in))))
@@ -494,14 +512,9 @@ end
     end
     @testset "stepview" begin
         @test Augmentor.supports_stepview(CropRatio) === true
-
-        @test_skip @inferred(Augmentor.applystepview(CropRatio(1), rect)) === view(rect, 1:1:2, 1:1:2)
-        @test_skip @inferred(Augmentor.applystepview(CropRatio(2), square2)) === view(square2, 2:1:3, 1:1:4)
-        @test_skip @inferred(Augmentor.applystepview(CropRatio(.5), square2)) === view(square2, 1:1:4, 2:1:3)
-
-        @test Augmentor.applystepview(CropRatio(1), rect) == view(rect, 1:1:2, 1:1:2)
-        @test Augmentor.applystepview(CropRatio(2), square2) == view(square2, 2:1:3, 1:1:4)
-        @test Augmentor.applystepview(CropRatio(.5), square2) == view(square2, 1:1:4, 2:1:3)
+        @test @inferred(Augmentor.applystepview(CropRatio(1), rect)) === view(rect, 1:1:2, 1:1:2)
+        @test @inferred(Augmentor.applystepview(CropRatio(2), square2)) === view(square2, 2:1:3, 1:1:4)
+        @test @inferred(Augmentor.applystepview(CropRatio(.5), square2)) === view(square2, 1:1:4, 2:1:3)
     end
     @testset "permute" begin
         @test Augmentor.supports_permute(CropRatio) === false
@@ -584,44 +597,62 @@ end
         @test Augmentor.supports_affineview(RCropRatio) === true
         @test_throws MethodError Augmentor.applyaffineview(RCropRatio(1), nothing)
         # preserve aspect ratio (i.e. not random)
-        @test @inferred(Augmentor.applyaffineview(RCropRatio(3/2), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyaffineview(RCropRatio(1), square)) == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyaffineview(RCropRatio(1), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyaffineview(RCropRatio(3/2), rect)) ==
+            view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(RCropRatio(1), square)) ==
+            view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(RCropRatio(1), square2)) ==
+            view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(1:4))
         # randomly placed
         out = @inferred Augmentor.applyaffineview(RCropRatio(1), rect)
-        @test out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
+        @test out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2)) ||
+            out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
         out = @inferred Augmentor.applyaffineview(RCropRatio(2/3), square)
-        @test out == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(2:3))
+        @test out == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:2)) ||
+            out == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(2:3))
         out = @inferred Augmentor.applyaffineview(RCropRatio(3/2), square)
-        @test out == view(Augmentor.prepareaffine(square), IdentityRange(1:2), IdentityRange(1:3)) || out == view(Augmentor.prepareaffine(square), IdentityRange(2:3), IdentityRange(1:3))
+        @test out == view(Augmentor.prepareaffine(square), IdentityRange(1:2), IdentityRange(1:3)) ||
+            out == view(Augmentor.prepareaffine(square), IdentityRange(2:3), IdentityRange(1:3))
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(RCropRatio) === true
         # preserve aspect ratio (i.e. not random)
-        @test @inferred(Augmentor.applylazy(RCropRatio(3/2), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applylazy(RCropRatio(1), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
-        @test @inferred(Augmentor.applylazy(RCropRatio(1), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        @test @inferred(Augmentor.applylazy(RCropRatio(3/2), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(RCropRatio(1), square)) ===
+            view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(RCropRatio(1), square2)) ===
+            view(square2, IdentityRange(1:4), IdentityRange(1:4))
         # randomly placed
         out = @inferred Augmentor.applylazy(RCropRatio(1), rect)
-        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out ===
+            view(rect, IdentityRange(1:2), IdentityRange(2:3))
         out = @inferred Augmentor.applylazy(RCropRatio(2/3), square)
-        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out === view(square, IdentityRange(1:3), IdentityRange(2:3))
+        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out ===
+            view(square, IdentityRange(1:3), IdentityRange(2:3))
         out = @inferred Augmentor.applylazy(RCropRatio(3/2), square)
-        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out === view(square, IdentityRange(2:3), IdentityRange(1:3))
+        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out ===
+            view(square, IdentityRange(2:3), IdentityRange(1:3))
     end
     @testset "view" begin
         @test Augmentor.supports_view(RCropRatio) === true
         # preserve aspect ratio (i.e. not random)
-        @test @inferred(Augmentor.applyview(RCropRatio(3/2), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyview(RCropRatio(1), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
-        @test @inferred(Augmentor.applyview(RCropRatio(1), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        @test @inferred(Augmentor.applyview(RCropRatio(3/2), rect)) ===
+            view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(RCropRatio(1), square)) ===
+            view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(RCropRatio(1), square2)) ===
+            view(square2, IdentityRange(1:4), IdentityRange(1:4))
         # randomly placed
         out = @inferred Augmentor.applyview(RCropRatio(1), rect)
-        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out ===
+            view(rect, IdentityRange(1:2), IdentityRange(2:3))
         out = @inferred Augmentor.applyview(RCropRatio(2/3), square)
-        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out === view(square, IdentityRange(1:3), IdentityRange(2:3))
+        @test out === view(square, IdentityRange(1:3), IdentityRange(1:2)) || out ===
+            view(square, IdentityRange(1:3), IdentityRange(2:3))
         out = @inferred Augmentor.applyview(RCropRatio(3/2), square)
-        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out === view(square, IdentityRange(2:3), IdentityRange(1:3))
+        @test out === view(square, IdentityRange(1:2), IdentityRange(1:3)) || out ===
+            view(square, IdentityRange(2:3), IdentityRange(1:3))
     end
     @testset "stepview" begin
         @test Augmentor.supports_stepview(RCropRatio) === true

@@ -75,10 +75,10 @@ pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>
 
 img_new = augment(img, pl)
 
-using Plots
+using Plots, Random
 pyplot(reuse = true)
 default(bg_outside=colorant"#F3F6F6")
-srand(123)
+Random.seed!(123)
 
 # Create image that shows the input
 plot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)

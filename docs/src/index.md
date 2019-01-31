@@ -32,7 +32,7 @@ database](http://yann.lecun.com/exdb/mnist/).
 # I can't use Reel.jl, because the way it stores the tmp pngs
 # causes the images to be upscaled too much.
 using Augmentor, MLDatasets, Images, Colors
-using PaddedViews, OffsetArrays
+using PaddedViews, OffsetArrays, Random
 
 pl = ElasticDistortion(6, scale=0.3, border=true) |>
      Rotate([10, -5, -3, 0, 3, 5, 10]) |>
@@ -42,7 +42,7 @@ pl = ElasticDistortion(6, scale=0.3, border=true) |>
 
 md_imgs = String[]
 for i in 1:24
-    srand(i) # somehow srand in the beginning isn't enough
+    Random.seed!(i) # somehow seed! in the beginning isn't enough
     input = MNIST.convert2image(MNIST.traintensor(i))
     imgs = [augment(input, pl) for j in 1:20]
     insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth

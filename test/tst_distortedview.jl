@@ -124,7 +124,7 @@ end
     @test_reference "reference/distort_static.txt" dv
 
     #camerao = OffsetArrays.no_offset_view(OffsetArray(camera, (-5,-10)))
-    camerao = no_offset_view(OffsetArray(camera, (-5,-10)))
+    camerao = Augmentor.no_offset_view(OffsetArray(camera, (-5,-10)))
     dv2 = @inferred Augmentor.DistortedView(camerao, A)
     @test size(dv2) == size(camera)
     @test eltype(dv2) == eltype(camera)

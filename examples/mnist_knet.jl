@@ -41,8 +41,8 @@ info("Preparing the MNIST dataset") #jl-only
 #'   Machine Learning datasets. This will help us prepare the
 #'   MNIST data to be used with Knet.jl.
 
-using Images, MLDatasets, MLDataUtils
-srand(42);
+using Images, MLDatasets, MLDataUtils, Random
+Random.seed!(42);
 #md nothing # hide
 
 #' As you may have seen previously in the
@@ -269,7 +269,7 @@ function train_baseline(; epochs = 500, batchsize = 100, lr = .03)
             train = acc(w, train_x, train_y)
             test  = acc(w, test_x,  test_y)
             @trace log epoch train test
-            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train, digits=3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
+            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train, digits=3),5,"0") * ", test accuracy " * rpad(round(test,digits=3),5,"0")
             cancel(p, msg, :blue) #jl-only
 #md             println(msg)
 #jp             println(msg)
@@ -417,7 +417,7 @@ function train_augmented(; epochs = 500, batchsize = 100, lr = .03)
             train = acc(w, train_x, train_y)
             test  = acc(w, test_x,  test_y)
             @trace log epoch train test
-            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train, digits=3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
+            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train, digits=3),5,"0") * ", test accuracy " * rpad(round(test,digits=3),5,"0")
             cancel(p, msg, :blue) #jl-only
 #md             println(msg)
 #jp             println(msg)
@@ -470,6 +470,7 @@ info("Improving Performance") #jl-only
 #' augmenting our dataset each epoch. This worker also needs
 #' access to a couple of our packages
 
+# using Distributed
 # addprocs(1)
 # @everywhere using Augmentor, MLDataUtils
 
@@ -510,7 +511,7 @@ function async_train_augmented(; epochs = 500, batchsize = 100, lr = .03)
             train = acc(w, train_x, train_y)
             test  = acc(w, test_x,  test_y)
             @trace log epoch train test
-            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train,digits=3),5,"0") * ", test accuracy " * rpad(round(test,3),5,"0")
+            msg = "epoch " * lpad(epoch,4) * ": train accuracy " * rpad(round(train,digits=3),5,"0") * ", test accuracy " * rpad(round(test,digits=3),5,"0")
             cancel(p, msg, :blue) #jl-only
 #md             println(msg)
 #jp             println(msg)
@@ -519,6 +520,10 @@ function async_train_augmented(; epochs = 500, batchsize = 100, lr = .03)
     finish!(p) #jl-only
     log
 end
+#md nothing # hide
+
+# async_train_augmented(epochs=1) # warm-up
+# augmented_log = @time async_train_augmented(epochs=200);
 #md nothing # hide
 
 #' Note that for this toy example the overhead of this approach

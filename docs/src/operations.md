@@ -1,6 +1,6 @@
 ```@eval
-using Augmentor, Images, Colors
-srand(1337)
+using Augmentor, Images, Colors, Random
+Random.seed!(1337)
 pattern = imresize(restrict(restrict(testpattern())), (60, 80))
 save("assets/tiny_pattern.png", pattern)
 # Affine Transformations
@@ -15,7 +15,7 @@ save("assets/tiny_ShearY.png", augment(pattern, ShearY(10)))
 save("assets/tiny_Scale.png", augment(pattern, Scale(0.9,1.2)))
 save("assets/tiny_Zoom.png", augment(pattern, Zoom(0.9,1.2)))
 # Distortions
-srand(1337)
+Random.seed!(1337)
 save("assets/tiny_ED1.png", augment(pattern, ElasticDistortion(15,15,0.1)))
 save("assets/tiny_ED2.png", augment(pattern, ElasticDistortion(10,10,0.2,4,3,true)))
 # Resizing and Subsetting
@@ -24,7 +24,7 @@ save("assets/tiny_Crop.png", augment(pattern, Rotate(45) |> Crop(1:50,1:80)))
 save("assets/tiny_CropNative.png", augment(pattern, Rotate(45) |> CropNative(1:50,1:80)))
 save("assets/tiny_CropSize.png", augment(pattern, CropSize(20,65)))
 save("assets/tiny_CropRatio.png", augment(pattern, CropRatio(1)))
-srand(1337)
+Random.seed!(1337)
 save("assets/tiny_RCropRatio.png", augment(pattern, RCropRatio(1)))
 # Conversion
 save("assets/tiny_ConvertEltype.png", augment(pattern, ConvertEltype(GrayA{N0f8})))

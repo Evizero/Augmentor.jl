@@ -276,8 +276,9 @@ function applyview(op::CropSize, img::AbstractArray, param)
     direct_view(img, Tuple(cropsize_axes(op, img)))
 end
 
+# . vs map saves 1 alloc
 function applystepview(op::CropSize, img::AbstractArray, param)
-    direct_view(img, Tuple(map(StepRange, cropsize_axes(op, img))))
+    direct_view(img, Tuple(StepRange.(cropsize_axes(op, img))))
 end
 
 function showconstruction(io::IO, op::CropSize)
@@ -384,9 +385,9 @@ function applyview(op::CropRatio, img::AbstractArray, param)
     direct_view(img, Tuple(cropratio_axes(op, img)))
 end
 
-# FIX
+# . vs map saves 1 alloc
 function applystepview(op::CropRatio, img::AbstractArray, param)
-    direct_view(img, Tuple(map(StepRange, cropratio_axes(op, img))))
+    direct_view(img, Tuple(StepRange.(cropratio_axes(op, img))))
 end
 
 function ratio2str(ratio)
@@ -510,6 +511,7 @@ function rcropratio_axes(op::RCropRatio, img::AbstractMatrix)
     end
 end
 
+# CHECK THIS
 randparam(op::RCropRatio, imgs::Tuple) = rcropratio_axes(op, imgs[1])
 randparam(op::RCropRatio, img::AbstractArray) = rcropratio_axes(op, img)
 

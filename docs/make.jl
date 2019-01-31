@@ -1,4 +1,4 @@
-using Documenter, Augmentor
+using Documenter, Augmentor, Random
 
 # Autogenerate documentation markdown and jupyter notebooks
 # for all the scripts in the "examples/" subfolder.
@@ -42,7 +42,7 @@ myless(a, b) = dict_order[a] < dict_order[b]
 
 # --------------------------------------------------------------------
 
-srand(1337)
+Random.seed!(1337)
 makedocs(
     modules = [Augmentor],
     clean = false,

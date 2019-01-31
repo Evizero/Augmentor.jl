@@ -19,10 +19,10 @@
 # ```
 
 using Augmentor, Images, Colors
-using Reel, PaddedViews, OffsetArrays
+using Reel, PaddedViews, OffsetArrays, Random
 Reel.set_output_type("gif")
 
-srand(1337)
+Random.seed!(1337)
 
 if !isfile("../assets/testpattern.png")
     pattern = imresize(testpattern(), (240, 320))
