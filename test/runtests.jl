@@ -11,6 +11,7 @@ using   ColorTypes,
         MLDataPattern,
         OffsetArrays,
         Random,
+        SparseArrays,
         StaticArrays,
         Statistics
 

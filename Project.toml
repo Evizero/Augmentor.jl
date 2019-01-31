@@ -20,12 +20,12 @@ MappedArrays = "dbb5928d-eab1-5f90-85c2-b9b0edb7c900"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
-SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [extras]
 ReferenceTests = "324d217c-45ce-50fc-942e-d289b448e8cf"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
