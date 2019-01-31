@@ -116,7 +116,7 @@ ops = (Rotate90(), Rotate270(), Rotate180())
     @test wv[1:2,1:3] == rot180(rect)
     wv2 = @inferred Augmentor.unroll_applylazy(ops, Augmentor.prepareaffine(rect))
     @test typeof(wv2) === typeof(invwarpedview(rect, Augmentor.toaffinemap(NoOp(),rect), Flat()))
-    @test wv2 == wv
+    @test wv2 === wv
     v = @inferred Augmentor.unroll_applylazy(ops, rect)
     @test v === view(rect, 2:-1:1, 3:-1:1)
     @test v == rot180(rect)
@@ -129,7 +129,7 @@ ops = (Rotate180(), Either((Rotate90(), Rotate270()), (1,0)))
     r1 = invwarpedview(square, Augmentor.toaffinemap(Rotate180(),square), Flat())
     @test wv == invwarpedview(r1, Augmentor.toaffinemap(Rotate90(), r1))
     wv2 = @inferred Augmentor.unroll_applylazy(ops, Augmentor.prepareaffine(square))
-    @test wv2 == wv
+    @test wv2 === wv
     v = @inferred Augmentor.unroll_applylazy(ops, rect)
     @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
     @test v == rotl90(rot180(rect))
