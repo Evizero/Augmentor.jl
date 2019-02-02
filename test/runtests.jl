@@ -45,7 +45,7 @@ rgb_rect = rand(RGB{N0f8}, 2, 3)
 
 #################
 # to be removed
-cd(joinpath(dirname(pathof(Augmentor)), "..", "test"))
+# cd(joinpath(dirname(pathof(Augmentor)), "..", "test"))
 #################
 
 tests = [

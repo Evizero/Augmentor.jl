@@ -61,24 +61,24 @@ function weave_markdown(scriptname; overwrite=false)
     mdpath = joinpath(GENERATED_DIR, name * ".md")
     # if markdown file already exists, only overwrite if requested
     if isfile(mdpath) && !overwrite
-        info("skipping markdown generation for \"$scriptname\" (file already exists)")
+        @info "skipping markdown generation for \"$scriptname\" (file already exists)"
         return mdpath
     else
-        info("generating markdown \"$(name*".md")\" for \"$scriptname\"")
+        @info "generating markdown \"$(name*".md")\" for \"$scriptname\""
         mkpath(GENERATED_DIR)
     end
     # load and pre-process script for markdown generation this
     # removes `# jp` and `#jp-only` lines and the `# md` prefix
-    str_jl = readstring(scriptpath)
-    str_jl = replace(str_jl, r"\n(#jp ).*", "")
-    str_jl = replace(str_jl, r"\n.*(#jl-only)", "")
-    str_jl = replace(str_jl, "\n#md ", "\n")
+    str_jl = read(scriptpath, String)
+    str_jl = replace(str_jl, r"\n(#jp ).*" => "")
+    str_jl = replace(str_jl, r"\n.*(#jl-only)" => "")
+    str_jl = replace(str_jl, "\n#md " => "\n")
     write(processed_scriptpath, str_jl)
     # weave the .jl file into a .jmd file
     convert_doc(processed_scriptpath, jmdpath)
     # posprocess the .jmd and save it as .md for documenter
-    str_md = readstring(jmdpath)
-    str_md = replace(str_md, "```julia", "```@example $name")
+    str_md = read(jmdpath, String)
+    str_md = replace(str_md, "```julia" => "```@example $name")
     write(mdpath, str_md)
     # cleanup temporary files
     rm(processed_scriptpath)
@@ -96,28 +96,28 @@ function weave_notebook(scriptname; overwrite=false, execute=true)
     jppath = joinpath(GENERATED_DIR, name * ".ipynb")
     # if notebook file already exists, only overwrite if requested
     if isfile(jppath) && !overwrite
-        info("skipping notebook generation for \"$scriptname\" (file already exists)")
+        @info "skipping notebook generation for \"$scriptname\" (file already exists)"
         return jppath
     else
-        info("generating notebook \"$(name*".ipynb")\" for \"$scriptname\"")
+        @info "generating notebook \"$(name*".ipynb")\" for \"$scriptname\""
         mkpath(GENERATED_DIR)
     end
     # load and pre-process script for notebook generation this
     # removes `# md` and `#jp-only` lines and the `# jp` prefix
-    str_jl = readstring(scriptpath)
-    str_jl = replace(str_jl, r"\n(#md ).*", "")
-    str_jl = replace(str_jl, r"\n.*(#jl-only)", "")
-    str_jl = replace(str_jl, "\n#jp ", "\n")
+    str_jl = read(scriptpath, String)
+    str_jl = replace(str_jl, r"\n(#md ).*" => "")
+    str_jl = replace(str_jl, r"\n.*(#jl-only)" => "")
+    str_jl = replace(str_jl, "\n#jp " => "\n")
     # additionally we slightly tweak the look of the references
-    str_jl = replace(str_jl, r"\[\^(.*)\]:", s"**\1**:") # references
-    str_jl = replace(str_jl, r"\[\^(.*)\]", s"[\1]") # citations
+    str_jl = replace(str_jl, r"\[\^(.*)\]:" => s"**\1**:") # references
+    str_jl = replace(str_jl, r"\[\^(.*)\]" => s"[\1]") # citations
     write(processed_scriptpath, str_jl)
     # weave the .jl file into a .ipynb file
     convert_doc(processed_scriptpath, jppath)
     # execute notebook
     if execute
         sleep(1)
-        info("executing and overwrite notebook \"$(name*".ipynb")\"")
+        @info "executing and overwrite notebook \"$(name*".ipynb")\""
         run(`jupyter-nbconvert --ExecutePreprocessor.timeout=-1 --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
     end
     # cleanup temporary files

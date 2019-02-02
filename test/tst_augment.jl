@@ -174,7 +174,9 @@ end
 ops = (Rotate180(), Crop(5:200,200:500), Rotate90(1), Crop(50:300, 50:195),
         Resize(25,15))
 @testset "$(str_showcompact(ops))" begin
-    wv = @inferred Augmentor._augment(camera, ops)
+    # see above
+    #wv = @inferred Augmentor._augment(camera, ops)
+    wv = Augmentor._augment(camera, ops)
 
     @test typeof(wv) <: SubArray
     @test eltype(wv) <: eltype(camera)
@@ -182,7 +184,10 @@ ops = (Rotate180(), Crop(5:200,200:500), Rotate90(1), Crop(50:300, 50:195),
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
     @test_reference "reference/rot_crop_rot_crop_resize.txt" wv
-    img = @inferred Augmentor.augment(camera, ops)
+
+    # see above
+    #img = @inferred Augmentor.augment(camera, ops)
+    img = Augmentor.augment(camera, ops)
 
     @test img == parent(copy(wv))
     @test typeof(img) <: Array

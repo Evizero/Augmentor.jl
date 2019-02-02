@@ -30,5 +30,5 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
 [targets]
-test = ["ReferenceTests", "Test", "TestImages"]
 benchmark = ["BenchmarkTools", "Images", "TestImages"]
+test = ["ReferenceTests", "SparseArrays", "Test", "TestImages"]

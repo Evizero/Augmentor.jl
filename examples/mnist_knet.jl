@@ -212,7 +212,7 @@ end
 #' to which computation node of our network.
 
 function weights(atype = KnetArray{Float32})
-    w = Array{Any}(8)
+    w = Array{Any}(undef, 8)
     # conv1
     w[1] = xavier(5,5,1,20)
     w[2] = zeros(1,1,20,1)
