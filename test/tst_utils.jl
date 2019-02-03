@@ -55,7 +55,7 @@ end
     let p = permuteddimsview(Ao, (2,1))
         pc = @inferred(Augmentor.maybe_copy(p))
         #@test pc == Ao'
-        @test pc == Augmentor.no_offset_view(Ao')
+        @test pc == OffsetArrays.no_offset_view(Ao')
         @test typeof(pc) <: Array
     end
     let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))

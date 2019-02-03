@@ -60,8 +60,7 @@
             (view(rect, IdentityRange(1:2), IdentityRange(1:3)), f1),
             (rgb_rect, f2),
             (Augmentor.prepareaffine(rgb_rect), f2),
-            #(OffsetArrays.no_offset_view(OffsetArray(rgb_rect, -2, -1)), f2),
-            (Augmentor.no_offset_view(OffsetArray(rgb_rect, -2, -1)), f2),
+            (OffsetArrays.no_offset_view(OffsetArray(rgb_rect, -2, -1)), f2),
             (view(rgb_rect, IdentityRange(1:2), IdentityRange(1:3)), f2),
         ]
         @testset "single image" begin

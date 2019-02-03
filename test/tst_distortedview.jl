@@ -120,7 +120,7 @@ end
     @test summary(dv) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with eltype Gray{Normed{UInt8,8}}"
     @test_reference "reference/distort_static.txt" dv
 
-    camerao = Augmentor.no_offset_view(OffsetArray(camera, (-5,-10)))
+    camerao = OffsetArrays.no_offset_view(OffsetArray(camera, (-5,-10)))
     dv2 = @inferred Augmentor.DistortedView(camerao, A)
     @test size(dv2) == size(camera)
     @test eltype(dv2) == eltype(camera)

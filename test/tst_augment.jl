@@ -374,7 +374,7 @@ ops = (Rotate(45), CropSize(200,200), Zoom(1.1), ConvertEltype(RGB{Float64}),
     # however:
     @test size(collect(wv1)) === size(img)
     # so (not sure if this is desired behaviour):
-    @test collect(wv1) ≈ Augmentor.no_offset_view(img)
+    @test collect(wv1) ≈ OffsetArrays.no_offset_view(img)
     @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
 end
 
