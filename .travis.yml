@@ -18,10 +18,10 @@ git:
 matrix:
   allow_failures:
     - julia: nightly
-
-branches:
-  only:
-    - master
+# 
+# branches:
+#   only:
+#     - master
 
 ## uncomment and modify the following lines to manually install system packages
 #addons:
