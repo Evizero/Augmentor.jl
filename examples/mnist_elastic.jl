@@ -99,7 +99,7 @@ using Augmentor, Interact, Reactive
 # loop into interactive widgets.
 @manipulate for
         unpaused = true,
-        ticks = fpswhen(signal(unpaused), 5.),
+        #ticks = fpswhen(Signal(unpaused), 5.), # non-boolean ... error
         image_index = 1:100,
         grid_size = 3:20,
         scale = .1:.1:.5,

@@ -3,7 +3,8 @@ using Documenter, Augmentor, Random
 # Autogenerate documentation markdown and jupyter notebooks
 # for all the scripts in the "examples/" subfolder.
 include("exampleweaver.jl")
-ExampleWeaver.weave(overwrite=false, execute=true)
+#ExampleWeaver.weave(overwrite=false, execute=true)
+ExampleWeaver.weave(overwrite=true, execute=true)
 
 # Define the documentation order of the operations. The whole
 # purpose of this vector is literally just to dictate in what
@@ -72,10 +73,11 @@ makedocs(
     html_prettyurls = !("local" in ARGS),
 )
 
+#= Remove this in final version
 deploydocs(
     repo = "github.com/Evizero/Augmentor.jl.git",
     target = "build",
-    julia = "0.6",
+    julia = "1.0",
     deps = nothing,
     make = nothing,
 )
@@ -89,21 +91,23 @@ build_dir = abspath(joinpath(@__DIR__, "build"))
 for markdownname in ExampleWeaver.listmarkdown()
     name = splitext(markdownname)[1]
     htmlpath = joinpath(build_dir, "generated", name, "index.html")
-    str_html = readstring(htmlpath)
+    str_html = read(htmlpath, String)
     # replace github url to .jl file
     str_html = replace(
         str_html,
-        r"docs/src/generated/([^.]*)\.md",
+        r"docs/src/generated/([^.]*)\.md" =>
         s"examples/\1.jl"
     )
     # insert link to jupyter notebook
     str_html = replace(
         str_html,
-        r"(<a class=\"edit-page\".*GitHub<\/a>)",
+        r"(<a class=\"edit-page\".*GitHub<\/a>)" =>
         s"\1<a class=\"edit-page\" href=\"___HREFPLACEHOLDER___\"><span class=\"fa fa-external-link\"> </span> Juypter Notebook</a>"
     )
     href = "https://nbviewer.jupyter.org/github/Evizero/Augmentor.jl/blob/gh-pages/generated/$(name * ".ipynb")"
-    str_html = replace(str_html, "___HREFPLACEHOLDER___", href)
+    str_html = replace(str_html, "___HREFPLACEHOLDER___" => href)
     # overwrite html file
     write(htmlpath, str_html)
 end
+
+=#

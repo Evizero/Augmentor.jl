@@ -470,9 +470,11 @@ info("Improving Performance") #jl-only
 #' augmenting our dataset each epoch. This worker also needs
 #' access to a couple of our packages
 
-# using Distributed
-# addprocs(1)
-# @everywhere using Augmentor, MLDataUtils
+using Distributed
+addprocs(1)
+@everywhere using Augmentor, MLDataUtils
+#md nothing # hide
+
 
 #' Next, we replace the inner `eachbatch` loop with a more
 #' complicated version using a `RemoteChannel` to exchange and
@@ -522,12 +524,12 @@ function async_train_augmented(; epochs = 500, batchsize = 100, lr = .03)
 end
 #md nothing # hide
 
-# async_train_augmented(epochs=1) # warm-up
-# augmented_log = @time async_train_augmented(epochs=200);
-#md nothing # hide
-
 #' Note that for this toy example the overhead of this approach
 #' is greater than the benefit.
+
+async_train_augmented(epochs=1) # warm-up
+augmented_log = @time async_train_augmented(epochs=200);
+#md nothing # hide
 
 #' ## Visualizing the Results
 info("Visualizing the Results") #jl-only
@@ -539,8 +541,8 @@ info("Visualizing the Results") #jl-only
 #' in order to get a good feeling about their differences.
 
 using Plots
-#jp pyplot()
-#md pyplot()
+#jp gr()
+#md gr()
 #md nothing # hide
 unicodeplots() #jl-only
 

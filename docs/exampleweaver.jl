@@ -118,7 +118,7 @@ function weave_notebook(scriptname; overwrite=false, execute=true)
     if execute
         sleep(1)
         @info "executing and overwrite notebook \"$(name*".ipynb")\""
-        run(`jupyter nbconvert --ExecutePreprocessor.timeout=-1 --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
+        run(`jupyter nbconvert --ExecutePreprocessor.timeout=-1 --ExecutePreprocessor.allow_errors=True --to notebook --execute $(abspath(jppath)) --output $(name * ".ipynb")`)
     end
     # cleanup temporary files
     rm(processed_scriptpath)
@@ -137,9 +137,13 @@ end
 function weave(; kw...)
     mds = String[]; jps = String[]
     for scriptname in listexamples()
-        md, jp = weave(scriptname; kw...)
-        push!(mds, md)
-        push!(jps, jp)
+	try 
+            md, jp = weave(scriptname; kw...)
+            push!(mds, md)
+            push!(jps, jp)
+	catch err
+	    println("error running scriptname:\n$err")
+	end
     end
     mds, jps
 end
