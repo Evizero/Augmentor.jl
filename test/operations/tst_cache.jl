@@ -74,11 +74,11 @@ end
         @test Augmentor.CacheImageInto(buf) === op
         @test str_show(op) == "Augmentor.CacheImageInto(::Array{Gray{N0f8},2})"
         @test str_showconst(op) == "CacheImage(Array{Gray{N0f8}}(2, 3))"
-        op2 = @inferred CacheImage(Array{Gray{N0f8}}(2, 3))
+        op2 = @inferred CacheImage(Array{Gray{N0f8}}(undef, 2, 3))
         @test typeof(op) == typeof(op2)
         @test typeof(op.buffer) == typeof(op2.buffer)
         @test size(op.buffer) == size(op2.buffer)
-        @test str_showcompact(op) == "Cache into preallocated 2×3 Array{Gray{N0f8},2}"
+        @test str_showcompact(op) == "Cache into preallocated 2×3 Array{Gray{N0f8},2} with eltype Gray{Normed{UInt8,8}}"
 
         v = Augmentor.applylazy(Resize(2,3), camera)
         res = @inferred Augmentor.applyeager(op, v)
@@ -116,11 +116,11 @@ end
         @test Augmentor.CacheImageInto((buf1,buf2)) === op
         @test str_show(op) == "Augmentor.CacheImageInto((::Array{Gray{N0f8},2}, ::Array{RGB{N0f8},2}))"
         @test str_showconst(op) == "CacheImage(Array{Gray{N0f8}}(3, 3), Array{RGB{N0f8}}(2, 3))"
-        op2 = @inferred CacheImage(Array{Gray{N0f8}}(3, 3), Array{RGB{N0f8}}(2, 3))
+        op2 = @inferred CacheImage(Array{Gray{N0f8}}(undef, 3, 3), Array{RGB{N0f8}}(undef, 2, 3))
         @test typeof(op) == typeof(op2)
         @test typeof(op.buffer) == typeof(op2.buffer)
         @test size.(op.buffer) === size.(op2.buffer)
-        @test str_showcompact(op) == "Cache into preallocated (3×3 Array{Gray{N0f8},2}, 2×3 Array{RGB{N0f8},2})"
+        @test str_showcompact(op) == "Cache into preallocated (3×3 Array{Gray{N0f8},2} with eltype Gray{Normed{UInt8,8}}, 2×3 Array{RGB{N0f8},2} with eltype RGB{Normed{UInt8,8}})"
 
         @test buf1 == square
         @test buf2 == rgb_rect

@@ -92,12 +92,12 @@ function applylazy(op::CacheImageInto, img::Tuple)
 end
 
 function applylazy(op::CacheImageInto{<:AbstractArray}, img::AbstractArray, param)
-    copy!(match_idx(op.buffer, axes(img)), img)
+    copyto!(match_idx(op.buffer, axes(img)), img)
 end
 
 function applylazy(op::CacheImageInto{<:Tuple}, imgs::Tuple)
     map(op.buffer, imgs) do buffer, img
-        copy!(match_idx(buffer, axes(img)), img)
+        copyto!(match_idx(buffer, axes(img)), img)
     end
 end
 
@@ -130,7 +130,7 @@ function Base.show(io::IO, op::CacheImageInto{<:AbstractArray})
         print(io, summary(op.buffer))
     else
         print(io, typeof(op).name, "(")
-        showarg(io, op.buffer)
+        Base.showarg(io, op.buffer, false)
         print(io, ")")
     end
 end
@@ -142,7 +142,7 @@ function Base.show(io::IO, op::CacheImageInto{<:Tuple})
     else
         print(io, typeof(op).name, "((")
         for (i, buffer) in enumerate(op.buffer)
-            showarg(io, buffer)
+            Base.showarg(io, buffer, false)
             i < length(op.buffer) && print(io, ", ")
         end
         print(io, "))")
