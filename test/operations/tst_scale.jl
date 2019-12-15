@@ -23,7 +23,7 @@
         @test @inferred(Scale((1:2,2:3))) == Scale{2}((1:2,2:3))
         op = @inferred(Scale([1,2],2:3))
         @test op.factors == ([1.,2.],[2.,3.])
-        @test str_show(op) == "Augmentor.Scale{2}(([1.0, 2.0], [2.0, 3.0]))"
+        @test str_show(op) == "Scale{2}(([1.0, 2.0], [2.0, 3.0]))"
         @test str_showconst(op) == "Scale([1.0, 2.0], [2.0, 3.0])"
         @test str_showcompact(op) == "Scale by I ∈ {1.0×2.0, 2.0×3.0}"
         op = @inferred(Scale([1,2],[2.,3]))
@@ -31,23 +31,23 @@
         op = @inferred(Scale([1,2]))
         @test op.factors == ([1.,2.],[1.,2.])
         op = @inferred(Scale(1))
-        @test str_show(op) == "Augmentor.Scale{2}((1, 1))"
+        @test str_show(op) == "Scale{2}((1, 1))"
         @test str_showconst(op) == "Scale(1, 1)"
         @test str_showcompact(op) == "Scale by 1×1"
         op = @inferred(Scale(0.8,0.9))
-        @test str_show(op) == "Augmentor.Scale{2}((0.8, 0.9))"
+        @test str_show(op) == "Scale{2}((0.8, 0.9))"
         @test str_showconst(op) == "Scale(0.8, 0.9)"
         @test str_showcompact(op) == "Scale by 0.8×0.9"
         op = @inferred(Scale(1:2,3:4))
-        @test str_show(op) == "Augmentor.Scale{2}((1:2, 3:4))"
+        @test str_show(op) == "Scale{2}((1:2, 3:4))"
         @test str_showconst(op) == "Scale(1:2, 3:4)"
         @test str_showcompact(op) == "Scale by I ∈ {1×3, 2×4}"
         op = @inferred(Scale(1:3,3:5))
-        @test str_show(op) == "Augmentor.Scale{2}((1:3, 3:5))"
+        @test str_show(op) == "Scale{2}((1:3, 3:5))"
         @test str_showconst(op) == "Scale(1:3, 3:5)"
         @test str_showcompact(op) == "Scale by I ∈ {1×3, 2×4, 3×5}"
         op = @inferred(Scale(1,2,3))
-        @test str_show(op) == "Augmentor.Scale{3}((1, 2, 3))"
+        @test str_show(op) == "Scale{3}((1, 2, 3))"
         @test str_showconst(op) == "Scale(1, 2, 3)"
         @test str_showcompact(op) == "Scale by 1×2×3"
     end
