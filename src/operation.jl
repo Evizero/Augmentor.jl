@@ -116,7 +116,7 @@ end
 @generated function toaffinemap_common(op::AffineOperation, img::AbstractArray{T,N}, param) where {T,N}
     quote
         tfm = toaffinemap(op, img, param)
-        AffineMap(SMatrix(tfm.m), SVector(tfm.v))::AffineMap{SArray{Tuple{$N,$N},Float64,$N,$(N*N)},SVector{$N,Float64}}
+        AffineMap(SMatrix(tfm.linear), SVector(tfm.translation))::AffineMap{SArray{Tuple{$N,$N},Float64,$N,$(N*N)},SVector{$N,Float64}}
     end
 end
 

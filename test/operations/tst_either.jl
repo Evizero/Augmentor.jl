@@ -73,21 +73,21 @@ end
 
 @testset "show" begin
     @test str_show(Either((Rotate90(),Rotate270(),NoOp()), (0.2,0.3,0.5))) == """
-    Augmentor.Either (1 out of 3 operation(s)):
+    Either (1 out of 3 operation(s)):
       - 20% chance to: Rotate 90 degree
       - 30% chance to: Rotate 270 degree
       - 50% chance to: No operation"""
     @test str_showcompact(Either((Rotate90(),Rotate270(),NoOp()), (0.2,0.3,0.5))) ==
         "Either: (20%) Rotate 90 degree. (30%) Rotate 270 degree. (50%) No operation."
     @test str_show(Either((Rotate90(),Rotate270(),NoOp()), (0.15,0.8,0.05))) == """
-    Augmentor.Either (1 out of 3 operation(s)):
+    Either (1 out of 3 operation(s)):
       - 15% chance to: Rotate 90 degree
       - 80% chance to: Rotate 270 degree
       -  5% chance to: No operation"""
     @test str_showcompact(Either((Rotate90(),Rotate270(),NoOp()), (0.15,0.8,0.05))) ==
         "Either: (15%) Rotate 90 degree. (80%) Rotate 270 degree. (5%) No operation."
     @test str_show(Either((Rotate90(),Rotate270(),NoOp()), (0.155,0.8,0.045))) == """
-    Augmentor.Either (1 out of 3 operation(s)):
+    Either (1 out of 3 operation(s)):
       - 15.5% chance to: Rotate 90 degree
       - 80.0% chance to: Rotate 270 degree
       -  4.5% chance to: No operation"""
