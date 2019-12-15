@@ -12,8 +12,18 @@ struct DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: Abstra
     end
 end
 
+# TODO: update1.0: check if these two methods are unnecessary
+function DistortedView(A::Union{OffsetArray, SubArray},
+                       grid::AbstractArray{Float64, 3})
+    DistortedView(parent(A), grid)
+end
+function DistortedView(A::InvWarpedView, grid::AbstractArray{Float64, 3})
+    DistortedView(collect(A), grid)
+end
+
 Base.parent(A::DistortedView) = A.parent
-Base.size(A::DistortedView) = map(length, axes(A.parent))
+Base.size(A::DistortedView) = map(length, axes(A))
+Base.axes(A::DistortedView) = axes(A.parent)
 
 function Base.showarg(io::IO, A::DistortedView, toplevel)
     print(io, typeof(A).name, '(')
@@ -22,11 +32,11 @@ function Base.showarg(io::IO, A::DistortedView, toplevel)
     Base.showarg(io, A.grid, false)
     print(io, " as ", size(A.field,2), '×', size(A.field,3), " vector field")
     print(io, ')')
-    toplevel && print(io, " with eltype ", eltype(v))
+    toplevel && print(io, " with eltype ", eltype(A))
 end
 
 # inline speeds up ~30%
-@inline function Base.getindex(A::DistortedView, i::Int, j::Int)
+function Base.getindex(A::DistortedView, i::Int, j::Int)
     # unpack member variables
     parent = A.parent
     etp    = A.etp
@@ -39,8 +49,8 @@ end
     # map array indices to grid indices
     gi, gj = (i-1)/(leny-1)*(gh-1)+1, (j-1)/(lenx-1)*(gw-1)+1
     # compute parent indices offset
-    @inbounds dy = field[1, gi, gj] * leny
-    @inbounds dx = field[2, gi, gj] * lenx
+    @inbounds dy = field(1, gi, gj) * leny
+    @inbounds dx = field(2, gi, gj) * lenx
     # compute parent indices and return value
     # Note: we subtract instead of add, because the vector field is
     #       specified in forward mode (i.e. in reference to the source
@@ -50,6 +60,6 @@ end
     checkbounds(indsx, j)
     @inbounds y = indsy[i] - dy
     @inbounds x = indsx[j] - dx
-    @inbounds res = etp[y, x]
+    @inbounds res = etp(y, x)
     res
 end

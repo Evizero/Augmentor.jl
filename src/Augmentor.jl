@@ -15,6 +15,7 @@ using MLDataPattern
 using ComputationalResources
 using FileIO
 using Base.PermutedDimsArrays: PermutedDimsArray
+using LinearAlgebra
 
 export
 
