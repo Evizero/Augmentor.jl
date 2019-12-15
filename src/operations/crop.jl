@@ -259,8 +259,8 @@ CropSize(; width=64, height=64) = CropSize((height,width))
 @inline supports_view(::Type{<:CropSize})       = true
 @inline supports_stepview(::Type{<:CropSize})   = true
 
-function cropsize_axes(op::CropSize, img::AbstractArray)
-    cntr = convert(Tuple, center(img))
+function cropsize_axes(op::CropSize, img::AbstractArray)::Tuple
+    cntr = Tuple(center(img))
     sze = op.size
     corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
     map((b,s)->b:(b+s-1), corner, sze)
@@ -358,7 +358,7 @@ CropRatio(; ratio = 1.) = CropRatio(ratio)
 @inline supports_view(::Type{CropRatio})       = true
 @inline supports_stepview(::Type{CropRatio})   = true
 
-function cropratio_axes(op::CropRatio, img::AbstractMatrix)
+function cropratio_axes(op::CropRatio, img::AbstractMatrix)::Tuple
     h, w = map(length, axes(img))
     ratio = op.ratio
     # compute new size based on ratio
@@ -368,7 +368,7 @@ function cropratio_axes(op::CropRatio, img::AbstractMatrix)
     nh = nh > 1 ? nh : 1
     sze = nh < h ? nh : h, nw < w ? nw : w
     # compute axes around center for given size
-    cntr = convert(Tuple, center(img))
+    cntr = Tuple(center(img))
     corner = map((ci,si)->floor(Int,ci)-floor(Int,si/2)+!isinteger(ci), cntr, sze)
     map((b,s)->b:(b+s-1), corner, sze)
 end
@@ -397,14 +397,14 @@ function ratio2str(ratio)
     found = false
     for i = 1:20
         high = i * high0
-        if round(high) == round(high,2)
+        if round(high) == round(high; digits=2)
             low = i
             found = true
             break
         end
     end
     if !found
-        string(round(ratio,2))
+        string(round(ratio; digits=2))
     elseif ratio >= 1
         string(round(Int,high), ':', low)
     else
@@ -416,7 +416,6 @@ function Base.show(io::IO, op::CropRatio)
     if get(io, :compact, false)
         print(io, "Crop to ", ratio2str(op.ratio), " aspect ratio")
     else
-        print(io, "Augmentor.")
         showconstruction(io, op)
     end
 end
@@ -535,7 +534,6 @@ function Base.show(io::IO, op::RCropRatio)
     if get(io, :compact, false)
         print(io, "Crop random window with ", ratio2str(op.ratio), " aspect ratio")
     else
-        print(io, "Augmentor.")
         showconstruction(io, op)
     end
 end
