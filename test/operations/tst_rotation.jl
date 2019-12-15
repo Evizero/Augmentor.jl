@@ -2,7 +2,7 @@
     @test typeof(@inferred(Rotate90())) <: Rotate90 <: Augmentor.AffineOperation
     @testset "constructor" begin
         @test @inferred(Rotate90(0.7)) === Either(Rotate90(), 0.7)
-        @test str_show(Rotate90()) == "Augmentor.Rotate90()"
+        @test str_show(Rotate90()) == "Rotate90()"
         @test str_showconst(Rotate90()) == "Rotate90()"
         @test str_showcompact(Rotate90()) == "Rotate 90 degree"
     end
@@ -92,7 +92,7 @@ end
     @test typeof(@inferred(Rotate180())) <: Rotate180 <: Augmentor.AffineOperation
     @testset "constructor" begin
         @test @inferred(Rotate180(0.7)) === Either(Rotate180(), 0.7)
-        @test str_show(Rotate180()) == "Augmentor.Rotate180()"
+        @test str_show(Rotate180()) == "Rotate180()"
         @test str_showconst(Rotate180()) == "Rotate180()"
         @test str_showcompact(Rotate180()) == "Rotate 180 degree"
     end
@@ -169,7 +169,7 @@ end
     @test typeof(@inferred(Rotate270())) <: Rotate270 <: Augmentor.AffineOperation
     @testset "constructor" begin
         @test @inferred(Rotate270(0.7)) === Either(Rotate270(), 0.7)
-        @test str_show(Rotate270()) == "Augmentor.Rotate270()"
+        @test str_show(Rotate270()) == "Rotate270()"
         @test str_showconst(Rotate270()) == "Rotate270()"
         @test str_showcompact(Rotate270()) == "Rotate 270 degree"
     end
