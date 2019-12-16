@@ -36,7 +36,7 @@ function Base.showarg(io::IO, A::DistortedView, toplevel)
 end
 
 # inline speeds up ~30%
-function Base.getindex(A::DistortedView, i::Int, j::Int)
+@inline function Base.getindex(A::DistortedView, i::Int, j::Int)
     # unpack member variables
     parent = A.parent
     etp    = A.etp

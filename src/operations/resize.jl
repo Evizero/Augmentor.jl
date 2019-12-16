@@ -80,7 +80,6 @@ end
 
 function applyaffineview(op::Resize{N}, img::AbstractArray{T,N}, param) where {T,N}
     Rin, Rout = CartesianIndices(axes(img)), CartesianIndices(op.size)
-    @assert first(Rout) == CartesianIndex(1, 1)
     sf = Tuple(last(Rout)) ./ Tuple(last(Rin) - first(Rin) + first(Rout))
     # We have to extrapolate if the image is upscaled,
     # otherwise the original border will only cause a single pixel
