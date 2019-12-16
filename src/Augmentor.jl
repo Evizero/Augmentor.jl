@@ -9,13 +9,18 @@ using CoordinateTransformations
 using Rotations
 using Interpolations
 using StaticArrays
-using OffsetArrays
 using IdentityRanges
 using MLDataPattern
 using ComputationalResources
 using FileIO
 using Base.PermutedDimsArrays: PermutedDimsArray
 using LinearAlgebra
+using OffsetArrays
+
+# axes(::OffsetArray) changes from Base.Slice to Base.IdentityUnitRange in julia 1.1
+# https://github.com/JuliaArrays/OffsetArrays.jl/pull/62
+# TODO: switch to Base.IdentityUnitRange when we decide to drop 1.0 compatibility
+using OffsetArrays: IdentityUnitRange
 
 export
 

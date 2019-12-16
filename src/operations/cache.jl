@@ -53,7 +53,7 @@ pl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)
 """
 struct CacheImage <: ImageOperation end
 
-applyeager(op::CacheImage, img::AbstractArray, param) = maybe_copy(img)
+applyeager(op::CacheImage, img::AbstractArray, param) = contiguous(img)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
