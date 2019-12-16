@@ -113,6 +113,7 @@ function Base.show(io::IO, op::Scale{N}) where N
             print(io, "Scale by I ∈ {$(str)}")
         end
     else
+        print(io, "Augmentor.")
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
         print(io, typeof(op).name, "{$N}($(fct))")
     end

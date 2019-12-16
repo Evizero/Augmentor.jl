@@ -247,6 +247,7 @@ for deg in (90, 180, 270)
         if get(io, :compact, false)
             print(io, "Rotate ", $deg, " degree")
         else
+            print(io, "Augmentor.")
             print(io, $T, "()")
         end
     end

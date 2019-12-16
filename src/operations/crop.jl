@@ -88,6 +88,7 @@ function Base.show(io::IO, op::Crop{N}) where N
             print(io, "Crop region $(op.indices)")
         end
     else
+        print(io, "Augmentor.")
         print(io, typeof(op).name, "{$N}($(op.indices))")
     end
 end
@@ -193,6 +194,7 @@ function Base.show(io::IO, op::CropNative{N}) where N
             print(io, "Crop native region $(op.indices)")
         end
     else
+        print(io, "Augmentor.")
         print(io, typeof(op).name, "{$N}($(op.indices))")
     end
 end
@@ -292,6 +294,7 @@ function Base.show(io::IO, op::CropSize{N}) where N
             print(io, "Crop a $(join(op.size,"×")) window around the center")
         end
     else
+        print(io, "Augmentor.")
         print(io, typeof(op), "($(op.size))")
     end
 end
@@ -416,6 +419,7 @@ function Base.show(io::IO, op::CropRatio)
     if get(io, :compact, false)
         print(io, "Crop to ", ratio2str(op.ratio), " aspect ratio")
     else
+        print(io, "Augmentor.")
         showconstruction(io, op)
     end
 end
@@ -534,6 +538,7 @@ function Base.show(io::IO, op::RCropRatio)
     if get(io, :compact, false)
         print(io, "Crop random window with ", ratio2str(op.ratio), " aspect ratio")
     else
+        print(io, "Augmentor.")
         showconstruction(io, op)
     end
 end

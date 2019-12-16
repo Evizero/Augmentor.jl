@@ -7,13 +7,13 @@
         @test typeof(@inferred(Crop(1:10,3:5))) <: Crop{2} <: Crop <: Augmentor.ImageOperation
         @test @inferred(Crop(Base.OneTo(10), Base.OneTo(5))) === @inferred(Crop((1:10,1:5)))
         @test @inferred(Crop(Base.OneTo(10), 1:5)) === @inferred(Crop((1:10,1:5)))
-        @test str_show(Crop(3:4)) == "Crop{1}((3:4,))"
+        @test str_show(Crop(3:4)) == "Augmentor.Crop{1}((3:4,))"
         @test str_showconst(Crop(3:4)) == "Crop(3:4)"
         @test str_showcompact(Crop(3:4)) == "Crop region (3:4,)"
-        @test str_show(Crop(1:2,2:3)) == "Crop{2}((1:2, 2:3))"
+        @test str_show(Crop(1:2,2:3)) == "Augmentor.Crop{2}((1:2, 2:3))"
         @test str_showconst(Crop(1:2,2:3)) == "Crop(1:2, 2:3)"
         @test str_showcompact(Crop(1:2,2:3)) == "Crop region 1:2×2:3"
-        @test str_show(Crop(1:2,2:3,3:4)) == "Crop{3}((1:2, 2:3, 3:4))"
+        @test str_show(Crop(1:2,2:3,3:4)) == "Augmentor.Crop{3}((1:2, 2:3, 3:4))"
         @test str_showconst(Crop(1:2,2:3,3:4)) == "Crop(1:2, 2:3, 3:4)"
         @test str_showcompact(Crop(1:2,2:3,3:4)) == "Crop region (1:2, 2:3, 3:4)"
     end
@@ -125,13 +125,13 @@ end
         @test typeof(@inferred(CropNative(1:10,3:5))) <: CropNative{2} <: CropNative <: Augmentor.ImageOperation
         @test @inferred(CropNative(Base.OneTo(10), Base.OneTo(5))) === @inferred(CropNative((1:10,1:5)))
         @test @inferred(CropNative(Base.OneTo(10), 1:5)) === @inferred(CropNative((1:10,1:5)))
-        @test str_show(CropNative(3:4)) == "CropNative{1}((3:4,))"
+        @test str_show(CropNative(3:4)) == "Augmentor.CropNative{1}((3:4,))"
         @test str_showconst(CropNative(3:4)) == "CropNative(3:4)"
         @test str_showcompact(CropNative(3:4)) == "Crop native region (3:4,)"
-        @test str_show(CropNative(1:2,2:3)) == "CropNative{2}((1:2, 2:3))"
+        @test str_show(CropNative(1:2,2:3)) == "Augmentor.CropNative{2}((1:2, 2:3))"
         @test str_showconst(CropNative(1:2,2:3)) == "CropNative(1:2, 2:3)"
         @test str_showcompact(CropNative(1:2,2:3)) == "Crop native region 1:2×2:3"
-        @test str_show(CropNative(1:2,2:3,3:4)) == "CropNative{3}((1:2, 2:3, 3:4))"
+        @test str_show(CropNative(1:2,2:3,3:4)) == "Augmentor.CropNative{3}((1:2, 2:3, 3:4))"
         @test str_showconst(CropNative(1:2,2:3,3:4)) == "CropNative(1:2, 2:3, 3:4)"
         @test str_showcompact(CropNative(1:2,2:3,3:4)) == "Crop native region (1:2, 2:3, 3:4)"
     end
@@ -234,20 +234,20 @@ end
         @test_throws ArgumentError CropSize(-1)
         @test_throws ArgumentError CropSize(0,2)
         op = @inferred(CropSize(10))
-        @test str_show(op) == "CropSize{1}((10,))"
+        @test str_show(op) == "Augmentor.CropSize{1}((10,))"
         @test str_showconst(op) == "CropSize(10)"
         @test str_showcompact(op) == "Crop a 10-length window at the center"
         op = @inferred(CropSize(20,30))
         @test op === CropSize(width=30, height=20)
         @test op.size == (20,30)
-        @test str_show(op) == "CropSize{2}((20, 30))"
+        @test str_show(op) == "Augmentor.CropSize{2}((20, 30))"
         @test str_showconst(op) == "CropSize(20, 30)"
         @test str_showcompact(op) == "Crop a 20×30 window around the center"
         op = @inferred(CropSize(20,30,40))
         @test op === @inferred(CropSize((20,30,40)))
         @test op === @inferred(CropSize{3}((20,30,40)))
         @test op.size == (20,30,40)
-        @test str_show(op) == "CropSize{3}((20, 30, 40))"
+        @test str_show(op) == "Augmentor.CropSize{3}((20, 30, 40))"
         @test str_showconst(op) == "CropSize(20, 30, 40)"
         @test str_showcompact(op) == "Crop a 20×30×40 window around the center"
     end
@@ -370,18 +370,18 @@ end
         @test_throws ArgumentError CropRatio(0)
         op = @inferred(CropRatio(3/4))
         @test op === CropRatio(ratio=3/4)
-        @test str_show(op) == "CropRatio(0.75)"
+        @test str_show(op) == "Augmentor.CropRatio(0.75)"
         @test str_showconst(op) == "CropRatio(0.75)"
         @test str_showcompact(op) == "Crop to 3:4 aspect ratio"
         op = @inferred(CropRatio(1))
         @test op === @inferred(CropRatio())
         @test op === CropRatio(ratio=1)
-        @test str_show(op) == "CropRatio(1.0)"
+        @test str_show(op) == "Augmentor.CropRatio(1.0)"
         @test str_showconst(op) == "CropRatio(1.0)"
         @test str_showcompact(op) == "Crop to 1:1 aspect ratio"
         op = @inferred(CropRatio(2.5))
         @test op === CropRatio(ratio=2.5)
-        @test str_show(op) == "CropRatio(2.5)"
+        @test str_show(op) == "Augmentor.CropRatio(2.5)"
         @test str_showconst(op) == "CropRatio(2.5)"
         @test str_showcompact(op) == "Crop to 5:2 aspect ratio"
         op = @inferred(CropRatio(sqrt(2)))
@@ -513,18 +513,18 @@ end
         @test_throws ArgumentError RCropRatio(0)
         op = @inferred(RCropRatio(3/4))
         @test op === RCropRatio(ratio=3/4)
-        @test str_show(op) == "RCropRatio(0.75)"
+        @test str_show(op) == "Augmentor.RCropRatio(0.75)"
         @test str_showconst(op) == "RCropRatio(0.75)"
         @test str_showcompact(op) == "Crop random window with 3:4 aspect ratio"
         op = @inferred(RCropRatio(1))
         @test op === @inferred(RCropRatio())
         @test op === RCropRatio(ratio=1)
-        @test str_show(op) == "RCropRatio(1.0)"
+        @test str_show(op) == "Augmentor.RCropRatio(1.0)"
         @test str_showconst(op) == "RCropRatio(1.0)"
         @test str_showcompact(op) == "Crop random window with 1:1 aspect ratio"
         op = @inferred(RCropRatio(2.5))
         @test op === RCropRatio(ratio=2.5)
-        @test str_show(op) == "RCropRatio(2.5)"
+        @test str_show(op) == "Augmentor.RCropRatio(2.5)"
         @test str_showconst(op) == "RCropRatio(2.5)"
         @test str_showcompact(op) == "Crop random window with 5:2 aspect ratio"
         op = @inferred(RCropRatio(sqrt(2)))
