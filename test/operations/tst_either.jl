@@ -117,34 +117,34 @@ end
             @test Augmentor.supports_view(op) === false
             @test Augmentor.supports_stepview(op) === false
             @test Augmentor.supports_permute(op) === false
-            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == rotl90(rect) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
             res1, res2 = @inferred(Augmentor.applyeager(op, (square2, img)))
             @test res1 == rotl90(square2)
             @test res2 == rotl90(rect)
         end
         let op = @inferred Either((Rotate90(),Rotate270()), (1,0))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == rotl90(rect) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,1,0))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == rotr90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == rotr90(rect) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),Rotate270(),NoOp()), (0,0,1))
             @test Augmentor.supports_eager(op) === true
             if img isa Union{Array,OffsetArray}
-                @test parent(@inferred(Augmentor.applyeager(op, img))) === rect
+                @test parent(@inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img)))) === rect # TODO: update 1.2: type instable if remove Augmentor.randparam
             else
-                @test @inferred(Augmentor.applyeager(op, img)) == rect
-                @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+                @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == rect # TODO: update 1.2: type instable if remove Augmentor.randparam
+                @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
             end
         end
         let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)), (0,0,1))
             @test Augmentor.supports_eager(op) === true
-            @test collect(@inferred(Augmentor.applyeager(op, img))) == rect[1:2,2:3]
+            @test collect(@inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img)))) == rect[1:2,2:3] # TODO: update 1.2: type instable if remove Augmentor.randparam
             @test_throws MethodError Augmentor.applyaffine(op, rect)
             @test_throws MethodError Augmentor.applyview(op, rect)
             @test_throws MethodError Augmentor.applystepview(op, rect)
@@ -152,33 +152,33 @@ end
         end
         let op = @inferred Either((Rotate90(),Zoom(.8)), (1,0))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == rotl90(rect) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),FlipX()), (1,0))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == rotl90(rect)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == rotl90(rect) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),FlipX()), (0,1))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == reverse(rect; dims=2)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == reverse(rect; dims=2) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),FlipY()), (0,1))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == reverse(rect; dims=1)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == reverse(rect; dims=1) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),Resize(5,5)), (0,1))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == imresize(rect,5,5) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Crop(1:2,1:2),Resize(5,5)), (0,1))
             @test Augmentor.supports_eager(op) === true
-            @test @inferred(Augmentor.applyeager(op, img)) == imresize(rect,5,5)
-            @test typeof(Augmentor.applyeager(op, img)) <: OffsetArray
+            @test @inferred(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) == imresize(rect,5,5) # TODO: update 1.2: type instable if remove Augmentor.randparam
+            @test typeof(Augmentor.applyeager(op, img, Augmentor.randparam(op, img))) <: OffsetArray # TODO: update 1.2: type instable if remove Augmentor.randparam
         end
         let op = @inferred Either((Rotate90(),Rotate270(),Crop(1:2,2:3)))
             @test Augmentor.supports_eager(op) === true
@@ -413,7 +413,7 @@ end
         @test Augmentor.supports_view(op) === true
         @test Augmentor.supports_stepview(op) === true
         @test Augmentor.supports_permute(op) === false
-        @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(op, rect,  Augmentor.randparam(op, rect))) === view(rect, IdentityRange(1:2), IdentityRange(1:3)) # TODO: update 1.2: type instable if remove Augmentor.randparam
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
         res1, res2 = @inferred(Augmentor.applylazy(op, (square2, rect)))
@@ -427,7 +427,7 @@ end
         @test Augmentor.supports_view(op) === true
         @test Augmentor.supports_stepview(op) === true
         @test Augmentor.supports_permute(op) === false
-        @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        @test @inferred(Augmentor.applyview(op, rect, Augmentor.randparam(op, rect))) === view(rect, IdentityRange(1:2), IdentityRange(2:3)) # TODO: update 1.2: type instable if remove Augmentor.randparam
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(2:3))
         @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
     end
@@ -438,7 +438,7 @@ end
         @test Augmentor.supports_view(op) === true
         @test Augmentor.supports_stepview(op) === true
         @test Augmentor.supports_permute(op) === false
-        @test @inferred(Augmentor.applyview(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(op, rect, Augmentor.randparam(op, rect))) === view(rect, IdentityRange(1:2), IdentityRange(1:3)) # TODO: update 1.2: type instable if remove Augmentor.randparam
         @test @inferred(Augmentor.applylazy(op, rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
         @test @inferred(Augmentor.applyaffineview(op, Augmentor.prepareaffine(rect))) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
     end
