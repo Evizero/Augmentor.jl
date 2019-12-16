@@ -110,14 +110,14 @@ augment!(out, img, op::Operation) = augment!(out, img, (op,))
 
 function augment!(out::AbstractArray, img::AbstractArray, pipeline::AbstractPipeline)
     out_lazy = _augment_avoid_eager(img, pipeline)
-    copy!(match_idx(out, axes(out_lazy)), out_lazy)
+    copyto!(match_idx(out, axes(out_lazy)), out_lazy)
     out
 end
 
 function augment!(outs::NTuple{N,AbstractArray}, imgs::NTuple{N,AbstractArray}, pipeline::AbstractPipeline) where N
     outs_lazy = _augment_avoid_eager(imgs, pipeline)
     map(outs, outs_lazy) do out, out_lazy
-        copy!(match_idx(out, axes(out_lazy)), out_lazy)
+        copyto!(match_idx(out, axes(out_lazy)), out_lazy)
     end
     outs
 end

@@ -90,14 +90,14 @@ ops = (Resize(2,2),Rotate90()) # forces affine
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === rect
-    @test round.(Float64.(wv),1) == round.(Float64.(rotl90(imresize(rect,2,2))),1)
+    @test round.(Float64.(wv); digits=1) == round.(Float64.(rotl90(imresize(rect,2,2))); digits=1)
 end
 
 ops = (Resize(2,2),Rotate90(),CacheImage()) # forces affine then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(rect, ops)
     @test typeof(img) <: OffsetArray
-    @test round.(Float64.(img),1) == round.(Float64.(rotl90(imresize(rect,2,2))),1)
+    @test round.(Float64.(img); digits=1) == round.(Float64.(rotl90(imresize(rect,2,2))); digits=1)
 end
 
 buf = rand(Gray{N0f8}, 2, 2)
@@ -105,20 +105,22 @@ ops = (Resize(2,2),Rotate90(),CacheImage(buf)) # forces affine then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(rect, ops)
     @test typeof(img) <: OffsetArray
-    @test round.(Float64.(img),1) == round.(Float64.(rotl90(imresize(rect,2,2))),1)
+    @test round.(Float64.(img); digits=1) == round.(Float64.(rotl90(imresize(rect,2,2))); digits=1)
     @test img == ops[3].buffer
     @test parent(img) === ops[3].buffer
 end
 
 ops = (Rotate180(),Crop(5:200,200:500),Rotate90(1),Crop(1:250, 1:150))
 @testset "$(str_showcompact(ops))" begin
-    wv = @inferred Augmentor._augment(camera, ops)
+    # wv = @inferred Augmentor._augment(camera, ops) # TODO: update1.0
+    wv = Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
     @test_reference "reference/rot_crop_either_crop.txt" wv
-    img = @inferred augment(camera, ops)
+    # img = @inferred augment(camera, ops) # TODO: update1.0
+    img = augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
@@ -148,14 +150,16 @@ end
 
 ops = (Rotate180(),Crop(5:200,200:500),Rotate90(),Crop(50:300, 50:195),Resize(25,15))
 @testset "$(str_showcompact(ops))" begin
-    wv = @inferred Augmentor._augment(camera, ops)
+    # wv = @inferred Augmentor._augment(camera, ops) # TODO: update1.0
+    wv = Augmentor._augment(camera, ops)
     @test typeof(wv) <: SubArray
     @test eltype(wv) <: eltype(camera)
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
     @test_reference "reference/rot_crop_rot_crop_resize.txt" wv
-    img = @inferred Augmentor.augment(camera, ops)
+    # img = @inferred Augmentor.augment(camera, ops) # TODO: update1.0
+    img = Augmentor.augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
     @test eltype(img) <: eltype(camera)
