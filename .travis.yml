@@ -5,6 +5,7 @@ os:
   - osx
 julia:
   - 1.0
+  - 1
   - nightly
 notifications:
   email: false
@@ -15,6 +16,7 @@ git:
 ## (tests will run but not make your overall status red)
 matrix:
   allow_failures:
+    - julia: 1
     - julia: nightly
 
 #jobs:
