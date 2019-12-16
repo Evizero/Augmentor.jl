@@ -116,16 +116,16 @@ end
     @test parent(dv) === camera
     @test size(dv) == size(camera)
     @test eltype(dv) == eltype(camera)
-    @test summary(dv) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with element type ColorTypes.Gray{FixedPointNumbers.Normed{UInt8,8}}"
+    @test summary(dv) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with eltype Gray{Normed{UInt8,8}}"
     @test_reference "reference/distort_static.txt" dv
 
     camerao = OffsetArray(camera, (-5,-10))
     dv2 = @inferred Augmentor.DistortedView(camerao, A)
     @test size(dv2) == size(camera)
     @test eltype(dv2) == eltype(camera)
-    @test summary(dv2) == "512×512 Augmentor.DistortedView(::OffsetArray{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with element type ColorTypes.Gray{FixedPointNumbers.Normed{UInt8,8}}"
+    @test summary(dv2) == "512×512 Augmentor.DistortedView(::Array{Gray{N0f8},2}, ::Array{Float64,3} as 3×3 vector field) with eltype Gray{Normed{UInt8,8}}"
     @test_reference "reference/distort_static.txt" dv2
 
     v = view(Augmentor.DistortedView(rand(10,10), A), 2:8, 3:10)
-    @test summary(v) == "7×8 view(Augmentor.DistortedView(::Array{Float64,2}, ::Array{Float64,3} as 3×3 vector field), 2:8, 3:10) with element type Float64"
+    @test summary(v) == "7×8 view(Augmentor.DistortedView(::Array{Float64,2}, ::Array{Float64,3} as 3×3 vector field), 2:8, 3:10) with eltype Float64"
 end
