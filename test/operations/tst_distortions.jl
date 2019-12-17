@@ -122,8 +122,15 @@
                 res = @inferred(Augmentor.applylazy(ElasticDistortion(4,4), img))
                 @test size(res) == size(rect)
                 @test typeof(res) <: Augmentor.DistortedView{eltype(rect)}
-                # @test parent(res) == img # TODO: update1.0:
-                # @test parent(res) === img # TODO: update1.0:
+                @test parent(res) == rect
+                # wapper type may change, but storage data isn't copied
+                if img isa InvWarpedView
+                    @test parent(parent(res)) === img
+                elseif img isa SubArray
+                    @test parent(parent(res)) === rect
+                else
+                    @test parent(parent(res)) === rect
+                end
             end
         end
         @testset "multiple images" begin

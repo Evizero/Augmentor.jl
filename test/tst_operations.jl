@@ -172,7 +172,7 @@ ops = (Rotate180(), ElasticDistortion(5))
     @test_throws MethodError Augmentor.unroll_applyaffine(ops, square)
     v = @inferred Augmentor.unroll_applylazy(ops, square)
     @test v isa Augmentor.DistortedView
-    @test_broken parent(v) === view(square, 3:-1:1, 3:-1:1) # TODO: update1.0
+    @test parent(v) === view(square, 3:-1:1, 3:-1:1)
 end
 
 ops = (Rotate180(), CropSize(2,2))

@@ -6,19 +6,12 @@ struct DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: Abstra
 
     function DistortedView(parent::AbstractMatrix{T}, grid::AbstractArray{Float64,3}) where T
         @assert size(grid,1) == 2
+        # to compare two DistortedViews, their `axes` should be the same
+        parent = plain_axes(parent)
         etp = ImageTransformations.box_extrapolation(parent, Flat())
         field = ImageTransformations.box_extrapolation(grid, 0.0)
         new{T,typeof(parent),typeof(etp),typeof(grid),typeof(field)}(parent, etp, grid, field)
     end
-end
-
-# TODO: update1.0: check if these two methods are unnecessary
-function DistortedView(A::Union{OffsetArray, SubArray},
-                       grid::AbstractArray{Float64, 3})
-    DistortedView(parent(A), grid)
-end
-function DistortedView(A::InvWarpedView, grid::AbstractArray{Float64, 3})
-    DistortedView(collect(A), grid)
 end
 
 Base.parent(A::DistortedView) = A.parent
