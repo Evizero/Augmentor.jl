@@ -73,6 +73,7 @@ export
 
     testpattern
 
+include("compat.jl")
 include("utils.jl")
 include("types.jl")
 include("operation.jl")
@@ -103,7 +104,10 @@ include("augment.jl")
 include("augmentbatch.jl")
 
 function __init__()
-    rand_mutex[] = Threads.Mutex()
+    if VERSION < v"1.3"
+        # see compat.jl
+        rand_mutex[] = Threads.Mutex()
+    end
 end
 
 end # module

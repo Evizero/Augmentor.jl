@@ -7,22 +7,6 @@
     @test tp == tp2
 end
 
-@testset "rand_mutex" begin
-    mutex = Augmentor.rand_mutex[]
-    typeof(mutex) <: Threads.Mutex
-    # check that its not a null pointer
-    @test reinterpret(Int, mutex.handle) > 0
-end
-
-@testset "safe_rand" begin
-    num = @inferred Augmentor.safe_rand()
-    @test 0 <= num <= 1
-    @test typeof(num) <: Float64
-    num = @inferred Augmentor.safe_rand(2)
-    @test all(0 .<= num .<= 1)
-    @test typeof(num) <: Vector{Float64}
-end
-
 @testset "contiguous" begin
     A = [1 2 3; 4 5 6; 7 8 9]
     Ao = OffsetArray(A, (-2,-1))

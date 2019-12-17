@@ -24,6 +24,7 @@ checkers = Gray{N0f8}[1 0 1 0 1; 0 1 0 1 0; 1 0 1 0 1]
 rgb_rect = rand(RGB{N0f8}, 2, 3)
 
 tests = [
+    "tst_compat.jl",
     "tst_utils.jl",
     "operations/tst_channels.jl",
     "operations/tst_dims.jl",
