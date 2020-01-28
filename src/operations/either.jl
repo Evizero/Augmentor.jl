@@ -181,6 +181,14 @@ function applyeager(op::Either, img::AbstractArray, idx)
     _offsetarray(applyeager(op.operations[idx], img))
 end
 
+# specialize for Either to preserve type stability
+@inline function applyeager(op::Either, img::AbstractArray)
+    applyeager(op, img, randparam(op, img))
+end
+@inline function applyview(op::Either, img::AbstractArray)
+    applyview(op, img, randparam(op, img))
+end
+
 # Sample a random operation and pass the function call along.
 # Note: "applyaffine" needs to map to "applyaffine_common" for
 #   type stability, because otherwise the concrete type of the
