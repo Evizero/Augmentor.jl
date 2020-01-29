@@ -1,5 +1,3 @@
-using Pkg
-
 if VERSION >= v"1.3"
     const safe_rand = rand
 else
@@ -21,10 +19,4 @@ else
         unlock(rand_mutex[])
         result
     end
-end
-
-# ImageTransformation <= v0.8.3
-# PR: https://github.com/JuliaImages/ImageTransformations.jl/pull/89
-if Pkg.installed()["ImageTransformations"] <= v"0.8.3"
-    Interpolations.tweight(A::AbstractArray{C}) where C<:FixedPoint = C
 end
