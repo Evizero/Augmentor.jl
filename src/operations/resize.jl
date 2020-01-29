@@ -58,8 +58,8 @@ Resize(; width=64, height=64) = Resize((height,width))
 
 function toaffinemap(op::Resize{2}, img::AbstractMatrix)
     # emulate behaviour of ImageTransformations.imresize!
-    Rin  = CartesianRange(axes(img))
-    sf = map(/, op.size, (last(Rin)-first(Rin)+1).I)
+    Rin  = CartesianIndices(axes(img))
+    sf = map(/, op.size, (last(Rin)-first(Rin)+CartesianIndex(1, 1)).I)
     offset = map((io,ir,s)->io - 0.5 - s*(ir-0.5), first(Rin).I, (1, 1), map(inv,sf))
     ttrans = AffineMap(@SMatrix([1. 0.; 0. 1.]), SVector(offset))
     tscale = recenter(@SMatrix([sf[1] 0.; 0. sf[2]]), @SVector([1., 1.]))
@@ -79,8 +79,8 @@ function padrange(range::AbstractUnitRange, pad)
 end
 
 function applyaffineview(op::Resize{N}, img::AbstractArray{T,N}, param) where {T,N}
-    Rin, Rout = CartesianRange(axes(img)), CartesianRange(op.size)
-    sf = map(/, (last(Rout)-first(Rout)+1).I, (last(Rin)-first(Rin)+1).I)
+    Rin, Rout = CartesianIndices(axes(img)), CartesianIndices(op.size)
+    sf = Tuple(last(Rout)) ./ Tuple(last(Rin) - first(Rin) + CartesianIndex(1, 1))
     # We have to extrapolate if the image is upscaled,
     # otherwise the original border will only cause a single pixel
     tinv = toaffinemap(op, img, param)
@@ -103,6 +103,7 @@ function Base.show(io::IO, op::Resize{N}) where {N}
             print(io, "Resize to $(op.size)")
         end
     else
+        print(io, "Augmentor.")
         print(io, typeof(op), "($(op.size))")
     end
 end

@@ -7,69 +7,53 @@
     @test tp == tp2
 end
 
-@testset "rand_mutex" begin
-    mutex = Augmentor.rand_mutex[]
-    typeof(mutex) <: Threads.Mutex
-    # check that its not a null pointer
-    @test reinterpret(Int, mutex.handle) > 0
-end
-
-@testset "safe_rand" begin
-    num = @inferred Augmentor.safe_rand()
-    @test 0 <= num <= 1
-    @test typeof(num) <: Float64
-    num = @inferred Augmentor.safe_rand(2)
-    @test all(0 .<= num .<= 1)
-    @test typeof(num) <: Vector{Float64}
-end
-
-@testset "maybe_copy" begin
+@testset "contiguous" begin
     A = [1 2 3; 4 5 6; 7 8 9]
     Ao = OffsetArray(A, (-2,-1))
-    @test @inferred(Augmentor.maybe_copy(A)) === A
-    @test @inferred(Augmentor.maybe_copy(Ao)) === Ao
+    @test @inferred(Augmentor.contiguous(A)) === A
+    @test @inferred(Augmentor.contiguous(Ao)) === Ao
     let Ast = @SMatrix [1 2 3; 4 5 6; 7 8 9]
-        @test @inferred(Augmentor.maybe_copy(Ast)) === Ast
+        @test @inferred(Augmentor.contiguous(Ast)) === Ast
     end
     let v = view(A, 2:3, 1:2)
-        @test @inferred(Augmentor.maybe_copy(v)) == A[2:3, 1:2]
-        @test typeof(Augmentor.maybe_copy(v)) <: Array
+        @test @inferred(Augmentor.contiguous(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.contiguous(v)) <: Array
     end
     let v = view(OffsetArray(A, (-2,-1)), 0:1, 0:1)
-        @test @inferred(Augmentor.maybe_copy(v)) == A[2:3, 1:2]
-        @test typeof(Augmentor.maybe_copy(v)) <: Array
+        @test @inferred(Augmentor.contiguous(v)) == A[2:3, 1:2]
+        @test typeof(Augmentor.contiguous(v)) <: Array
     end
     let v = view(A, IdentityRange(2:3), IdentityRange(1:2))
-        @test @inferred(Augmentor.maybe_copy(v)) == OffsetArray(A[2:3,1:2], (1, 0))
-        @test typeof(Augmentor.maybe_copy(v)) <: OffsetArray
+        @test @inferred(Augmentor.contiguous(v)) == OffsetArray(A[2:3,1:2], (1, 0))
+        @test typeof(Augmentor.contiguous(v)) <: OffsetArray
     end
     let v = channelview(rect)
-        @test @inferred(Augmentor.maybe_copy(v)) == channelview(rect)
-        @test typeof(Augmentor.maybe_copy(v)) <: Array
+        @test @inferred(Augmentor.contiguous(v)) == channelview(rect)
+        @test typeof(Augmentor.contiguous(v)) <: Array
     end
     let p = permuteddimsview(A, (2,1))
-        @test @inferred(Augmentor.maybe_copy(p)) == A'
-        @test typeof(Augmentor.maybe_copy(p)) <: Array
+        @test @inferred(Augmentor.contiguous(p)) == A'
+        @test typeof(Augmentor.contiguous(p)) <: Array
     end
     let p = permuteddimsview(Ao, (2,1))
-        @test @inferred(Augmentor.maybe_copy(p)) == Ao'
-        @test typeof(Augmentor.maybe_copy(p)) <: OffsetArray
+        @test @inferred(Augmentor.contiguous(p)) == Ao'
+        @test typeof(Augmentor.contiguous(p)) <: OffsetArray
     end
     let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
-        @test @inferred(Augmentor.maybe_copy(p)) == OffsetArray(A'[2:3, 1:2],1,0)
-        @test typeof(Augmentor.maybe_copy(p)) <: OffsetArray
+        @test @inferred(Augmentor.contiguous(p)) == OffsetArray(A'[2:3, 1:2],1,0)
+        @test typeof(Augmentor.contiguous(p)) <: OffsetArray
     end
     let Aa = Augmentor.prepareaffine(A)
-        @test @inferred(Augmentor.maybe_copy(Aa)) == OffsetArray(A, (0,0))
-        @test typeof(Augmentor.maybe_copy(Aa)) <: OffsetArray
+        @test @inferred(Augmentor.contiguous(Aa)) == OffsetArray(A, (0,0))
+        @test typeof(Augmentor.contiguous(Aa)) <: OffsetArray
     end
     let Ar = reshape(view(A,:,:),1,3,3)
-        @test @inferred(Augmentor.maybe_copy(Ar)) == reshape(A,1,3,3)
-        @test typeof(Augmentor.maybe_copy(Ar)) <: Array{Int,3}
+        @test @inferred(Augmentor.contiguous(Ar)) == reshape(A,1,3,3)
+        @test typeof(Augmentor.contiguous(Ar)) <: Array{Int,3}
     end
     let Ar = reshape(view(Ao,:,:),1,3,3)
-        @test @inferred(Augmentor.maybe_copy(Ar)) == reshape(A,1,3,3)
-        @test typeof(Augmentor.maybe_copy(Ar)) <: Array{Int,3}
+        @test @inferred(Augmentor.contiguous(Ar)) == reshape(A,1,3,3)
+        @test typeof(Augmentor.contiguous(Ar)) <: Array{Int,3}
     end
 end
 
@@ -157,7 +141,7 @@ end
     A = [1 2 3; 4 5 6; 7 8 9]
     @test @inferred(Augmentor.match_idx(A, axes(A))) === A
     let img = @inferred Augmentor.match_idx(A, (2:4, 2:4))
-        @test axes(img) === Base.Slice.((2:4, 2:4))
+        @test axes(img) === OffsetArrays.IdentityUnitRange.((2:4, 2:4))
         @test typeof(img) <: OffsetArray
     end
     let B = view(A,1:3,1:3)
@@ -165,11 +149,11 @@ end
     end
     let B = view(A,1:3,1:3)
         img = @inferred(Augmentor.match_idx(B, B.indices))
-        @test axes(img) === Base.Slice.((1:3, 1:3))
+        @test axes(img) === OffsetArrays.IdentityUnitRange.((1:3, 1:3))
         @test typeof(img) <: OffsetArray
     end
     let img = @inferred Augmentor.match_idx(view(A,1:3,1:3), (2:4,2:4))
-        @test axes(img) === Base.Slice.((2:4, 2:4))
+        @test axes(img) === OffsetArrays.IdentityUnitRange.((2:4, 2:4))
         @test typeof(img) <: OffsetArray
     end
     let C = Augmentor.prepareaffine(A)

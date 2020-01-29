@@ -16,29 +16,21 @@ function use_testpattern()
 end
 
 # --------------------------------------------------------------------
-# rand() is not threadsafe (https://discourse.julialang.org/t/4683)
+"""
+    contiguous(A::AbstractArray)
+    contiguous(A::Tuple)
 
-# Because we only require random numbers to sample parameters
-# and not the actual expensive computation, this seems like a better
-# approach than using separate RNG per thread.
-const rand_mutex = Ref{Threads.Mutex}()
+Return a memory contiguous array for better performance.
 
-# constant overhead of about 80 ns compared to unsafe rand
-function safe_rand(args...)
-    lock(rand_mutex[])
-    result = rand(args...)
-    unlock(rand_mutex[])
-    result
-end
-
-# --------------------------------------------------------------------
-
-@inline maybe_copy(A::OffsetArray) = A
-@inline maybe_copy(A::Array) = A
-@inline maybe_copy(A::SArray) = A
-@inline maybe_copy(A::MArray) = A
-@inline maybe_copy(A::AbstractArray) = match_idx(collect(A), axes(A))
-@inline maybe_copy(A::Tuple) = map(maybe_copy, A)
+Data copy only happens when necessary. For example, views returned by `view`,
+`permuteddimsview` are such cases.
+"""
+@inline contiguous(A::OffsetArray) = A
+@inline contiguous(A::Array) = A
+@inline contiguous(A::SArray) = A
+@inline contiguous(A::MArray) = A
+@inline contiguous(A::AbstractArray) = match_idx(collect(A), axes(A))
+@inline contiguous(A::Tuple) = map(contiguous, A)
 
 # --------------------------------------------------------------------
 
@@ -48,10 +40,15 @@ end
 @inline _plain_array(A::MArray) = A
 @inline _plain_array(A::Tuple) = map(_plain_array, A)
 # avoid recursion
-@inline plain_array(A) = _plain_array(maybe_copy(A))
+@inline plain_array(A) = _plain_array(contiguous(A))
 
 # --------------------------------------------------------------------
 
+"""
+    plain_axes(A::AbstractArray)
+
+Generate a 1-based array from `A` without data copy.
+"""
 @inline plain_axes(A::Array) = A
 @inline plain_axes(A::OffsetArray) = parent(A)
 @inline plain_axes(A::AbstractArray) = _plain_axes(A, axes(A))
@@ -65,7 +62,7 @@ end
     view(A, axes(A)...)
 end
 
-@inline function _plain_axes(A::AbstractArray{T,N}, ids::NTuple{N,Base.Slice}) where {T, N}
+@inline function _plain_axes(A::AbstractArray{T,N}, ids::NTuple{N, IdentityUnitRange}) where {T, N}
     view(A, map(i->i.indices, ids)...)
 end
 
@@ -76,7 +73,7 @@ end
 # --------------------------------------------------------------------
 
 @inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
-@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,Union{UnitRange,Base.Slice{<:UnitRange}}}) where {N} =
+@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,Union{UnitRange, IdentityUnitRange}}) where {N} =
     OffsetArray(buffer, inds)
 
 # --------------------------------------------------------------------

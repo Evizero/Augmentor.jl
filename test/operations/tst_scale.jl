@@ -90,7 +90,7 @@
                 @test typeof(res2) <: OffsetArray{N0f8}
                 res1, res2 = @inferred(Augmentor.applyeager(Scale(0.2), (img_in, N0f8.(img_in))))
                 @test parent(res1) ≈ parent(img_out2)
-                @test parent(res2) == parent(img_out2)
+                @test parent(res2) ==  parent(img_out2)
                 @test typeof(res1) == typeof(img_out2)
                 @test typeof(res2) <: OffsetArray{N0f8}
             end

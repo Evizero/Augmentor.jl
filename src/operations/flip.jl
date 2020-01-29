@@ -57,8 +57,7 @@ FlipX(p::Number) = Either(FlipX(), p)
 @inline supports_stepview(::Type{FlipX}) = true
 
 toaffinemap(::FlipX, img::AbstractMatrix) = recenter(@SMatrix([1. 0; 0 -1.]), center(img))
-# Base.flipdim not type-stable for AbstractArray's
-applyeager(::FlipX, img::Array, param) = plain_array(flipdim(img,2))
+applyeager(::FlipX, img::Array, param) = plain_array(reverse(img; dims=2))
 applyeager(op::FlipX, img::AbstractArray, param) = plain_array(applystepview(op, img, param))
 applylazy_fallback(op::FlipX, img::AbstractMatrix, param) = applystepview(op, img, param)
 
@@ -139,8 +138,7 @@ FlipY(p::Number) = Either(FlipY(), p)
 @inline supports_stepview(::Type{FlipY}) = true
 
 toaffinemap(::FlipY, img::AbstractMatrix) = recenter(@SMatrix([-1. 0; 0 1.]), center(img))
-# Base.flipdim not type-stable for AbstractArray's
-applyeager(::FlipY, img::Array, param) = plain_array(flipdim(img,1))
+applyeager(::FlipY, img::Array, param) = plain_array(reverse(img; dims=1))
 applyeager(op::FlipY, img::AbstractArray, param) = plain_array(applystepview(op, img, param))
 applylazy_fallback(op::FlipY, img::AbstractMatrix, param) = applystepview(op, img, param)
 

@@ -74,7 +74,9 @@ struct Zoom{N,T<:AbstractVector} <: ImageOperation
         new{N,T}(factors)
     end
 end
+Zoom{N}() where N = throw(MethodError(Zoom{N}, ()))
 Zoom() = throw(MethodError(Zoom, ()))
+Zoom{N}(::Tuple{}) where N = throw(MethodError(Zoom{N}, ((), )))
 Zoom(::Tuple{}) = throw(MethodError(Zoom, ((),)))
 Zoom(factors...) = Zoom(factors)
 Zoom(factor::Union{AbstractVector,Real}) = Zoom((factor, factor))
@@ -94,7 +96,7 @@ randparam(op::Zoom, imgs::Tuple) = randparam(op, imgs[1])
 
 function randparam(op::Zoom, img::AbstractArray{T,N}) where {T,N}
     i = safe_rand(1:length(op.factors[1]))
-    ntuple(j -> Float64(op.factors[j][i]), Val{N})
+    ntuple(j -> Float64(op.factors[j][i]), Val(N))
 end
 
 function toaffinemap(op::Zoom{2}, img::AbstractMatrix, idx)
@@ -134,6 +136,7 @@ function Base.show(io::IO, op::Zoom{N}) where N
         end
     else
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
+        print(io, "Augmentor.")
         print(io, typeof(op).name, "{$N}($(fct))")
     end
 end
