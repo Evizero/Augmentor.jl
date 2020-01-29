@@ -50,7 +50,7 @@ function augment_impl(var_offset::Int, op_offset::Int, head::DataType, tail::NTu
         num_affine, after_affine = uses_affinemap(head, tail) ? seek_connected(uses_affinemap, 0, head, tail) : (0, nothing)
         num_special, _ = seek_connected(x->(supports_permute(x)||supports_view(x)||supports_stepview(x)), 0, head, tail)
         num_lazy, after_lazy = seek_connected(supports_lazy, 0, head, tail)
-        assert num_special <= num_affine <= num_lazy # issue #40
+        @assert num_special <= num_affine <= num_lazy # issue #40
         if num_special >= num_affine
             # If reached then there're non-affine special operations
             quote
