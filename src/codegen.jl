@@ -50,12 +50,15 @@ function augment_impl(var_offset::Int, op_offset::Int, head::DataType, tail::NTu
         num_affine, after_affine = uses_affinemap(head, tail) ? seek_connected(uses_affinemap, 0, head, tail) : (0, nothing)
         num_special, _ = seek_connected(x->(supports_permute(x)||supports_view(x)||supports_stepview(x)), 0, head, tail)
         num_lazy, after_lazy = seek_connected(supports_lazy, 0, head, tail)
+        assert num_special <= num_affine <= num_lazy # issue #40
         if num_special >= num_affine
+            # If reached then there're non-affine special operations
             quote
                 $var_out = unroll_applylazy($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_lazy-1)...)), $var_in)
                 $(augment_impl(var_offset+1, op_offset+num_lazy, after_lazy, avoid_eager))
             end
         else
+            # If reached then all special operations are affine operations
             quote
                 $var_out = unroll_applyaffine($(Expr(:tuple, (:(pipeline[$i]) for i in op_offset:op_offset+num_affine-1)...)), $var_in)
                 $(augment_impl(var_offset+1, op_offset+num_affine, after_affine, avoid_eager))
