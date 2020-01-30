@@ -39,6 +39,7 @@ StaticArrays = "0.8, 0.9, 0.10, 0.11, 0.12"
 julia = "1"
 
 [extras]
+ImageDistances = "51556ac3-7006-55f5-8cb3-34580c88182d"
 ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 ReferenceTests = "324d217c-45ce-50fc-942e-d289b448e8cf"
@@ -47,4 +48,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
 [targets]
-test = ["ImageInTerminal", "ImageMagick", "ReferenceTests", "Statistics", "TestImages", "Test"]
+test = ["ImageDistances", "ImageInTerminal", "ImageMagick", "ReferenceTests", "Statistics", "TestImages", "Test"]

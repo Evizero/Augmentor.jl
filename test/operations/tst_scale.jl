@@ -77,15 +77,15 @@
         @testset "fixed parameter" begin
             for img_in in imgs
                 res = @inferred(Augmentor.applyeager(Scale(1.5), img_in))
-                @test parent(res) ≈ parent(img_out1)
+                @test cityblock(parent(res), parent(img_out1)) <= 1e-2 # issue #38
                 @test typeof(res) == typeof(img_out1)
                 res = @inferred(Augmentor.applyeager(Scale(0.2), img_in))
                 @test parent(res) == parent(img_out2)
                 @test typeof(res) == typeof(img_out2)
                 # test same with tuple of images
                 res1, res2 = @inferred(Augmentor.applyeager(Scale(1.5), (img_in, N0f8.(img_in))))
-                @test parent(res1) ≈ parent(img_out1)
-                @test parent(res2) == parent(img_out1)
+                @test cityblock(parent(res1), parent(img_out1)) <= 1e-2 # issue #38
+                @test cityblock(parent(res2), parent(img_out1)) <= 1e-2 # issue #38
                 @test typeof(res1) == typeof(img_out1)
                 @test typeof(res2) <: OffsetArray{N0f8}
                 res1, res2 = @inferred(Augmentor.applyeager(Scale(0.2), (img_in, N0f8.(img_in))))

@@ -1,4 +1,4 @@
-using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, Statistics
+using ImageCore, ImageFiltering, ImageTransformations, CoordinateTransformations, Interpolations, OffsetArrays, StaticArrays, ColorTypes, TestImages, IdentityRanges, MappedArrays, ComputationalResources, MLDataPattern, ImageInTerminal, Statistics, ImageDistances
 using ReferenceTests, Test
 
 # check for ambiguities
