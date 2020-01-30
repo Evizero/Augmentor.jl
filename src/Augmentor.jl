@@ -22,6 +22,8 @@ using OffsetArrays
 # TODO: switch to Base.IdentityUnitRange when we decide to drop 1.0 compatibility
 using OffsetArrays: IdentityUnitRange
 
+using InteractiveUtils: methodswith
+
 export
 
     CPU1,
