@@ -20,3 +20,11 @@ else
         result
     end
 end
+
+# issue #39
+if all(map((FixedPoint, Normed)) do T
+        isempty(methodswith(AbstractArray{<:T}, Interpolations.tweight))
+    end)
+    # Reached when upstream package (e.g., FixedPoint) doesn't provide a specialization
+    Interpolations.tweight(A::AbstractArray{T}) where T<:FixedPoint = T
+end
