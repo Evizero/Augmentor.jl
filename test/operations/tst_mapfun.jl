@@ -32,8 +32,7 @@
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
-            @test_broken false # FIXME: type stability below from "mean"
-            res = (Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
+            res = @inferred(Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
             @test @inferred(getindex(res,0,0)) isa RGB{Float64}
             @test res == img .- RGB(.1,.1,.1)
             @test typeof(res) <: OffsetArray{RGB{Float64}}
@@ -109,8 +108,7 @@ end
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
-            @test_broken false # FIXME: type stability below from "mean"
-            res = (Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
+            res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
             @test res ≈ img .- mean(rgb_rect)
             @test @inferred(getindex(res,0,0)) isa RGB{Float64}
             @test typeof(res) <: OffsetArray{RGB{Float64}}
