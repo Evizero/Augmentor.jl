@@ -1,0 +1,5 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+PkgBenchmark = "32113eaa-f34f-5b0d-bd6c-c81e245fc73d"
+TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
