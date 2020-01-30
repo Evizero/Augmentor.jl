@@ -93,7 +93,7 @@ augment(img, ElasticDistortion(15, 15; scale = 0.1))
 # distort everything more smoothly.
 augment(img, ElasticDistortion(10, 10; sigma = 4, iter=3, border=true))
 ```
-""" ->
+"""
 struct ElasticDistortion <: ImageOperation
     gridheight::Int
     gridwidth::Int

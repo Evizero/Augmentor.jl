@@ -76,14 +76,15 @@ function applylazy(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N}, param
 end
 
 function showconstruction(io::IO, op::PermuteDims{N,perm}) where {N,perm}
-    print(io, typeof(op).name.name, '(', join(map(string, perm),", "), ')')
+    print(io, nameof(typeof(op)), '(', join(map(string, perm),", "), ')')
 end
 
 function Base.show(io::IO, op::PermuteDims{N,perm}) where {N,perm}
     if get(io, :compact, false)
         print(io, "Permute dimension order to ", perm)
     else
-        print(io, typeof(op).name, '(', perm, ')')
+        print(io, "Augmentor.")
+        showconstruction(io, op)
     end
 end
 
@@ -144,10 +145,10 @@ Reshape(dims::Int...) = Reshape(dims)
 @inline supports_eager(::Type{<:Reshape}) = false
 @inline supports_lazy(::Type{<:Reshape}) = true
 
-applylazy(op::Reshape, img::AbstractArray, param) = reshape(plain_indices(img), op.dims)
+applylazy(op::Reshape, img::AbstractArray, param) = reshape(plain_axes(img), op.dims)
 
 function showconstruction(io::IO, op::Reshape)
-    print(io, typeof(op).name.name, '(', join(map(string, op.dims),", "), ')')
+    print(io, nameof(typeof(op)), '(', join(map(string, op.dims),", "), ')')
 end
 
 function Base.show(io::IO, op::Reshape{N}) where N
@@ -158,6 +159,7 @@ function Base.show(io::IO, op::Reshape{N}) where N
             print(io, "Reshape array to ", join(op.dims,"×"))
         end
     else
-        print(io, typeof(op), '(', op.dims, ')')
+        print(io, "Augmentor.")
+        print(io, nameof(typeof(op)), '{', N, '}', '(', join(map(string, op.dims),", "), ')')
     end
 end

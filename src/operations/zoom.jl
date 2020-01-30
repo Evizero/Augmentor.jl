@@ -74,12 +74,14 @@ struct Zoom{N,T<:AbstractVector} <: ImageOperation
         new{N,T}(factors)
     end
 end
+Zoom{N}() where N = throw(MethodError(Zoom{N}, ()))
 Zoom() = throw(MethodError(Zoom, ()))
+Zoom{N}(::Tuple{}) where N = throw(MethodError(Zoom{N}, ((), )))
 Zoom(::Tuple{}) = throw(MethodError(Zoom, ((),)))
 Zoom(factors...) = Zoom(factors)
 Zoom(factor::Union{AbstractVector,Real}) = Zoom((factor, factor))
 Zoom(factors::NTuple{N,Any}) where {N} = Zoom(map(vectorize, factors))
-Zoom(factors::NTuple{N,Range}) where {N} = Zoom{N}(promote(factors...))
+Zoom(factors::NTuple{N,AbstractRange}) where {N} = Zoom{N}(promote(factors...))
 function Zoom(factors::NTuple{N,AbstractVector}) where N
     Zoom{N}(map(Vector{Float64}, factors))
 end
@@ -94,7 +96,7 @@ randparam(op::Zoom, imgs::Tuple) = randparam(op, imgs[1])
 
 function randparam(op::Zoom, img::AbstractArray{T,N}) where {T,N}
     i = safe_rand(1:length(op.factors[1]))
-    ntuple(j -> Float64(op.factors[j][i]), Val{N})
+    ntuple(j -> Float64(op.factors[j][i]), Val(N))
 end
 
 function toaffinemap(op::Zoom{2}, img::AbstractMatrix, idx)
@@ -107,16 +109,16 @@ function applylazy(op::Zoom, img::AbstractArray, idx)
 end
 
 function applyaffineview(op::Zoom{N}, img::AbstractArray{T,N}, idx) where {T,N}
-    wv = invwarpedview(img, toaffinemap(op, img, idx), indices(img))
-    direct_view(wv, indices(img))
+    wv = invwarpedview(img, toaffinemap(op, img, idx), axes(img))
+    direct_view(wv, axes(img))
 end
 
 function applyaffineview(op::Zoom{N}, v::SubArray{T,N,<:InvWarpedView}, idx) where {T,N}
     tinv = toaffinemap(op, v, idx)
     img = parent(v)
     nidx = ImageTransformations.autorange(img, tinv)
-    wv = InvWarpedView(img, tinv, map(unionrange, nidx, indices(img)))
-    view(wv, v.indexes...)
+    wv = InvWarpedView(img, tinv, map(unionrange, nidx, axes(img)))
+    view(wv, v.indices...)
 end
 
 function showconstruction(io::IO, op::Zoom)
@@ -134,6 +136,7 @@ function Base.show(io::IO, op::Zoom{N}) where N
         end
     else
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
+        print(io, "Augmentor.")
         print(io, typeof(op).name, "{$N}($(fct))")
     end
 end

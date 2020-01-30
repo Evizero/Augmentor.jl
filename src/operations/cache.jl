@@ -53,7 +53,7 @@ pl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)
 """
 struct CacheImage <: ImageOperation end
 
-applyeager(op::CacheImage, img::AbstractArray, param) = maybe_copy(img)
+applyeager(op::CacheImage, img::AbstractArray, param) = contiguous(img)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
@@ -92,12 +92,12 @@ function applylazy(op::CacheImageInto, img::Tuple)
 end
 
 function applylazy(op::CacheImageInto{<:AbstractArray}, img::AbstractArray, param)
-    copy!(match_idx(op.buffer, indices(img)), img)
+    copyto!(match_idx(op.buffer, axes(img)), img)
 end
 
 function applylazy(op::CacheImageInto{<:Tuple}, imgs::Tuple)
     map(op.buffer, imgs) do buffer, img
-        copy!(match_idx(buffer, indices(img)), img)
+        copyto!(match_idx(buffer, axes(img)), img)
     end
 end
 
@@ -105,7 +105,7 @@ function _showconstruction(io::IO, array::AbstractArray)
     print(io, "Array{")
     _showcolor(io, eltype(array))
     print(io, "}(")
-    print(io, join(map(i->string(length(i)), indices(array)), ", "))
+    print(io, join(map(i->string(length(i)), axes(array)), ", "))
     print(io, ")")
 end
 
@@ -130,7 +130,7 @@ function Base.show(io::IO, op::CacheImageInto{<:AbstractArray})
         print(io, summary(op.buffer))
     else
         print(io, typeof(op).name, "(")
-        showarg(io, op.buffer)
+        Base.showarg(io, op.buffer, false)
         print(io, ")")
     end
 end
@@ -142,7 +142,7 @@ function Base.show(io::IO, op::CacheImageInto{<:Tuple})
     else
         print(io, typeof(op).name, "((")
         for (i, buffer) in enumerate(op.buffer)
-            showarg(io, buffer)
+            Base.showarg(io, buffer, false)
             i < length(op.buffer) && print(io, ", ")
         end
         print(io, "))")
