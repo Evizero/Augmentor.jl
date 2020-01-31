@@ -1,6 +1,5 @@
 module Augmentor
 
-using ColorTypes
 using MappedArrays
 using ImageCore
 using ImageTransformations
