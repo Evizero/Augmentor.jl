@@ -1,4 +1,6 @@
 using Documenter, Augmentor
+using Images
+using Random
 
 # Autogenerate documentation markdown and jupyter notebooks
 # for all the scripts in the "examples/" subfolder.
@@ -42,43 +44,39 @@ myless(a, b) = dict_order[a] < dict_order[b]
 
 # --------------------------------------------------------------------
 
-srand(1337)
+Random.seed!(1337)
+format = Documenter.HTML(edit_link = "master",
+                         prettyurls = get(ENV, "CI", nothing) == "true",
+                         assets = [
+                             joinpath("assets", "favicon.ico"),
+                             joinpath("assets", "style.css")
+                        ]
+)
+
 makedocs(
     modules = [Augmentor],
-    clean = false,
-    format = :html,
-    assets = [
-        joinpath("assets", "favicon.ico"),
-        joinpath("assets", "style.css"),
-    ],
     sitename = "Augmentor.jl",
     authors = "Christof Stocker",
-    linkcheck = !("skiplinks" in ARGS),
-    pages = Any[
+    # linkcheck = true,
+    format = format,
+    pages = [
         "Home" => "index.md",
         "gettingstarted.md",
-        "Introduction and Motivation" => Any[
+        "Introduction and Motivation" => [
             "background.md",
             "images.md",
         ],
-        "User's Guide" => Any[
+        "User's Guide" => [
             "interface.md",
             hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations")), lt = myless) if splitext(fname)[2] == ".md"]),
         ],
         "Tutorials" => joinpath.("generated", ExampleWeaver.listmarkdown()),
         hide("Indices" => "indices.md"),
         "LICENSE.md",
-    ],
-    html_prettyurls = !("local" in ARGS),
+    ]
 )
 
-deploydocs(
-    repo = "github.com/Evizero/Augmentor.jl.git",
-    target = "build",
-    julia = "0.6",
-    deps = nothing,
-    make = nothing,
-)
+deploydocs(repo = "github.com/Evizero/Augmentor.jl.git")
 
 # --------------------------------------------------------------------
 # Post-process the generated HTML files of the examples/tutorials
