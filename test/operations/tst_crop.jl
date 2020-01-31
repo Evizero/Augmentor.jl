@@ -31,8 +31,8 @@
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(Crop(1:2,2:3), img_in))
                 @test collect(res) == rect[1:2, 2:3]
-                @test axes(res) == inds
-                @test typeof(res) <: OffsetArray{eltype(img_in),2}
+                @test axes(res) == map(n->1:n, size(res)) # 1-base
+                @test typeof(res) <: Array{eltype(img_in),2}
             end
         end
         @testset "multiple images" begin
@@ -41,7 +41,7 @@
                 inds = (inds1, inds2)
                 res = @inferred(Augmentor.applyeager(Crop(1:2,2:3), img_in))
                 @test collect.(res) == ntuple(i->rect[1:2, 2:3],2)
-                @test typeof(res) <: NTuple{2,OffsetArray{eltype(img_in1),2}}
+                @test typeof(res) <: NTuple{2,Array{eltype(img_in1),2}}
             end
         end
     end
@@ -149,13 +149,13 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(CropNative(inds), img_in))
                 @test collect(res) == rect[1:2, 2:3]
-                @test axes(res) == inds
-                @test typeof(res) <: OffsetArray{eltype(img_in),2}
+                @test axes(res) == map(n->1:n, size(res)) # 1-base
+                @test typeof(res) <: Array{eltype(img_in),2}
             end
         end
         img = OffsetArray(rect, -2, -1)
         @test collect(@inferred(Augmentor.applyeager(CropNative(-1:0,1:2), img))) == rect[1:2, 2:3]
-        @test typeof(Augmentor.applyeager(CropNative(-1:0,1:2), img)) <: OffsetArray
+        @test typeof(Augmentor.applyeager(CropNative(-1:0,1:2), img)) <: Array
     end
     @testset "affine" begin
         @test Augmentor.supports_affine(CropNative) === false
@@ -278,8 +278,8 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(CropSize(2,2), img_in))
                 @test collect(res) == img_in[inds...]
-                @test axes(res) == inds
-                @test typeof(res) <: OffsetArray{eltype(img_in),2}
+                @test axes(res) == map(n->1:n, size(res)) # 1-base
+                @test typeof(res) <: Array{eltype(img_in),2}
             end
         end
         @testset "multiple images" begin
@@ -288,7 +288,7 @@ end
                 inds = (inds1, inds2)
                 res = @inferred(Augmentor.applyeager(CropSize(2,2), img_in))
                 @test collect.(res) == ntuple(i->img_in[i][inds[i]...],2)
-                @test typeof(res) <: NTuple{2,OffsetArray{eltype(img_in1),2}}
+                @test typeof(res) <: NTuple{2,Array{eltype(img_in1),2}}
             end
         end
     end
@@ -417,8 +417,8 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(CropRatio(1), img_in))
                 @test collect(res) == img_in[inds...]
-                @test axes(res) == inds
-                @test typeof(res) <: OffsetArray{eltype(img_in),2}
+                @test axes(res) == map(n->1:n, size(res)) # 1-base
+                @test typeof(res) <: Array{eltype(img_in),2}
             end
         end
         @testset "multiple images" begin
@@ -427,7 +427,7 @@ end
                 inds = (inds1, inds2)
                 res = @inferred(Augmentor.applyeager(CropRatio(1), img_in))
                 @test collect.(res) == ntuple(i->img_in[i][inds[i]...],2)
-                @test typeof(res) <: NTuple{2,OffsetArray{eltype(img_in1),2}}
+                @test typeof(res) <: NTuple{2,Array{eltype(img_in1),2}}
             end
         end
     end
@@ -553,8 +553,8 @@ end
             for (img_in, inds) in imgs
                 res = @inferred(Augmentor.applyeager(RCropRatio(3/2), img_in))
                 @test collect(res) == img_in[inds...]
-                @test axes(res) == inds
-                @test typeof(res) <: OffsetArray{eltype(img_in),2}
+                @test axes(res) == map(n->1:n, size(res)) # 1-base
+                @test typeof(res) <: Array{eltype(img_in),2}
             end
         end
         @testset "multiple images" begin
@@ -563,8 +563,8 @@ end
                 # make sure both images are processed
                 @test res1 == res2
                 @test axes(res1) == axes(res2)
-                @test typeof(res1) <: OffsetArray{Gray{N0f8}}
-                @test typeof(res2) <: OffsetArray{N0f8}
+                @test typeof(res1) <: Array{Gray{N0f8}}
+                @test typeof(res2) <: Array{N0f8}
             end
         end
     end

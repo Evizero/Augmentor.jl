@@ -23,7 +23,7 @@
     @testset "eager" begin
         @test Augmentor.supports_eager(PermuteDims) === true
         @test @inferred(Augmentor.supports_eager(typeof(PermuteDims(2,1)))) === true
-        f = (img) -> permutedims(img, (2,1))
+        f = (img) -> collect(permutedims(img, (2,1)))
         imgs = [
             (rect),
             (Augmentor.prepareaffine(rect)),
@@ -74,7 +74,7 @@
                 @test_throws MethodError Augmentor.applylazy(PermuteDims(3,2,1), img_in)
                 res = @inferred(Augmentor.applylazy(PermuteDims(2,1), img_in))
                 @test res == img_out
-                @test res == Augmentor.applyeager(PermuteDims(2,1), img_in)
+                @test collect(res) == Augmentor.applyeager(PermuteDims(2,1), img_in)
                 @test typeof(res) == typeof(img_out)
             end
         end

@@ -63,9 +63,7 @@ for FUN in (:applyeager, :applylazy, :applypermute,
 end
 
 function applyeager(op::Operation, img::AbstractArray, param)
-    # TODO: we don't need wrappers for eager mode, so we might want to
-    # add plain_array to it as well for the sake of simplicity
-    contiguous(applylazy(op, img, param))
+    plain_array(applylazy(op, img, param))
 end
 
 function applyaffineview(op::Operation, img::AbstractArray, param)

@@ -12,30 +12,28 @@
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(MapFun(identity), nothing)
         @test Augmentor.supports_eager(MapFun) === true
-        res1 = map(x->x-Gray{Float32}(0.1), rect)
-        res2 = map(x->x-Gray{Float32}(0.1), OffsetArray(rect,0,0))
+        img_out = map(x->x-Gray{Float32}(0.1), rect)
         imgs = [
-            (rect, res1),
-            (view(rect,:,:), res1),
-            (Augmentor.prepareaffine(rect), res2),
-            (OffsetArray(rect, 0, 0), res2),
-            (view(rect, IdentityRange(1:2), IdentityRange(1:3)), res2),
+            rect,
+            view(rect,:,:),
+            Augmentor.prepareaffine(rect),
+            OffsetArray(rect, 0, 0),
+            view(rect, IdentityRange(1:2), IdentityRange(1:3))
         ]
         @testset "single image" begin
-            for (img_in, img_out) in imgs
+            for img_in in imgs
                 res = @inferred(Augmentor.applyeager(MapFun(identity), img_in))
                 @test res == img_in
                 @test eltype(res) <: Gray{N0f8}
-                @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: OffsetArray
+                @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: Array
                 res = @inferred(Augmentor.applyeager(MapFun(x->x-Gray{Float32}(0.1)), img_in))
                 @test res == img_out
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
             res = @inferred(Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
-            @test @inferred(getindex(res,0,0)) isa RGB{Float64}
-            @test res == img .- RGB(.1,.1,.1)
-            @test typeof(res) <: OffsetArray{RGB{Float64}}
+            @test res ≈ collect(img .- RGB(.1,.1,.1))
+            @test typeof(res) <: Array{RGB{Float64}}
         end
     end
     @testset "affine" begin
@@ -88,30 +86,28 @@ end
         @test_throws MethodError Augmentor.applyeager(AggregateThenMapFun(mean, identity), nothing)
         @test Augmentor.supports_eager(AggregateThenMapFun) === true
         m = mean(rect)
-        res1 = map(x->x-m, rect)
-        res2 = map(x->x-m, OffsetArray(rect,0,0))
+        img_out = map(x->x-m, rect)
         imgs = [
-            (rect, res1),
-            (view(rect,:,:), res1),
-            (Augmentor.prepareaffine(rect), res2),
-            (OffsetArray(rect, 0, 0), res2),
-            (view(rect, IdentityRange(1:2), IdentityRange(1:3)), res2),
+            rect,
+            view(rect,:,:),
+            Augmentor.prepareaffine(rect),
+            OffsetArray(rect, 0, 0),
+            view(rect, IdentityRange(1:2), IdentityRange(1:3))
         ]
         @testset "single image" begin
-            for (img_in, img_out) in imgs
+            for img_in in imgs
                 res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x), img_in))
                 @test res == img_in
                 @test eltype(res) <: Gray{N0f8}
-                @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: OffsetArray
+                @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: Array
                 res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img_in))
                 @test res == img_out
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
             res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
-            @test res ≈ img .- mean(rgb_rect)
-            @test @inferred(getindex(res,0,0)) isa RGB{Float64}
-            @test typeof(res) <: OffsetArray{RGB{Float64}}
+            @test res ≈ collect(img .- mean(rgb_rect))
+            @test typeof(res) <: Array{RGB{Float64}}
         end
     end
     @testset "affine" begin

@@ -137,7 +137,7 @@ end
             @testset "special case that simplifies" begin
                 res = @inferred(Augmentor.applyeager(CombineChannels(Gray), reshape(channelview(Augmentor.prepareaffine(rect)), 1, 2, 3)))
                 @test collect(res) == rect
-                @test typeof(res) <: OffsetArray{Gray{N0f8}}
+                @test typeof(res) <: Array{Gray{N0f8}}
             end
             for (img_in, img_out) in imgs
                 res = @inferred(Augmentor.applyeager(CombineChannels(Gray), img_in))
