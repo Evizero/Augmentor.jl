@@ -1,8 +1,5 @@
-__precompile__()
 module Augmentor
 
-using ColorTypes
-using ColorTypes: AbstractGray
 using MappedArrays
 using ImageCore
 using ImageTransformations
@@ -11,14 +8,20 @@ using CoordinateTransformations
 using Rotations
 using Interpolations
 using StaticArrays
-using OffsetArrays
 using IdentityRanges
 using MLDataPattern
 using ComputationalResources
 using FileIO
-using ShowItLikeYouBuildIt
-using Compat
 using Base.PermutedDimsArrays: PermutedDimsArray
+using LinearAlgebra
+using OffsetArrays
+
+# axes(::OffsetArray) changes from Base.Slice to Base.IdentityUnitRange in julia 1.1
+# https://github.com/JuliaArrays/OffsetArrays.jl/pull/62
+# TODO: switch to Base.IdentityUnitRange when we decide to drop 1.0 compatibility
+using OffsetArrays: IdentityUnitRange
+
+using InteractiveUtils: methodswith
 
 export
 
@@ -71,6 +74,7 @@ export
 
     testpattern
 
+include("compat.jl")
 include("utils.jl")
 include("types.jl")
 include("operation.jl")
@@ -101,7 +105,10 @@ include("augment.jl")
 include("augmentbatch.jl")
 
 function __init__()
-    rand_mutex[] = Threads.Mutex()
+    if VERSION < v"1.3"
+        # see compat.jl
+        rand_mutex[] = Threads.Mutex()
+    end
 end
 
 end # module

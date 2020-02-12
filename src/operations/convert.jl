@@ -52,7 +52,7 @@ end
 @inline supports_lazy(::Type{<:ConvertEltype}) = true
 
 function applyeager(op::ConvertEltype{T}, img::AbstractArray, param) where T
-    maybe_copy(convert(AbstractArray{T}, img))
+    contiguous(convert(AbstractArray{T}, img))
 end
 
 function applylazy(op::ConvertEltype{T}, img::AbstractArray, param) where T

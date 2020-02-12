@@ -64,19 +64,19 @@ applyeager(::Rotate90, img::AbstractMatrix, param) = plain_array(rotl90(img))
 applylazy_fallback(op::Rotate90, img::AbstractMatrix, param) = applypermute(op, img, param)
 
 function applypermute(::Rotate90, img::AbstractMatrix{T}, param) where T
-    idx = map(StepRange, indices(img))
+    idx = map(StepRange, axes(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, reverse(idx[2]), idx[1])
 end
 
-function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
-    idx = map(StepRange, sub.indexes)
+function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
+    idx = map(x->convert(StepRange, x), sub.indices)
     img = parent(parent(sub))
     view(img, reverse(idx[2]), idx[1])
 end
 
-function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT}
-    idx = map(StepRange, sub.indexes)
+function applypermute(::Rotate90, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT}
+    idx = map(x->convert(StepRange, x), sub.indices)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, reverse(idx[2]), idx[1])
@@ -147,7 +147,7 @@ applyeager(::Rotate180, img::AbstractMatrix, param) = plain_array(rot180(img))
 applylazy_fallback(op::Rotate180, img::AbstractMatrix, param) = applystepview(op, img, param)
 
 function applystepview(::Rotate180, img::AbstractMatrix, param)
-    idx = map(i->1:1:length(i), indices(img))
+    idx = map(i->1:1:length(i), axes(img))
     indirect_view(img, (reverse(idx[1]), reverse(idx[2])))
 end
 
@@ -218,19 +218,19 @@ applyeager(::Rotate270, img::AbstractMatrix, param) = plain_array(rotr90(img))
 applylazy_fallback(op::Rotate270, img::AbstractMatrix, param) = applypermute(op, img, param)
 
 function applypermute(::Rotate270, img::AbstractMatrix{T}, param) where T
-    idx = map(StepRange, indices(img))
+    idx = map(StepRange, axes(img))
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, idx[2], reverse(idx[1]))
 end
 
-function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
-    idx = map(StepRange, sub.indexes)
+function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT<:PermutedDimsArray{T,2,(2,1)}}
+    idx = map(x->convert(StepRange, x), sub.indices)
     img = parent(parent(sub))
     view(img, idx[2], reverse(idx[1]))
 end
 
-function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,Range}}, param) where {T,IT}
-    idx = map(StepRange, sub.indexes)
+function applypermute(::Rotate270, sub::SubArray{T,2,IT,<:NTuple{2,AbstractRange}}, param) where {T,IT}
+    idx = map(StepRange, sub.indices)
     img = parent(sub)
     perm_img = PermutedDimsArray{T,2,(2,1),(2,1),typeof(img)}(img)
     view(perm_img, idx[2], reverse(idx[1]))
@@ -247,6 +247,7 @@ for deg in (90, 180, 270)
         if get(io, :compact, false)
             print(io, "Rotate ", $deg, " degree")
         else
+            print(io, "Augmentor.")
             print(io, $T, "()")
         end
     end

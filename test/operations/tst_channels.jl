@@ -12,8 +12,8 @@
     @testset "eager" begin
         @test Augmentor.supports_eager(SplitChannels) === false
         @test_throws MethodError Augmentor.applyeager(SplitChannels(), rand(2,2))
-        res1 = channelview(reshape(rect, 1, 2, 3))
-        res2 = channelview(rgb_rect)
+        res1 = collect(channelview(reshape(rect, 1, 2, 3)))
+        res2 = collect(channelview(rgb_rect))
         imgs = [
             (rect, res1),
             (Augmentor.prepareaffine(rect), res1),
@@ -52,7 +52,7 @@
         @test @inferred(Augmentor.supports_lazy(typeof(SplitChannels()))) === true
         @test_throws MethodError Augmentor.applylazy(SplitChannels(), rand(2,2))
         f1 = img->reshape(channelview(img), 1, 2, 3)
-        f2 = img->Augmentor.plain_indices(channelview(img))
+        f2 = img->Augmentor.plain_axes(channelview(img))
         imgs = [
             (rect, f1),
             (Augmentor.prepareaffine(rect), f1),
@@ -120,11 +120,10 @@ end
         @test_throws MethodError Augmentor.applyeager(CombineChannels(RGB), (rand(3,4,4), rand(RGB{N0f8},4,4)))
         @test_throws MethodError Augmentor.applyeager(CombineChannels(Gray), (rand(1,4,4), rand(Gray{N0f8},4,4)))
         @test_throws ArgumentError Augmentor.applyeager(CombineChannels(Gray), (rand(1,4,4), rand(4,4)))
-        rect_split = reshape(channelview(rect), 1, 2, 3)
-        rgb_rect_split = channelview(rgb_rect)
+        rect_split = collect(reshape(channelview(rect), 1, 2, 3))
+        rgb_rect_split = collect(channelview(rgb_rect))
         imgs = [
             (rect_split, rect),
-            (reshape(channelview(Augmentor.prepareaffine(rect)), 1, 2, 3), rect),
             (OffsetArray(rect_split, 0, -2, -1), rect),
             (view(rect_split, 1:1, IdentityRange(1:2), IdentityRange(1:3)), rect),
         ]
@@ -135,6 +134,11 @@ end
             (view(rgb_rect_split, IdentityRange(1:3), IdentityRange(1:2), IdentityRange(1:3)), rgb_rect),
         ]
         @testset "single image" begin
+            @testset "special case that simplifies" begin
+                res = @inferred(Augmentor.applyeager(CombineChannels(Gray), reshape(channelview(Augmentor.prepareaffine(rect)), 1, 2, 3)))
+                @test collect(res) == rect
+                @test typeof(res) <: OffsetArray{Gray{N0f8}}
+            end
             for (img_in, img_out) in imgs
                 res = @inferred(Augmentor.applyeager(CombineChannels(Gray), img_in))
                 @test res == img_out
@@ -197,7 +201,7 @@ end
         rect_split = reshape(channelview(rect), 1, 2, 3)
         rgb_rect_split = channelview(rgb_rect)
         f1 = (T, img) -> colorview(T, reshape(img, 2, 3))
-        f2 = (T, img) -> colorview(T, Augmentor.plain_indices(img))
+        f2 = (T, img) -> colorview(T, Augmentor.plain_axes(img))
         imgs = [
             (rect_split),
             (reshape(channelview(Augmentor.prepareaffine(rect)), 1, 2, 3)),

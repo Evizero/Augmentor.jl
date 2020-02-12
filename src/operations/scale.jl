@@ -70,12 +70,14 @@ struct Scale{N,T<:AbstractVector} <: AffineOperation
         new{N,T}(factors)
     end
 end
+Scale{N}() where N = throw(MethodError(Scale{N}, ()))
 Scale() = throw(MethodError(Scale, ()))
+Scale{N}(::Tuple{}) where N = throw(MethodError(Scale{N}, ((), )))
 Scale(::Tuple{}) = throw(MethodError(Scale, ((),)))
 Scale(factors...) = Scale(factors)
 Scale(factor::Union{AbstractVector,Real}) = Scale((factor, factor))
 Scale(factors::NTuple{N,Any}) where {N} = Scale(map(vectorize, factors))
-Scale(factors::NTuple{N,Range}) where {N} = Scale{N}(promote(factors...))
+Scale(factors::NTuple{N,AbstractRange}) where {N} = Scale{N}(promote(factors...))
 function Scale(factors::NTuple{N,AbstractVector}) where N
     Scale{N}(map(Vector{Float64}, factors))
 end
@@ -89,7 +91,7 @@ randparam(op::Scale, imgs::Tuple) = randparam(op, imgs[1])
 
 function randparam(op::Scale, img::AbstractArray{T,N}) where {T,N}
     i = safe_rand(1:length(op.factors[1]))
-    ntuple(j -> Float64(op.factors[j][i]), Val{N})
+    ntuple(j -> Float64(op.factors[j][i]), Val(N))
 end
 
 function toaffinemap(op::Scale{2}, img::AbstractMatrix, idx)
@@ -111,6 +113,7 @@ function Base.show(io::IO, op::Scale{N}) where N
             print(io, "Scale by I ∈ {$(str)}")
         end
     else
+        print(io, "Augmentor.")
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
         print(io, typeof(op).name, "{$N}($(fct))")
     end

@@ -15,8 +15,8 @@
         @test typeof(PermuteDims((1,))) <: PermuteDims{1} <: Augmentor.Operation
         @test typeof(PermuteDims((1,2))) <: PermuteDims{2} <: Augmentor.Operation
         @test typeof(PermuteDims((3,1,2))) <: PermuteDims{3} <: Augmentor.Operation
-        @test str_show(PermuteDims((1,))) == "Augmentor.PermuteDims((1,))"
-        @test str_show(PermuteDims((1,2))) == "Augmentor.PermuteDims((1, 2))"
+        @test str_show(PermuteDims((1,))) == "Augmentor.PermuteDims(1)"
+        @test str_show(PermuteDims((1,2))) == "Augmentor.PermuteDims(1, 2)"
         @test str_showconst(PermuteDims((1,3,2))) == "PermuteDims(1, 3, 2)"
         @test str_showcompact(PermuteDims((3,2,1))) == "Permute dimension order to (3, 2, 1)"
     end
@@ -121,8 +121,8 @@ end
         @test typeof(Reshape((1,))) <: Reshape{1} <: Augmentor.Operation
         @test typeof(Reshape((1,2))) <: Reshape{2} <: Augmentor.Operation
         @test typeof(Reshape((3,1,2))) <: Reshape{3} <: Augmentor.Operation
-        @test str_show(Reshape((1,))) == "Augmentor.Reshape{1}((1,))"
-        @test str_show(Reshape((1,2))) == "Augmentor.Reshape{2}((1, 2))"
+        @test str_show(Reshape((1,))) == "Augmentor.Reshape{1}(1)"
+        @test str_show(Reshape((1,2))) == "Augmentor.Reshape{2}(1, 2)"
         @test str_showconst(Reshape((1,3,2))) == "Reshape(1, 3, 2)"
         @test str_showcompact(Reshape((3,2,1))) == "Reshape array to 3×2×1"
         @test str_showcompact(Reshape(10)) == "Reshape array to 10-element vector"
@@ -174,7 +174,7 @@ end
         ]
         @testset "single image" begin
             for img_in in imgs
-                img_out = reshape(Augmentor.plain_indices(img_in), (3,2,1))
+                img_out = reshape(Augmentor.plain_axes(img_in), (3,2,1))
                 res = @inferred(Augmentor.applylazy(Reshape(3,2,1), img_in))
                 @test res == Augmentor.applyeager(Reshape(3,2,1), img_in)
                 @test res == img_out
@@ -183,8 +183,8 @@ end
         end
         @testset "multiple images" begin
             for img_in1 in imgs, img_in2 in imgs
-                img_out1 = reshape(Augmentor.plain_indices(img_in1), (3,2,1))
-                img_out2 = reshape(Augmentor.plain_indices(img_in2), (3,2,1))
+                img_out1 = reshape(Augmentor.plain_axes(img_in1), (3,2,1))
+                img_out2 = reshape(Augmentor.plain_axes(img_in2), (3,2,1))
                 img_in = (img_in1, img_in2)
                 img_out = (img_out1, img_out2)
                 res = @inferred(Augmentor.applylazy(Reshape(3,2,1), img_in))

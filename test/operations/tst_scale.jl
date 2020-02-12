@@ -65,8 +65,8 @@
         # TODO: actual content tests (maybe test_reference)
         img_out1 = @inferred Augmentor.applyeager(Scale(1.5), square2)
         img_out2 = @inferred Augmentor.applyeager(Scale(0.2), square2)
-        @test indices(img_out1) == (0:5, 0:5)
-        @test indices(img_out2) == (2:3, 2:3)
+        @test axes(img_out1) == (0:5, 0:5)
+        @test axes(img_out2) == (2:3, 2:3)
         imgs = [
             (square2),
             (view(square2, :, :)),
@@ -77,27 +77,27 @@
         @testset "fixed parameter" begin
             for img_in in imgs
                 res = @inferred(Augmentor.applyeager(Scale(1.5), img_in))
-                @test parent(res) ≈ parent(img_out1)
+                @test cityblock(parent(res), parent(img_out1)) <= 1e-2 # issue #38
                 @test typeof(res) == typeof(img_out1)
                 res = @inferred(Augmentor.applyeager(Scale(0.2), img_in))
                 @test parent(res) == parent(img_out2)
                 @test typeof(res) == typeof(img_out2)
                 # test same with tuple of images
                 res1, res2 = @inferred(Augmentor.applyeager(Scale(1.5), (img_in, N0f8.(img_in))))
-                @test parent(res1) ≈ parent(img_out1)
-                @test parent(res2) == parent(img_out1)
+                @test cityblock(parent(res1), parent(img_out1)) <= 1e-2 # issue #38
+                @test cityblock(parent(res2), parent(img_out1)) <= 1e-2 # issue #38
                 @test typeof(res1) == typeof(img_out1)
                 @test typeof(res2) <: OffsetArray{N0f8}
                 res1, res2 = @inferred(Augmentor.applyeager(Scale(0.2), (img_in, N0f8.(img_in))))
                 @test parent(res1) ≈ parent(img_out2)
-                @test parent(res2) == parent(img_out2)
+                @test parent(res2) ==  parent(img_out2)
                 @test typeof(res1) == typeof(img_out2)
                 @test typeof(res2) <: OffsetArray{N0f8}
             end
             # check that the affine map is computed for each image
             res1, res2 = @inferred(Augmentor.applyeager(Scale(1.5), (square, OffsetArray(square,-5,-5))))
             @test collect(res1) == collect(res2)
-            @test indices(res1) != indices(res2)
+            @test axes(res1) != axes(res2)
         end
         @testset "random parameter" begin
             for img_in in imgs

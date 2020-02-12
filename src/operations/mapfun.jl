@@ -51,7 +51,7 @@ end
 @inline supports_lazy(::Type{<:MapFun}) = true
 
 function applyeager(op::MapFun, img::AbstractArray, param)
-    maybe_copy(map(op.fun, img))
+    contiguous(map(op.fun, img))
 end
 
 function applylazy(op::MapFun, img::AbstractArray, param)
@@ -59,7 +59,7 @@ function applylazy(op::MapFun, img::AbstractArray, param)
 end
 
 function showconstruction(io::IO, op::MapFun)
-    print(io, typeof(op).name.name, '(', op.fun, ')')
+    print(io, nameof(typeof(op)), '(', op.fun, ')')
 end
 
 function Base.show(io::IO, op::MapFun)
@@ -130,7 +130,7 @@ end
 
 function applyeager(op::AggregateThenMapFun, img::AbstractArray, param)
     agg = op.aggfun(img)
-    maybe_copy(map(x -> op.mapfun(x, agg), img))
+    contiguous(map(x -> op.mapfun(x, agg), img))
 end
 
 function applylazy(op::AggregateThenMapFun, img::AbstractArray, param)
@@ -139,7 +139,7 @@ function applylazy(op::AggregateThenMapFun, img::AbstractArray, param)
 end
 
 function showconstruction(io::IO, op::AggregateThenMapFun)
-    print(io, typeof(op).name.name, '(', op.aggfun, ", ", op.mapfun, ')')
+    print(io, nameof(typeof(op)), '(', op.aggfun, ", ", op.mapfun, ')')
 end
 
 function Base.show(io::IO, op::AggregateThenMapFun)

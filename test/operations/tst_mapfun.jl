@@ -26,7 +26,7 @@
                 res = @inferred(Augmentor.applyeager(MapFun(identity), img_in))
                 @test res == img_in
                 @test eltype(res) <: Gray{N0f8}
-                @test typeof(indices(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: OffsetArray
+                @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: OffsetArray
                 res = @inferred(Augmentor.applyeager(MapFun(x->x-Gray{Float32}(0.1)), img_in))
                 @test res == img_out
                 @test typeof(res) == typeof(img_out)
@@ -53,7 +53,7 @@
         res = @inferred(Augmentor.applylazy(MapFun(x->x-RGB(.1,.1,.1)), rgb_rect))
         @test res == mappedarray(x->x-RGB(.1,.1,.1), rgb_rect)
         res = @inferred(Augmentor.applylazy(MapFun(x->x-RGB(.1,.1,.1)), OffsetArray(rgb_rect,-2,-1)))
-        @test indices(res) === (-1:0, 0:2)
+        @test axes(res) === OffsetArrays.IdentityUnitRange.((-1:0, 0:2))
         @test @inferred(getindex(res,0,0)) isa RGB{Float64}
         @test res == mappedarray(x->x-RGB(.1,.1,.1), OffsetArray(rgb_rect,-2,-1))
         @test typeof(res) <: MappedArrays.ReadonlyMappedArray{ColorTypes.RGB{Float64}}
@@ -79,8 +79,9 @@ end
         @test_throws MethodError AggregateThenMapFun(x->x)
         @test typeof(@inferred(AggregateThenMapFun(x->x, x->x))) <: AggregateThenMapFun <: Augmentor.Operation
         @test typeof(@inferred(AggregateThenMapFun(mean, identity))) <: AggregateThenMapFun <: Augmentor.Operation
-        @test str_show(AggregateThenMapFun(mean, identity)) == "Augmentor.AggregateThenMapFun(mean, identity)"
-        @test str_showconst(AggregateThenMapFun(mean, identity)) == "AggregateThenMapFun(mean, identity)"
+        mean_str = VERSION >= v"1.2.0" ? "mean" : "Statistics.mean"
+        @test str_show(AggregateThenMapFun(mean, identity)) == "Augmentor.AggregateThenMapFun($mean_str, identity)"
+        @test str_showconst(AggregateThenMapFun(mean, identity)) == "AggregateThenMapFun($mean_str, identity)"
         @test str_showcompact(AggregateThenMapFun(mean, identity)) == "Map result of \"mean\" using \"identity\" over image"
     end
     @testset "eager" begin
@@ -101,7 +102,7 @@ end
                 res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x), img_in))
                 @test res == img_in
                 @test eltype(res) <: Gray{N0f8}
-                @test typeof(indices(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: OffsetArray
+                @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: OffsetArray
                 res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img_in))
                 @test res == img_out
                 @test typeof(res) == typeof(img_out)
