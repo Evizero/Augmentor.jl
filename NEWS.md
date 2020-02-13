@@ -1,3 +1,9 @@
+# v0.6.0
+
+Other changes:
+
+- upgrade to Julia 1.x
+
 # v0.5.0
 
 New functionality:
