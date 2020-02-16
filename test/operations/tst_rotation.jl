@@ -282,19 +282,17 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(Rotate(10), nothing)
         @test Augmentor.supports_eager(Rotate) === false
-        res1 = OffsetArray(rotl90(square), 0, 0)
-        res2 = OffsetArray(rotl90(square), -1, -1)
-        res3 = OffsetArray(rotr90(square), 0, 0)
-        res4 = OffsetArray(rotr90(square), -1, -1)
+        img_out1 = rotl90(square)
+        img_out2 = rotr90(square)
         imgs = [
-            (square, res1, res3),
-            (view(square, :, :), res1, res3),
-            (Augmentor.prepareaffine(square), res1, res3),
-            (OffsetArray(square, -1, -1), res2, res4),
-            (view(square, IdentityRange(1:3), IdentityRange(1:3)), res1, res3),
+            square,
+            view(square, :, :),
+            Augmentor.prepareaffine(square),
+            OffsetArray(square, -1, -1),
+            view(square, IdentityRange(1:3), IdentityRange(1:3))
         ]
         @testset "fixed parameter" begin
-            for (img_in, img_out1, img_out2) in imgs
+            for img_in in imgs
                 res = @inferred(Augmentor.applyeager(Rotate(90), img_in))
                 @test res == img_out1
                 @test typeof(res) == typeof(img_out1)
@@ -306,12 +304,12 @@ end
                 @test res1 == img_out1
                 @test res2 == img_out1
                 @test typeof(res1) == typeof(img_out1)
-                @test typeof(res2) <: OffsetArray{N0f8}
+                @test typeof(res2) <: Array{N0f8}
                 res1, res2 = @inferred(Augmentor.applyeager(Rotate(-90), (img_in, N0f8.(img_in))))
                 @test res1 == img_out2
                 @test res2 == img_out2
                 @test typeof(res1) == typeof(img_out2)
-                @test typeof(res2) <: OffsetArray{N0f8}
+                @test typeof(res2) <: Array{N0f8}
             end
             # check that the affine map is computed for each image
             res1, res2 = @inferred(Augmentor.applyeager(Rotate(90), (square, square2)))
@@ -319,12 +317,12 @@ end
             @test res2 == OffsetArray(rotl90(square2), 0, 0)
         end
         @testset "random parameter" begin
-            for (img_in, img_out_type, _) in imgs
+            for img_in in imgs
                 res1, res2 = @inferred(Augmentor.applyeager(Rotate(1:90), (img_in, N0f8.(img_in))))
                 # make sure same angle is used
                 @test res1 == res2
-                @test typeof(res1) == typeof(img_out_type)
-                @test typeof(res2) <: OffsetArray{N0f8}
+                @test typeof(res1) == typeof(img_out1)
+                @test typeof(res2) <: Array{N0f8}
             end
         end
     end

@@ -20,15 +20,17 @@
     # Identidy ranges
     v = view(square, IdentityRange(1:3), IdentityRange(1:3))
     img = @inferred Augmentor.applyeager(CacheImage(), v)
-    @test typeof(img) <: OffsetArray
+    @test typeof(img) <: Array
     @test eltype(img) == eltype(v)
-    @test img == OffsetArray(square, 0, 0)
+    @test img !== square
+    @test img == square
     # Affine
     v = Augmentor.prepareaffine(square)
     img = @inferred Augmentor.applyeager(CacheImage(), v)
-    @test typeof(img) <: OffsetArray
+    @test typeof(img) <: Array
     @test eltype(img) == eltype(v)
-    @test img == OffsetArray(square, 0, 0)
+    @test img !== square
+    @test img == square
     # Array and SubArray
     v = view(square, :, :)
     tmp,img = @inferred Augmentor.applyeager(CacheImage(), (square,v))
@@ -39,8 +41,8 @@
     @test img == square
     # OffsetArray
     o = OffsetArray(square, (-1,2))
-    @test @inferred(Augmentor.applyeager(CacheImage(),o)) === o
-    @test @inferred(Augmentor.applyeager(CacheImage(),(o,square))) === (o,square)
+    @test @inferred(Augmentor.applyeager(CacheImage(),o)) === parent(o)
+    @test @inferred(Augmentor.applyeager(CacheImage(),(o,square))) === (parent(o),square)
 
     @test Augmentor.supports_eager(CacheImage) === true
     @test Augmentor.supports_lazy(CacheImage) === false
@@ -83,7 +85,7 @@ end
         v = Augmentor.applylazy(Resize(2,3), camera)
         res = @inferred Augmentor.applyeager(op, v)
         @test res == v
-        @test typeof(res) <: OffsetArray
+        @test typeof(res) <: Array
         @test parent(res) === op.buffer
 
         res = @inferred Augmentor.applyeager(op, rect)
@@ -130,7 +132,7 @@ end
         @test buf1 != square
         @test buf2 != rgb_rect
         @test res == (v1, v2)
-        @test typeof(res) <: NTuple{2,OffsetArray}
+        @test typeof(res) <: NTuple{2, Array}
         @test parent.(res) === (op.buffer[1], op.buffer[2])
 
         @test_throws BoundsError Augmentor.applyeager(op, (camera,buf1))

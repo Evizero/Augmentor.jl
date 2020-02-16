@@ -8,18 +8,16 @@ end
 @testset "eager" begin
     @test_throws MethodError Augmentor.applyeager(NoOp(), nothing)
     @test Augmentor.supports_eager(NoOp) === false
-    res1 = rect
-    res2 = OffsetArray(rect, -2, -1)
-    res3 = OffsetArray(rect, 0, 0)
+    img_out = rect
     imgs = [
-        (rect, res1),
-        (view(rect, :, :), res1),
-        (Augmentor.prepareaffine(rect), res3),
-        (OffsetArray(rect, -2, -1), res2),
-        (view(rect, IdentityRange(1:2), IdentityRange(1:3)), res3),
+        rect,
+        view(rect, :, :),
+        Augmentor.prepareaffine(rect),
+        OffsetArray(rect, -2, -1),
+        view(rect, IdentityRange(1:2), IdentityRange(1:3))
     ]
     @testset "single image" begin
-        for (img_in, img_out) in imgs
+        for img_in in imgs
             res = @inferred(Augmentor.applyeager(NoOp(), img_in))
             @test res == img_out
             @test typeof(res) == typeof(img_out)

@@ -24,6 +24,8 @@ Return a memory contiguous array for better performance.
 
 Data copy only happens when necessary. For example, views returned by `view`,
 `permuteddimsview` are such cases.
+
+See also: [`plain_array`](@ref), [`plain_axes`](@ref)
 """
 @inline contiguous(A::OffsetArray) = A
 @inline contiguous(A::Array) = A
@@ -39,8 +41,20 @@ Data copy only happens when necessary. For example, views returned by `view`,
 @inline _plain_array(A::SArray) = A
 @inline _plain_array(A::MArray) = A
 @inline _plain_array(A::Tuple) = map(_plain_array, A)
-# avoid recursion
-@inline plain_array(A) = _plain_array(contiguous(A))
+
+"""
+    plain_array(A::AbstractArray)
+    plain_array(A::Tuple)
+
+Return a memory contiguous plain array for better performance.
+A plain array is either an `Array` or a `StaticArray`.
+
+Data copy only happens when necessary. For example, views returned by `view`,
+`permuteddimsview` are such cases.
+
+See also: [`contiguous`](@ref), [`plain_axes`](@ref)
+"""
+@inline plain_array(A) = _plain_array(contiguous(A)) # avoid recursion
 
 # --------------------------------------------------------------------
 
@@ -48,6 +62,8 @@ Data copy only happens when necessary. For example, views returned by `view`,
     plain_axes(A::AbstractArray)
 
 Generate a 1-based array from `A` without data copy.
+
+See also: [`contiguous`](@ref), [`plain_array`](@ref)
 """
 @inline plain_axes(A::Array) = A
 @inline plain_axes(A::OffsetArray) = parent(A)

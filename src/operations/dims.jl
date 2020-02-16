@@ -68,7 +68,7 @@ PermuteDims(perm::Vararg{Int,N}) where {N} = PermuteDims{N,perm,invperm(perm)}()
 @inline supports_lazy(::Type{<:PermuteDims}) = true
 
 function applyeager(op::PermuteDims{N,perm}, img::AbstractArray{T,N}, param) where {T,N,perm}
-    permutedims(img, perm)
+    plain_array(permutedims(img, perm))
 end
 
 function applylazy(op::PermuteDims{N,perm,iperm}, img::AbstractArray{T,N}, param) where {T,N,perm,iperm}

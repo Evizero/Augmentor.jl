@@ -79,8 +79,8 @@ end
 ops = (ShearY(45),ShearX(-2),CacheImage()) # forces affine then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(camera, ops)
-    @test typeof(img) <: OffsetArray
-    @test axes(img) == (-255:768, 0:512)
+    @test typeof(img) <: Array
+    @test axes(img) == (1:1024, 1:513)
 end
 
 ops = (Resize(2,2),Rotate90()) # forces affine
@@ -96,7 +96,7 @@ end
 ops = (Resize(2,2),Rotate90(),CacheImage()) # forces affine then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(rect, ops)
-    @test typeof(img) <: OffsetArray
+    @test typeof(img) <: Array
     @test round.(Float64.(img); digits=1) == round.(Float64.(rotl90(imresize(rect,2,2))); digits=1)
 end
 
@@ -104,7 +104,7 @@ buf = rand(Gray{N0f8}, 2, 2)
 ops = (Resize(2,2),Rotate90(),CacheImage(buf)) # forces affine then eager
 @testset "$(str_showcompact(ops))" begin
     img = @inferred Augmentor._augment(rect, ops)
-    @test typeof(img) <: OffsetArray
+    @test typeof(img) <: Array
     @test round.(Float64.(img); digits=1) == round.(Float64.(rotl90(imresize(rect,2,2))); digits=1)
     @test img == ops[3].buffer
     @test parent(img) === ops[3].buffer
@@ -333,8 +333,8 @@ ops = (Rotate(45),CropSize(200,200),Zoom(1.1),ConvertEltype(RGB{Float64}),SplitC
     @test wv3 == wv4
     @test typeof(wv3) == typeof(wv4)
     img = colorview(RGB{Float64}, wv3)
-    @test RGB{Float64}.(copy(wv1)) ≈ wv2
-    @test collect(wv1) ≈ img
+    @test RGB{Float64}.(collect(wv1)) ≈ img # collect(RGB{Float64}, wv1) returns OffsetArray
+    @test wv2 == img
     @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
 end
 

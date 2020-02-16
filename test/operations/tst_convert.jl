@@ -19,27 +19,26 @@
     @testset "eager" begin
         @test Augmentor.supports_eager(ConvertEltype) === true
         @test Augmentor.supports_eager(ConvertEltype{Float64}) === true
-        res1 = convert(Array{Gray{Float32}}, rect)
-        res1a = OffsetArray(res1, 0, 0)
-        res1b = OffsetArray(res1, -2, -1)
+        img_out = convert(Array{Gray{Float32}}, rect)
         imgs = [
-            (Float32, rect, Float32.(res1)),
-            (Float32, OffsetArray(rect, -2, -1), Float32.(res1b)),
-            (Gray{Float32}, rect, res1),
-            (Gray{Float32}, Float64.(rect), res1),
-            (Gray{Float32}, reshape(view(rect,:,:), 2,3), res1),
-            (Gray{Float32}, RGB{N0f8}.(rect), res1),
-            (Gray{Float32}, Augmentor.prepareaffine(rect), res1a),
-            (Gray{Float32}, OffsetArray(rect, -2, -1), res1b),
-            (Gray{Float32}, view(rect, IdentityRange(1:2), IdentityRange(1:3)), res1a),
-            (RGB{Float32}, rect, RGB{Float32}.(res1)),
-            (RGB{Float32}, OffsetArray(rect, -2, -1), RGB{Float32}.(res1b)),
+            (Float32, rect),
+            (Float32, OffsetArray(rect, -2, -1)),
+            (Gray{Float32}, rect),
+            (Gray{Float32}, Float64.(rect)),
+            (Gray{Float32}, reshape(view(rect,:,:), 2,3)),
+            (Gray{Float32}, RGB{N0f8}.(rect)),
+            (Gray{Float32}, Augmentor.prepareaffine(rect)),
+            (Gray{Float32}, OffsetArray(rect, -2, -1)),
+            (Gray{Float32}, view(rect, IdentityRange(1:2), IdentityRange(1:3))),
+            (RGB{Float32}, rect),
+            (RGB{Float32}, OffsetArray(rect, -2, -1))
         ]
         @testset "single image" begin
-            for (T, img_in, img_out) in imgs
+            for (T, img_in) in imgs
                 res = @inferred(Augmentor.applyeager(ConvertEltype(T), img_in))
-                @test res ≈ img_out
-                @test typeof(res) == typeof(img_out)
+                out = T.(img_out)
+                @test res ≈ out
+                @test typeof(res) <: typeof(out)
             end
         end
     end

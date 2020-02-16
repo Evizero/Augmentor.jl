@@ -53,7 +53,7 @@ pl = ElasticDistortion(3,3) |> zeros(20,20) |> Rotate(-10:10)
 """
 struct CacheImage <: ImageOperation end
 
-applyeager(op::CacheImage, img::AbstractArray, param) = contiguous(img)
+applyeager(op::CacheImage, img::AbstractArray, param) = plain_array(img)
 
 function showconstruction(io::IO, op::CacheImage)
     print(io, typeof(op).name.name, "()")
@@ -84,14 +84,15 @@ CacheImage(buffers::NTuple{N,AbstractArray}) where {N} = CacheImageInto(buffers)
 
 @inline supports_lazy(::Type{<:CacheImageInto}) = true
 
-applyeager(op::CacheImageInto, img::AbstractArray, param) = applylazy(op, img)
-applyeager(op::CacheImageInto, img::Tuple) = applylazy(op, img)
+applyeager(op::CacheImageInto, img::AbstractArray, param) = plain_array(applylazy(op, img))
+applyeager(op::CacheImageInto, img::Tuple) = plain_array(applylazy(op, img))
 
 function applylazy(op::CacheImageInto, img::Tuple)
     throw(ArgumentError("Operation $(op) not compatiable with given image(s) ($(summary(img))). This can happen if the amount of images does not match the amount of buffers in the operation"))
 end
 
 function applylazy(op::CacheImageInto{<:AbstractArray}, img::AbstractArray, param)
+    # TODO: don't copy data if img is memory contiguous
     copyto!(match_idx(op.buffer, axes(img)), img)
 end
 
