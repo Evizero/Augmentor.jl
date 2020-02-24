@@ -4,6 +4,12 @@ using MLDataPattern
 using OffsetArrays, StaticArrays, IdentityRanges, MappedArrays, ComputationalResources
 using ReferenceTests, Test, TestImages, ImageDistances, Statistics
 
+if isdefined(OffsetArrays, :IdOffsetRange)
+    OffsetRange = OffsetArrays.IdOffsetRange
+else
+    OffsetRange = OffsetArrays.IdentityUnitRange
+end
+
 # check for ambiguities
 refambs = detect_ambiguities(ImageTransformations, Base, Core)
 using Augmentor

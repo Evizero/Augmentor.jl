@@ -105,6 +105,10 @@ end
         @test @inferred(Augmentor.plain_array(Ar)) == reshape(A,1,3,3)
         @test typeof(Augmentor.plain_array(Ar)) <: Array{Int,3}
     end
+    let Ac = channelview(Gray{Float64}.(A))
+        @test @inferred(Augmentor.plain_array(Ac)) == A
+        @test typeof(Augmentor.plain_array(Ac)) <: Array{Float64, 2}
+    end
 end
 
 @testset "plain_axes" begin
@@ -141,7 +145,7 @@ end
     A = [1 2 3; 4 5 6; 7 8 9]
     @test @inferred(Augmentor.match_idx(A, axes(A))) === A
     let img = @inferred Augmentor.match_idx(A, (2:4, 2:4))
-        @test axes(img) === OffsetArrays.IdentityUnitRange.((2:4, 2:4))
+        @test axes(img) == OffsetRange.((2:4, 2:4))
         @test typeof(img) <: OffsetArray
     end
     let B = view(A,1:3,1:3)
@@ -149,11 +153,11 @@ end
     end
     let B = view(A,1:3,1:3)
         img = @inferred(Augmentor.match_idx(B, B.indices))
-        @test axes(img) === OffsetArrays.IdentityUnitRange.((1:3, 1:3))
+        @test axes(img) == OffsetRange.((1:3, 1:3))
         @test typeof(img) <: OffsetArray
     end
     let img = @inferred Augmentor.match_idx(view(A,1:3,1:3), (2:4,2:4))
-        @test axes(img) === OffsetArrays.IdentityUnitRange.((2:4, 2:4))
+        @test axes(img) == OffsetRange.((2:4, 2:4))
         @test typeof(img) <: OffsetArray
     end
     let C = Augmentor.prepareaffine(A)
