@@ -36,10 +36,11 @@ See also: [`plain_array`](@ref), [`plain_axes`](@ref)
 
 # --------------------------------------------------------------------
 
-@inline _plain_array(A::OffsetArray) = parent(A)
+@inline _plain_array(A::OffsetArray) = _plain_array(parent(A))
 @inline _plain_array(A::Array) = A
 @inline _plain_array(A::SArray) = A
 @inline _plain_array(A::MArray) = A
+@inline _plain_array(A::AbstractArray) = collect(A)
 @inline _plain_array(A::Tuple) = map(_plain_array, A)
 
 """
@@ -89,7 +90,7 @@ end
 # --------------------------------------------------------------------
 
 @inline match_idx(buffer::AbstractArray, inds::Tuple) = buffer
-@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,Union{UnitRange, IdentityUnitRange}}) where {N} =
+@inline match_idx(buffer::Union{Array,SubArray}, inds::NTuple{N,OffsetRange}) where {N} =
     OffsetArray(buffer, inds)
 
 # --------------------------------------------------------------------

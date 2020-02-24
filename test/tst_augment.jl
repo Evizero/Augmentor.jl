@@ -235,7 +235,7 @@ ops = (Scale(.1,.2),CropRatio())
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === camera
-    @test_reference "reference/scale_cropratio.txt" wv
+    @test_reference "reference/scale_cropratio.txt" collect(wv)
     img = @inferred augment(camera, ops)
     @test img == parent(copy(wv))
     @test typeof(img) <: Array
@@ -333,8 +333,14 @@ ops = (Rotate(45),CropSize(200,200),Zoom(1.1),ConvertEltype(RGB{Float64}),SplitC
     @test wv3 == wv4
     @test typeof(wv3) == typeof(wv4)
     img = colorview(RGB{Float64}, wv3)
-    @test RGB{Float64}.(collect(wv1)) ≈ img # collect(RGB{Float64}, wv1) returns OffsetArray
-    @test wv2 == img
+    if axes(wv1) == axes(img)
+        # OffsetArray v1
+        @test RGB{Float64}.(wv1) ≈ img
+    else
+        # OffsetArray v0
+        @test RGB{Float64}.(collect(wv1)) ≈ img
+    end
+    @test wv2 == collect(img)
     @test_reference "reference/rot45_crop_zoom_convert.txt" wv2
 end
 

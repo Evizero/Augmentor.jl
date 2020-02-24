@@ -28,3 +28,11 @@ if all(map((FixedPoint, Normed)) do T
     # Reached when upstream package (e.g., FixedPoint) doesn't provide a specialization
     Interpolations.tweight(A::AbstractArray{T}) where T<:FixedPoint = T
 end
+
+# backward support for OffsetArrays v0
+if isdefined(OffsetArrays, :IdOffsetRange)
+    # introduced by OffsetArrays v1.0.0
+    OffsetRange = Union{UnitRange, IdentityUnitRange, OffsetArrays.IdOffsetRange}
+else
+    OffsetRange = Union{UnitRange, IdentityUnitRange}
+end

@@ -68,7 +68,7 @@
                 img_out = f(img_in)
                 res = @inferred(Augmentor.applylazy(SplitChannels(), img_in))
                 @test res == img_out
-                @test res == Augmentor.applyeager(SplitChannels(), img_in)
+                @test collect(res) == Augmentor.applyeager(SplitChannels(), img_in)
                 @test typeof(res) == typeof(img_out)
             end
         end

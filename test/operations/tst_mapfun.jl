@@ -51,7 +51,7 @@
         res = @inferred(Augmentor.applylazy(MapFun(x->x-RGB(.1,.1,.1)), rgb_rect))
         @test res == mappedarray(x->x-RGB(.1,.1,.1), rgb_rect)
         res = @inferred(Augmentor.applylazy(MapFun(x->x-RGB(.1,.1,.1)), OffsetArray(rgb_rect,-2,-1)))
-        @test axes(res) === OffsetArrays.IdentityUnitRange.((-1:0, 0:2))
+        @test axes(res) == OffsetRange.((-1:0, 0:2))
         @test @inferred(getindex(res,0,0)) isa RGB{Float64}
         @test res == mappedarray(x->x-RGB(.1,.1,.1), OffsetArray(rgb_rect,-2,-1))
         @test typeof(res) <: MappedArrays.ReadonlyMappedArray{ColorTypes.RGB{Float64}}

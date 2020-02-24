@@ -63,6 +63,8 @@ for FUN in (:applyeager, :applylazy, :applypermute,
 end
 
 function applyeager(op::Operation, img::AbstractArray, param)
+    # fallback for operations that doesn't treat eager and lazy mode differently
+    # i.e., for op that supports_eager(typeof(op)) == false
     plain_array(applylazy(op, img, param))
 end
 
