@@ -29,10 +29,10 @@ first few examples of the [MNIST
 database](http://yann.lecun.com/exdb/mnist/).
 
 ```@eval
-# I can't use Reel.jl, because the way it stores the tmp pngs
-# causes the images to be upscaled too much.
-using Augmentor, MLDatasets, Images, Colors
-using PaddedViews, OffsetArrays
+using Augmentor, Images
+using PaddedViews, OffsetArrays, MosaicViews
+using MLDatasets, ImageMagick
+using Random
 
 pl = ElasticDistortion(6, scale=0.3, border=true) |>
      Rotate([10, -5, -3, 0, 3, 5, 10]) |>
@@ -40,34 +40,31 @@ pl = ElasticDistortion(6, scale=0.3, border=true) |>
      CropSize(28, 28) |>
      Zoom(0.9:0.1:1.2)
 
-md_imgs = String[]
-for i in 1:24
-    srand(i) # somehow srand in the beginning isn't enough
-    input = MNIST.convert2image(MNIST.traintensor(i))
-    imgs = [augment(input, pl) for j in 1:20]
-    insert!(imgs, 1, first(imgs)) # otherwise loop isn't smooth
-    fnames = map(imgs) do img
-        tpath = tempname() * ".png"
-        save(tpath, img)
-        tpath
-    end
-    args = reduce(vcat, [[fname, "-delay", "1x4", "-alpha", "deactivate"] for fname in fnames])
-    convert = strip(readstring(`which convert`))
-    outname = joinpath("assets", "idx_mnist_$i.gif")
-    run(`$convert $args $outname`)
-    push!(md_imgs, "[![mnist $i]($outname)](@ref mnist)")
-    foreach(fname -> rm(fname), fnames)
+
+n_sample, nrow = 24, 1
+reduce_op = (x,y) -> cat(x, y, dims=3)
+img_generator = i->augment(MNIST.convert2image(MNIST.traintensor(i)), pl)
+frame_generator = (n, nrow)-> mosaicview(mapreduce(img_generator, reduce_op, 1:n), nrow=nrow)
+
+preview = mapreduce(reduce_op, 1:10) do i
+    Random.seed!(i)
+    frame_generator(n_sample, nrow)
 end
-Markdown.parse(join(md_imgs, " "))
+
+ImageMagick.save("mnist_preview.gif", preview; fps=3)
 ```
 
-The Julia version of Augmentor is engineered specifically for
+![](mnist_preview.gif)
+
+The Julia version of **Augmentor** is engineered specifically for
 high performance applications. It makes use of multiple
 heuristics to generate efficient tailor-made code for the
 concrete user-specified augmentation pipeline. In particular
 Augmentor tries to avoid the need for any intermediate images,
 but instead aims to compute the output image directly from the
 input in one single pass.
+
+For the Python version of Augmentor, you can find it [here](https://github.com/mdbloice/Augmentor)
 
 ## Where to begin?
 
@@ -80,10 +77,6 @@ installation instructions and some simple hello world examples.
 Pages = ["gettingstarted.md"]
 Depth = 2
 ```
-
-**Augmentor.jl** is the [Julia](https://julialang.org) package
-for Augmentor. You can find the Python version
-[here](https://github.com/mdbloice/Augmentor).
 
 ## Introduction and Motivation
 
@@ -102,7 +95,7 @@ free to browse the following documents for a crash course on how
 image data is represented in the Julia language, as well as how
 to visualize it. For more information on image processing in
 Julia, take a look at the documentation for the vast
-[`JuliaImages`](https://juliaimages.github.io/latest/) ecosystem.
+[`JuliaImages`](https://juliaimages.github.io/stable/) ecosystem.
 
 ```@contents
 Pages = ["images.md"]

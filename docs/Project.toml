@@ -1,7 +1,14 @@
 [deps]
+Augmentor = "02898b10-1f73-11ea-317c-6393d7073e15"
+DemoCards = "311a05b2-6137-4a5a-b473-18580a3d38b5"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
+ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+MLDatasets = "eb30cadb-4394-5ae3-aed4-317e484a6458"
+MosaicViews = "e94cdb99-869f-56ef-bcf0-1ae2bcbe0389"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+PaddedViews = "5432bcbf-9aad-5242-b902-cca2824c8663"
 
 [compat]
+DemoCards = "0.2"
 Documenter = "0.24"

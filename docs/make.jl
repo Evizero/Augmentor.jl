@@ -1,6 +1,12 @@
 using Documenter, Augmentor
 using Images
 using Random
+using MLDatasets
+
+# predownload the dataset to skip the interactive prompt
+if !isdir(first(Base.DEPOT_PATH))
+    MNIST.download(;i_accept_the_terms_of_use=true)
+end
 
 # Define the documentation order of the operations. The whole
 # purpose of this vector is literally just to dictate in what
