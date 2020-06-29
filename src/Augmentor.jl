@@ -56,6 +56,7 @@ export
     CropSize,
     CropRatio,
     RCropRatio,
+    RCropSize,
 
     Resize,
 

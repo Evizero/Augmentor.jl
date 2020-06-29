@@ -457,7 +457,7 @@ Arguments
 See also
 --------------
 
-[`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+[`RCropSize`](@ref), [`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
 
 Examples
 --------------
@@ -537,6 +537,123 @@ end
 function Base.show(io::IO, op::RCropRatio)
     if get(io, :compact, false)
         print(io, "Crop random window with ", ratio2str(op.ratio), " aspect ratio")
+    else
+        print(io, "Augmentor.")
+        showconstruction(io, op)
+    end
+end
+
+"""
+    RCropSize <: Augmentor.ImageOperation
+
+Description
+--------------
+
+Crops out an area of predefined size at some random position of
+the given image.
+
+For example the operation `RCropSize(128, 64)` denotes a random crop with height
+128 and width 64. `RCropSize(64)` denotes a square shaped crop of size 64.
+
+Usage
+--------------
+
+    RCropSize(height, width)
+
+    RCropSize(width)
+
+Arguments
+--------------
+
+- **`height::Number`** : Height of cropped region
+- **`width::Number`** : Width of cropped region
+
+See also
+--------------
+
+[`RCropRatio`](@ref), [`CropRatio`](@ref), [`CropSize`](@ref), [`Crop`](@ref), [`CropNative`](@ref), [`augment`](@ref)
+
+Examples
+--------------
+
+```julia
+using Augmentor
+img = testpattern()
+
+# crop a randomly placed square of size 100
+augment(img, RCropSize(100))
+```
+"""
+struct RCropSize <: ImageOperation
+    height::Int
+    width::Int
+
+    function RCropSize(height::Integer, width::Integer)
+        (width > 0 && height > 0) || throw(ArgumentError("Width and height must be greater than 0."))
+        new(Int(height), Int(width))
+    end
+end
+# RCropSize(height::Integer, width::Integer) = RCropSize(height, width)
+RCropSize(height::Integer) = RCropSize(height, height)
+
+@inline supports_eager(::Type{RCropSize})      = false
+@inline supports_affineview(::Type{RCropSize}) = true
+@inline supports_view(::Type{RCropSize})       = true
+@inline supports_stepview(::Type{RCropSize})   = true
+
+function rcropsize_axes(op::RCropSize, img::AbstractMatrix)
+    h, w = size(img)
+    #new size dictated by op
+    nw = op.width
+    nh = op.height
+    # place window at a random position
+    if nw == w && nh == h
+        return 1:h, 1:w
+    elseif nw < w && nh < h
+        x_max = w - nw + 1
+        y_max = h - nh + 1
+        x = safe_rand(1:x_max)
+        y = safe_rand(1:y_max)
+        return y:(y+nh-1), x:(x+nw-1)
+    elseif nw < w && nh == h
+        x_max = w - nw + 1
+        x = safe_rand(1:x_max)
+        return 1:h, x:(x+nw-1)
+    elseif nh < h && nw == w
+        y_max = h - nh + 1
+        y = safe_rand(1:y_max)
+        return y:(y+nh-1), 1:w
+    else
+        error("unreachable code reached")
+    end
+end
+
+randparam(op::RCropSize, imgs::Tuple) = rcropsize_axes(op, imgs[1])
+randparam(op::RCropSize, img::AbstractArray) = rcropsize_axes(op, img)
+
+function applylazy(op::RCropSize, img::AbstractArray, inds)
+    applyview(op, img, inds)
+end
+
+function applyaffineview(op::RCropSize, img::AbstractArray, inds)
+    applyview(op, prepareaffine(img), inds)
+end
+
+function applyview(op::RCropSize, img::AbstractArray, inds)
+    indirect_view(img, inds)
+end
+
+function applystepview(op::RCropSize, img::AbstractArray, inds)
+    indirect_view(img, map(StepRange, inds))
+end
+
+function showconstruction(io::IO, op::RCropSize)
+    print(io, typeof(op).name.name, '(', op.height, ", ", op.width, ')')
+end
+
+function Base.show(io::IO, op::RCropSize)
+    if get(io, :compact, false)
+        print(io, "Crop random window with size ($(op.height), $(op.width))")
     else
         print(io, "Augmentor.")
         showconstruction(io, op)
