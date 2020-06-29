@@ -624,7 +624,8 @@ function rcropsize_axes(op::RCropSize, img::AbstractMatrix)
         y = safe_rand(1:y_max)
         return y:(y+nh-1), 1:w
     else
-        error("unreachable code reached")
+        # alternative behaviour could be to return the whole image or to pad
+        error("Trying to crop region of size ($nh, $nw) from image with size $(size(img)).")
     end
 end
 
