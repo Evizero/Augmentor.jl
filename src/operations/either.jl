@@ -231,7 +231,7 @@ function Base.show(io::IO, op::Either)
             print(io, '.')
         end
     else
-        print(io, typeof(op).name, " (1 out of ", length(op.operations), " operation(s)):")
+        print(io, typeof(op).name.name, " (1 out of ", length(op.operations), " operation(s)):")
         percent_int   = map(c->round(Int, c*100), op.chances)
         percent_float = map(c->round(c*100; digits=1), op.chances)
         percent = if any(i != f for (i,f) in zip(percent_int,percent_float))

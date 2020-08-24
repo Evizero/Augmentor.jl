@@ -130,7 +130,7 @@ function Base.show(io::IO, op::CacheImageInto{<:AbstractArray})
         print(io, "Cache into preallocated ")
         print(io, summary(op.buffer))
     else
-        print(io, typeof(op).name, "(")
+        print(io, typeof(op).name.name, "(")
         Base.showarg(io, op.buffer, false)
         print(io, ")")
     end
@@ -141,7 +141,7 @@ function Base.show(io::IO, op::CacheImageInto{<:Tuple})
         print(io, "Cache into preallocated ")
         print(io, "(", join(map(summary, op.buffer), ", "), ")")
     else
-        print(io, typeof(op).name, "((")
+        print(io, typeof(op).name.name, "((")
         for (i, buffer) in enumerate(op.buffer)
             Base.showarg(io, buffer, false)
             i < length(op.buffer) && print(io, ", ")

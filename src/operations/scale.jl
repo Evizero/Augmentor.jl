@@ -115,6 +115,6 @@ function Base.show(io::IO, op::Scale{N}) where N
     else
         print(io, "Augmentor.")
         fct = length(op.factors[1]) == 1 ? map(first,op.factors) : op.factors
-        print(io, typeof(op).name, "{$N}($(fct))")
+        print(io, typeof(op).name.name, "{$N}($(fct))")
     end
 end

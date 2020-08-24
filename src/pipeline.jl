@@ -40,7 +40,7 @@ function Base.show(io::IO, pipeline::Pipeline)
         end
     else
         k = length("$n")
-        print(io, "$n-step $(typeof(pipeline).name):")
+        print(io, "$n-step Augmentor.$(typeof(pipeline).name.name):")
         for (i, op) in enumerate(ops)
             println(io)
             print(io, lpad(string(i), k+1, " "), ".) ")
