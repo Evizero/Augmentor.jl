@@ -89,7 +89,7 @@ function Base.show(io::IO, op::Crop{N}) where N
         end
     else
         print(io, "Augmentor.")
-        print(io, typeof(op).name, "{$N}($(op.indices))")
+        print(io, typeof(op).name.name, "{$N}($(op.indices))")
     end
 end
 
@@ -195,7 +195,7 @@ function Base.show(io::IO, op::CropNative{N}) where N
         end
     else
         print(io, "Augmentor.")
-        print(io, typeof(op).name, "{$N}($(op.indices))")
+        print(io, typeof(op).name.name, "{$N}($(op.indices))")
     end
 end
 

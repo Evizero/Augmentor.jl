@@ -19,7 +19,7 @@ Base.size(A::DistortedView) = map(length, axes(A))
 Base.axes(A::DistortedView) = axes(A.parent)
 
 function Base.showarg(io::IO, A::DistortedView, toplevel)
-    print(io, typeof(A).name, '(')
+    print(io, typeof(A).name.name, '(')
     Base.showarg(io, parent(A), false)
     print(io, ", ")
     Base.showarg(io, A.grid, false)
