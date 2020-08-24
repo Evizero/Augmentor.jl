@@ -85,7 +85,7 @@ end
     @testset "eager" begin
         @test_throws MethodError Augmentor.applyeager(AggregateThenMapFun(mean, identity), nothing)
         @test Augmentor.supports_eager(AggregateThenMapFun) === true
-        m = mean(rect)
+        m = floattype(eltype(rect)).(mean(rect))
         img_out = map(x->x-m, rect)
         imgs = [
             rect,
@@ -101,13 +101,14 @@ end
                 @test eltype(res) <: Gray{N0f8}
                 @test typeof(axes(img_in)) <: NTuple{2,Base.OneTo} ? typeof(res) <: Array : typeof(res) <: Array
                 res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img_in))
-                @test res == img_out
+                @test res ≈ img_out
                 @test typeof(res) == typeof(img_out)
             end
             img = OffsetArray(rgb_rect, -2, -1)
             res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
             @test res ≈ collect(img .- mean(rgb_rect))
-            @test typeof(res) <: Array{RGB{Float64}}
+            @test typeof(res) <: Array
+            @test eltype(res) <: RGB{<:AbstractFloat} # could be either Float32 / Float64
         end
     end
     @testset "affine" begin
@@ -123,15 +124,17 @@ end
         @test parent(res) === rect
         @test res isa ReadonlyMappedArray
         res = @inferred(Augmentor.applylazy(AggregateThenMapFun(mean, (x,a)->x-a), rgb_rect))
-        @test res == mappedarray(x->x-mean(rgb_rect), rgb_rect)
+        @test res ≈ mappedarray(x->x-mean(rgb_rect), rgb_rect)
         @test parent(res) === rgb_rect
-        @test typeof(res) <: MappedArrays.ReadonlyMappedArray{ColorTypes.RGB{Float64}}
+        @test typeof(res) <: MappedArrays.ReadonlyMappedArray
+        @test eltype(res) <: RGB{<:AbstractFloat} # could be either Float32 / Float64
         img = OffsetArray(rgb_rect, -2, -1)
         res = @inferred(Augmentor.applylazy(AggregateThenMapFun(mean, (x,a)->x-a), img))
-        @test res == mappedarray(x->x-mean(rgb_rect), img)
+        @test res ≈ mappedarray(x->x-mean(rgb_rect), img)
         @test parent(res) === img
-        @test typeof(res) <: MappedArrays.ReadonlyMappedArray{ColorTypes.RGB{Float64}}
-        @test @inferred(getindex(res,0,0)) isa RGB{Float64}
+        @test typeof(res) <: MappedArrays.ReadonlyMappedArray
+        @test eltype(res) <: RGB{<:AbstractFloat} # could be either Float32 / Float64
+        @test @inferred(getindex(res,0,0)) isa RGB{<:AbstractFloat}
     end
     @testset "view" begin
         @test Augmentor.supports_view(AggregateThenMapFun) === false
