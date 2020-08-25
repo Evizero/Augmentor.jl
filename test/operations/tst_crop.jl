@@ -632,3 +632,115 @@ end
         @test @inferred(Augmentor.supports_permute(RCropRatio)) === false
     end
 end
+
+# --------------------------------------------------------------------
+
+@testset "RCropSize" begin
+    @test (RCropSize <: Augmentor.AffineOperation) == false
+    @test typeof(@inferred(RCropSize(1))) <: RCropSize <: Augmentor.ImageOperation
+    @testset "constructor" begin
+        @test_throws MethodError RCropSize(())
+        @test_throws MethodError RCropSize(1.,2.)
+        @test_throws MethodError RCropSize(:a)
+        @test_throws MethodError RCropSize([:a])
+        @test_throws ArgumentError RCropSize(-1)
+        @test_throws ArgumentError RCropSize(0)
+        op = @inferred(RCropSize(100, 100))
+        @test op === RCropSize(100, 100)
+        @test str_show(op) == "Augmentor.RCropSize(100, 100)"
+        @test str_showconst(op) == "RCropSize(100, 100)"
+        @test str_showcompact(op) == "Crop random window with size (100, 100)"
+    end
+    @testset "randparam" begin
+        @test @inferred(Augmentor.randparam(RCropSize(3), square)) == (1:3, 1:3)
+        @test @inferred(Augmentor.randparam(RCropSize(2,3), rect)) == (1:2, 1:3)
+        @test @inferred(Augmentor.randparam(RCropSize(2,2), rect)) in ((1:2, 1:2), (1:2, 2:3))
+    end
+    imgs = [
+        (rect, (1:2, 1:3)),
+        (Augmentor.prepareaffine(rect), (1:2, 1:3)),
+        (OffsetArray(rect, -2, -1), (-1:0, 0:2)),
+        (view(rect, IdentityRange(1:2), IdentityRange(1:3)), (1:2, 1:3)),
+    ]
+    @testset "eager" begin
+        @test_throws MethodError Augmentor.applyeager(RCropSize(10), nothing)
+        @test Augmentor.supports_eager(RCropSize) === false
+        @test @inferred(Augmentor.applyeager(RCropSize(3), square)) == square
+        @test @inferred(Augmentor.applyeager(RCropSize(4), square2)) == square2
+        out = collect(@inferred(Augmentor.applyeager(RCropSize(2,2), rect)))
+        @test out == rect[1:2,1:2] || out == rect[1:2,2:3]
+        @testset "single image" begin
+            for (img_in, inds) in imgs
+                res = @inferred(Augmentor.applyeager(RCropSize(2,3), img_in))
+                @test collect(res) == img_in[inds...]
+                @test axes(res) == map(n->1:n, size(res)) # 1-base
+                @test typeof(res) <: Array{eltype(img_in),2}
+            end
+        end
+        @testset "multiple images" begin
+            for (img_in, _) in imgs
+                res1, res2 = @inferred(Augmentor.applyeager(RCropSize(2), (img_in, N0f8.(img_in))))
+                # make sure both images are processed
+                @test res1 == res2
+                @test axes(res1) == axes(res2)
+                @test typeof(res1) <: Array{Gray{N0f8}}
+                @test typeof(res2) <: Array{N0f8}
+            end
+        end
+    end
+    @testset "affine" begin
+        @test Augmentor.supports_affine(RCropSize) === false
+    end
+    @testset "affineview" begin
+        @test Augmentor.supports_affineview(RCropSize) === true
+        @test_throws MethodError Augmentor.applyaffineview(RCropSize(1), nothing)
+        @test @inferred(Augmentor.applyaffineview(RCropSize(2,3), rect)) == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(RCropSize(3), square)) == view(Augmentor.prepareaffine(square), IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyaffineview(RCropSize(4), square2)) == view(Augmentor.prepareaffine(square2), IdentityRange(1:4), IdentityRange(1:4))
+        # randomly placed
+        out = @inferred Augmentor.applyaffineview(RCropSize(2), rect)
+        @test out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(rect), IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applyaffineview(RCropSize(2), square)
+        @test (out == view(Augmentor.prepareaffine(square), IdentityRange(1:2), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(square), IdentityRange(1:2), IdentityRange(2:3))
+            || out == view(Augmentor.prepareaffine(square), IdentityRange(2:3), IdentityRange(1:2)) || out == view(Augmentor.prepareaffine(square), IdentityRange(2:3), IdentityRange(2:3)))
+    end
+    @testset "lazy" begin
+        @test Augmentor.supports_lazy(RCropSize) === true
+        @test @inferred(Augmentor.applylazy(RCropSize(2,3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(RCropSize(3), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applylazy(RCropSize(4), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        # randomly placed
+        out = @inferred Augmentor.applylazy(RCropSize(2), rect)
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applylazy(RCropSize(2), square)
+        @test (out === view(square, IdentityRange(1:2), IdentityRange(1:2)) || out === view(square, IdentityRange(1:2), IdentityRange(2:3))
+            || out === view(square, IdentityRange(2:3), IdentityRange(1:2)) || out === view(square, IdentityRange(2:3), IdentityRange(2:3)))
+    end
+    @testset "view" begin
+        @test Augmentor.supports_view(RCropSize) === true
+        @test @inferred(Augmentor.applyview(RCropSize(2,3), rect)) === view(rect, IdentityRange(1:2), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(RCropSize(3), square)) === view(square, IdentityRange(1:3), IdentityRange(1:3))
+        @test @inferred(Augmentor.applyview(RCropSize(4), square2)) === view(square2, IdentityRange(1:4), IdentityRange(1:4))
+        # randomly placed
+        out = @inferred Augmentor.applyview(RCropSize(2), rect)
+        @test out === view(rect, IdentityRange(1:2), IdentityRange(1:2)) || out === view(rect, IdentityRange(1:2), IdentityRange(2:3))
+        out = @inferred Augmentor.applyview(RCropSize(2), square)
+        @test (out === view(square, IdentityRange(1:2), IdentityRange(1:2)) || out === view(square, IdentityRange(1:2), IdentityRange(2:3))
+            || out === view(square, IdentityRange(2:3), IdentityRange(1:2)) || out === view(square, IdentityRange(2:3), IdentityRange(2:3)))
+    end
+    @testset "stepview" begin
+        @test Augmentor.supports_stepview(RCropSize) === true
+        @test @inferred(Augmentor.applystepview(RCropSize(2,3), rect)) === view(rect, 1:1:2, 1:1:3)
+        @test @inferred(Augmentor.applystepview(RCropSize(3), square)) === view(square, 1:1:3, 1:1:3)
+        @test @inferred(Augmentor.applystepview(RCropSize(4), square2)) === view(square2, 1:1:4, 1:1:4)
+        # randomly placed
+        out = @inferred Augmentor.applystepview(RCropSize(2), rect)
+        @test out === view(rect, 1:1:2, 1:1:2) || out === view(rect, 1:1:2, 2:1:3)
+        out = @inferred Augmentor.applystepview(RCropSize(2), square)
+        @test (out === view(square, 1:1:2, 1:1:2) || out === view(square, 1:1:2, 2:1:3)
+            || out === view(square, 2:1:3, 1:1:2) || out === view(square, 2:1:3, 2:1:3))
+    end
+    @testset "permute" begin
+        @test @inferred(Augmentor.supports_permute(RCropSize)) === false
+    end
+end
