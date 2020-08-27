@@ -21,7 +21,7 @@ in the case you would like to contribute to the package, you can
 manually choose to be on the latest (untagged) version.
 
 ```julia
-Pkg.checkout("Augmentor")
+Pkg.develop("Augmentor")
 ```
 
 ## Example
