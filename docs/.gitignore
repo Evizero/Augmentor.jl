@@ -1,4 +1,4 @@
 build/
 site/
-src/generated/*
+src/democards
 /Manifest.toml

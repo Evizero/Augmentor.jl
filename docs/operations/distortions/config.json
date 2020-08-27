@@ -1,0 +1,7 @@
+{
+  "title": "Distortions",
+  "order": [
+    "elasticdistortion.jl"
+  ],
+  "description": "Aside from affine transformations, Augmentor also provides functionality for performing a variety of distortions. These types of operations usually provide a much larger distribution of possible output images."
+}

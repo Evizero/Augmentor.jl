@@ -1,56 +1,19 @@
-using Documenter, Augmentor
-using Images
+using Documenter, DemoCards
+using Augmentor
 using Random
 using MLDatasets
 
-# predownload the dataset to skip the interactive prompt
-if !isdir(first(Base.DEPOT_PATH))
-    MNIST.download(;i_accept_the_terms_of_use=true)
-end
+ENV["DATADEPS_ALWAYS_ACCEPT"] = true # MLDatasets
 
-# Define the documentation order of the operations. The whole
-# purpose of this vector is literally just to dictate in what
-# chronological order the operations are documented.
-op_fnames = [
-    "flipx",
-    "flipy",
-    "rotate90",
-    "rotate270",
-    "rotate180",
-    "rotate",
-    "shearx",
-    "sheary",
-    "scale",
-    "zoom",
-    "elasticdistortion",
-    "crop",
-    "cropnative",
-    "cropsize",
-    "cropratio",
-    "rcropratio",
-    "resize",
-    "converteltype",
-    "mapfun",
-    "aggmapfun",
-    "splitchannels",
-    "combinechannels",
-    "permutedims",
-    "reshape",
-    "noop",
-    "cacheimage",
-    "either",
-]
-dict_order = Dict(fname * ".md" => i for (i, fname) in enumerate(op_fnames))
-myless(a, b) = dict_order[a] < dict_order[b]
+op_templates, op_theme = cardtheme("grid")
+operations, operations_cb = makedemos("operations", op_templates)
 
-# --------------------------------------------------------------------
-
-Random.seed!(1337)
 format = Documenter.HTML(edit_link = "master",
                          prettyurls = get(ENV, "CI", nothing) == "true",
                          assets = [
                              joinpath("assets", "favicon.ico"),
-                             joinpath("assets", "style.css")
+                             joinpath("assets", "style.css"),
+                             op_theme
                         ]
 )
 
@@ -69,12 +32,14 @@ makedocs(
         ],
         "User's Guide" => [
             "interface.md",
-            hide("operations.md", Any[joinpath("operations", fname) for fname in sort(readdir(joinpath(@__DIR__, "src", "operations")), lt = myless) if splitext(fname)[2] == ".md"]),
+            operations,
         ],
         # "Tutorials" => joinpath.("generated", ExampleWeaver.listmarkdown()),
         hide("Indices" => "indices.md"),
         "LICENSE.md",
     ]
 )
+
+operations_cb()
 
 deploydocs(repo = "github.com/Evizero/Augmentor.jl.git")

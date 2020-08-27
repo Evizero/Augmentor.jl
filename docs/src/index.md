@@ -29,10 +29,22 @@ first few examples of the [MNIST
 database](http://yann.lecun.com/exdb/mnist/).
 
 ```@eval
-using Augmentor, Images
-using PaddedViews, OffsetArrays, MosaicViews
-using MLDatasets, ImageMagick
+using Augmentor, ImageCore, ImageMagick
+using MLDatasets
 using Random
+
+# copied from operations/assets/gif.jl
+function make_gif(img, pl, num_sample; random_seed=1337, kwargs...)
+    fillvalue = oneunit(eltype(img[1]))
+
+    init_frame = mosaicview(img; kwargs...)
+    frames = map(1:num_sample-1) do _
+        mosaicview(map(x->augment(x, pl), img)...; kwargs...)
+    end
+
+    frames = sym_paddedviews(fillvalue, init_frame, frames...)
+    cat(frames..., dims=3)
+end
 
 pl = ElasticDistortion(6, scale=0.3, border=true) |>
      Rotate([10, -5, -3, 0, 3, 5, 10]) |>
@@ -40,21 +52,14 @@ pl = ElasticDistortion(6, scale=0.3, border=true) |>
      CropSize(28, 28) |>
      Zoom(0.9:0.1:1.2)
 
+n_samples, n_frames = 24, 10
+imgs = [MNIST.convert2image(MNIST.traintensor(i)) for i in 1:n_samples]
+preview = make_gif(imgs, pl, n_frames; nrow=1)
 
-n_sample, nrow = 24, 1
-reduce_op = (x,y) -> cat(x, y, dims=3)
-img_generator = i->augment(MNIST.convert2image(MNIST.traintensor(i)), pl)
-frame_generator = (n, nrow)-> mosaicview(mapreduce(img_generator, reduce_op, 1:n), nrow=nrow)
-
-preview = mapreduce(reduce_op, 1:10) do i
-    Random.seed!(i)
-    frame_generator(n_sample, nrow)
-end
-
-ImageMagick.save("mnist_preview.gif", preview; fps=3)
+ImageMagick.save("mnist_preview.gif", RGB(1, 1, 1) .- preview; fps=3)
 ```
 
-![](mnist_preview.gif)
+![mnist_preview](mnist_preview.gif)
 
 The Julia version of **Augmentor** is engineered specifically for
 high performance applications. It makes use of multiple

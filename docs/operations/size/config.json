@@ -1,0 +1,9 @@
+{
+  "title": "Resizing and Subsetting",
+  "order": [
+    "crop.jl",
+    "cropsize.jl",
+    "cropratio.jl"
+  ],
+  "description": "The process of cropping is useful to discard parts of the input image. To provide this functionality lazily, applying a crop introduces a layer of representation called a \"view\" or SubArray. This is different yet compatible with how affine operations or other special purpose implementations work. This means that chaining a crop with some affine operation is perfectly fine if done sequentially. However, it is generally not advised to combine affine operations with crop operations within an [`Either`](@ref) block. Doing that would force the [`Either`](@ref) to trigger the eager computation of its branches in order to preserve type-stability."
+}

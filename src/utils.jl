@@ -1,14 +1,26 @@
 """
-    testpattern() -> Matrix{RGBA{N0f8}}
+    testpattern([T=RGBA{N0f8}]; ratio=1.0) -> Matrix{RGBA{N0f8}}
 
-Load and return the provided 300x400 test image.
+Load and return the provided 300x400 test image. Additional args and kwargs
+are passed to `imresize`.
 
 The returned image was specifically designed to be informative
 about the effects of the applied augmentation operations. It is
 thus well suited to prototype an augmentation pipeline, because it
 makes it easy to see what kind of effects one can achieve with it.
 """
-testpattern() = load(joinpath(@__DIR__, "..", "resources", "testpattern.png"))
+function testpattern(args...; ratio=1.0)
+    imresize(load(joinpath(@__DIR__, "..", "resources", "testpattern.png")), ratio=ratio)
+end
+function testpattern(T::Type{<:Colorant}; ratio=1.0)
+    # Directly call T.(testpattern) returns a testpattern with border filled with black pixels
+    # This patch fills border with white pixels so as to be consistent with ARGB(0, 0, 0, 0).
+    npad = 20
+    temp = testpattern()
+    out = fill(oneunit(T), size(temp))
+    out[npad:end-npad, npad:end-npad] .= temp[npad:end-npad, npad:end-npad]
+    return imresize(out, ratio=ratio)
+end
 
 function use_testpattern()
     @info("No custom image specifed. Using \"testpattern()\" for demonstration.")
