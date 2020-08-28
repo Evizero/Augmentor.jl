@@ -318,7 +318,7 @@ numbers still depends on the number of underlying bits in the
 memory, but that is not much of an issue.
 
 ```jldoctest 1
-julia> using FixedPointNumbers;
+julia> using ImageCore; # ImageCore reexports FixedPointNumbers and Colors
 
 julia> reinterpret(N0f8, 0xFF)
 1.0N0f8
@@ -352,8 +352,6 @@ per color channel, and with the second command as a single pixel
 of 16 bit per color channel
 
 ```jldoctest 1
-julia> using Colors, FixedPointNumbers;
-
 julia> reinterpret(RGB{N0f8}, memory)
 2-element reinterpret(RGB{N0f8}, ::Vector{UInt8}):
  RGB{N0f8}(0.004,0.008,0.012)
