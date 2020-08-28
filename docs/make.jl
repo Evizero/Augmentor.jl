@@ -54,4 +54,7 @@ makedocs(
 operations_cb()
 examples_cb()
 
-deploydocs(repo = "github.com/Evizero/Augmentor.jl.git")
+deploydocs(
+    repo = "github.com/johnnychen94/Augmentor.jl.git",
+    push_preview=true
+)
