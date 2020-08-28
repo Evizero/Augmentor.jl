@@ -30,9 +30,9 @@ detail.
    ```
 
 Depending on the complexity of your problem, you may want to
-iterate between `2.` and `3.` to identify an appropriate
+iterate between step `2.` and `3.` to identify an appropriate
 pipeline.
-Take a look at the [Elastic Distortions Tutorial](@ref elastic)
+Take a look at the [Elastic Distortions Tutorial](@ref op_elastic)
 for an example of how such an iterative process could look like.
 
 ## [Defining a Pipeline](@id pipeline)
@@ -50,7 +50,7 @@ them down to the biggest possible square, and lastly resize the
 image(s) to a fixed size of 64 by 64 pixel. Such a pipeline would
 be defined as follows:
 
-```julia-repl
+```jldoctest; setup = :(using Augmentor)
 julia> pl = Rotate(14) |> CropRatio(1) |> Resize(64,64)
 3-step Augmentor.ImmutablePipeline:
  1.) Rotate 14 degree

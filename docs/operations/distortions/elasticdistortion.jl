@@ -1,6 +1,7 @@
 # ---
 # title: ElasticDistortion
 # cover: elasticdistortion.gif
+# id: op_elastic
 # ---
 
 # Smoothed random distortion

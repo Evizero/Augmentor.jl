@@ -1,5 +1,6 @@
 # LICENSE
 
 ```@eval
-Markdown.parse_file(joinpath(@__DIR__, "../LICENSE.md"))
+using Markdown, Augmentor
+Markdown.parse_file(joinpath(pkgdir(Augmentor), "LICENSE.md"))
 ```

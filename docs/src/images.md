@@ -18,7 +18,7 @@ new community members. This beginner's guide is an attempt to
 provide a step-by-step overview of how pixel data is handled in
 Julia. To get a more detailed explanation on some particular
 concept involved, please take a look at the documentation of the
-[JuliaImages](https://juliaimages.github.io) ecosystem.
+[JuliaImages](https://juliaimages.org/) ecosystem.
 
 ## Multi-dimensional Arrays
 
@@ -49,7 +49,7 @@ representation.
 
 ```jldoctest 1
 julia> memory = [0x1, 0x2, 0x3, 0x4, 0x5, 0x6]
-6-element Array{UInt8,1}:
+6-element Vector{UInt8}:
  0x01
  0x02
  0x03
@@ -61,11 +61,11 @@ julia> memory = [0x1, 0x2, 0x3, 0x4, 0x5, 0x6]
 The same block of memory could also be interpreted differently.
 For example we could think of this as a matrix with 3 rows and 2
 columns instead (or even the other way around). The function
-`reinterpret` allows us to do just that
+`reshape` allows us to do just that
 
 ```jldoctest 1
-julia> A = reinterpret(UInt8, memory, (3,2))
-3×2 Array{UInt8,2}:
+julia> A = reshape(memory, (3, 2))
+3×2 Matrix{UInt8}:
  0x01  0x04
  0x02  0x05
  0x03  0x06
@@ -95,7 +95,7 @@ This idea can also be generalized for higher dimensions. For
 example we can think of this as a 3D array as well.
 
 ```jldoctest 1
-julia> reinterpret(UInt8, memory, (3,1,2))
+julia> reshape(memory, (3, 1, 2))
 3×1×2 Array{UInt8,3}:
 [:, :, 1] =
  0x01
@@ -115,7 +115,7 @@ any number of practically empty dimensions, otherwise known as
 *singleton dimensions*.
 
 ```jldoctest 1
-julia> reinterpret(UInt8, memory, (3,1,1,1,2))
+julia> reshape(memory, (3,1,1,1,2))
 3×1×1×1×2 Array{UInt8,5}:
 [:, :, 1, 1, 1] =
  0x01
@@ -153,8 +153,8 @@ If for some reason that is not the case there are two possible
 ways to convert the image to that format.
 
 ```jldoctest 1
-julia> At = reinterpret(UInt8, memory, (3,2))' # "row-major" layout
-2×3 Array{UInt8,2}:
+julia> At = collect(reshape(memory, (3,2))') # "row-major" layout
+2×3 Matrix{UInt8}:
  0x01  0x02  0x03
  0x04  0x05  0x06
 ```
@@ -166,22 +166,19 @@ julia> At = reinterpret(UInt8, memory, (3,2))' # "row-major" layout
 
    ```jldoctest 1
    julia> B = permutedims(At, (2,1))
-   3×2 Array{UInt8,2}:
+   3×2 Matrix{UInt8}:
     0x01  0x04
     0x02  0x05
     0x03  0x06
    ```
 
-2. The second way is using the function
-   `ImageCore.permuteddimsview` which results in a lazy view that
+2. The second way is using `Base.PermutedDimsArray` which results in a lazy view that
    does not allocate a new array but instead only computes the
    correct values when queried.
 
    ```jldoctest 1
-   julia> using ImageCore
-
-   julia> C = permuteddimsview(At, (2,1))
-   3×2 PermutedDimsArray(::Array{UInt8,2}, (2, 1)) with element type UInt8:
+   julia> C = PermutedDimsArray(At, (2,1))
+   3×2 PermutedDimsArray(::Matrix{UInt8}, (2, 1)) with eltype UInt8:
     0x01  0x04
     0x02  0x05
     0x03  0x06
@@ -204,7 +201,7 @@ consider our original vector `memory` again.
 
 ```jldoctest 1
 julia> memory = [0x1, 0x2, 0x3, 0x4, 0x5, 0x6]
-6-element Array{UInt8,1}:
+6-element Vector{UInt8}:
  0x01
  0x02
  0x03
@@ -219,7 +216,7 @@ vector of 3 `UInt16` elements.
 
 ```jldoctest 1
 julia> reinterpret(UInt16, memory)
-3-element Array{UInt16,1}:
+3-element reinterpret(UInt16, ::Vector{UInt8}):
  0x0201
  0x0403
  0x0605
@@ -274,7 +271,7 @@ above, and interpret the underlying memory as a vector of to
 
 ```julia-repl
 julia> reinterpret(MyRGB, memory)
-2-element Array{MyRGB,1}:
+2-element Vector{MyRGB}:
  MyRGB(0x01,0x02,0x03)
  MyRGB(0x04,0x05,0x06)
 ```
@@ -358,12 +355,12 @@ of 16 bit per color channel
 julia> using Colors, FixedPointNumbers;
 
 julia> reinterpret(RGB{N0f8}, memory)
-2-element Array{RGB{N0f8},1}:
+2-element reinterpret(RGB{N0f8}, ::Vector{UInt8}):
  RGB{N0f8}(0.004,0.008,0.012)
  RGB{N0f8}(0.016,0.02,0.024)
 
 julia> reinterpret(RGB{N0f16}, memory)
-1-element Array{RGB{N0f16},1}:
+1-element reinterpret(RGB{N0f16}, ::Vector{UInt8}):
  RGB{N0f16}(0.00783,0.01567,0.02351)
 ```
 
