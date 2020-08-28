@@ -7,7 +7,7 @@ try
     using ISICArchive
 catch
     using Pkg
-    Pkg.add(url="https://evizero.github.io/Augmentor.jl/generated/mnist_elastic/", rev="master")
+    Pkg.add(url="https://github.com/Evizero/ISICArchive.jl.git", rev="master")
     using ISICArchive
 end
 
