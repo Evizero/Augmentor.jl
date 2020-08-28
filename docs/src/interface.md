@@ -32,7 +32,7 @@ detail.
 Depending on the complexity of your problem, you may want to
 iterate between step `2.` and `3.` to identify an appropriate
 pipeline.
-Take a look at the [Elastic Distortions Tutorial](@ref op_elastic)
+Take a look at the [Elastic Distortions Tutorial](@ref mnist_elastic)
 for an example of how such an iterative process could look like.
 
 ## [Defining a Pipeline](@id pipeline)

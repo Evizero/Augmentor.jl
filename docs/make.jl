@@ -7,13 +7,16 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = true # MLDatasets
 
 op_templates, op_theme = cardtheme("grid")
 operations, operations_cb = makedemos("operations", op_templates)
+examples_templates, examples_theme = cardtheme("list")
+examples, examples_cb = makedemos("examples", examples_templates)
 
 format = Documenter.HTML(edit_link = "master",
                          prettyurls = get(ENV, "CI", nothing) == "true",
                          assets = [
                              joinpath("assets", "favicon.ico"),
                              joinpath("assets", "style.css"),
-                             op_theme
+                             op_theme,
+                             examples_theme
                         ]
 )
 
@@ -34,12 +37,13 @@ makedocs(
             "interface.md",
             operations,
         ],
-        # "Tutorials" => joinpath.("generated", ExampleWeaver.listmarkdown()),
+        "Tutorials" => examples,
         hide("Indices" => "indices.md"),
         "LICENSE.md",
     ]
 )
 
 operations_cb()
+examples_cb()
 
 deploydocs(repo = "github.com/Evizero/Augmentor.jl.git")
