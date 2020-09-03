@@ -1,0 +1,9 @@
+{
+  "order": [
+    "affine",
+    "distortions",
+    "size",
+    "misc"
+  ]
+}
+  

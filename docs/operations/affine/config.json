@@ -1,0 +1,12 @@
+{
+  "title": "Affine Transformations",
+  "order": [
+    "flip.jl",
+    "rotate.jl",
+    "shear.jl",
+    "scale.jl",
+    "resize.jl",
+    "zoom.jl"
+  ],
+  "description": "A sizeable amount of the provided operations fall under the category of **affine transformations**. As such, they can be described using what is known as an [affine map](https://en.wikipedia.org/wiki/Affine_transformation), which are inherently compose-able if chained together. However, utilizing such a affine formulation requires (costly) interpolation, which may not always be needed to achieve the desired effect. For that reason do some of the operations below also provide a special purpose implementation to produce their specified result. Those are usually preferred over the affine formulation if sensible considering the complete pipeline."
+}

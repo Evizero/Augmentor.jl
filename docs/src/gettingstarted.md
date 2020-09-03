@@ -21,7 +21,7 @@ in the case you would like to contribute to the package, you can
 manually choose to be on the latest (untagged) version.
 
 ```julia
-Pkg.checkout("Augmentor")
+Pkg.develop("Augmentor")
 ```
 
 ## Example
@@ -35,7 +35,7 @@ can be downloaded
 [here](https://isic-archive.com/api/v1/image/5592ac599fc3c13155a57a85/thumbnail)
 using their [Web API](https://isic-archive.com/api/v1).
 
-```julia-repl
+```julia
 julia> using Augmentor, ISICArchive
 
 julia> img = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
@@ -62,7 +62,9 @@ julia> img_new = augment(img, pl)
 ```
 
 ```@eval
-using Augmentor, ISICArchive;
+using Augmentor, ISICArchive
+using ImageCore, ImageMagick
+using Random
 
 img = get(ImageThumbnailRequest(id = "5592ac599fc3c13155a57a85"))
 
@@ -73,34 +75,29 @@ pl = Either(1=>FlipX(), 1=>FlipY(), 2=>NoOp()) |>
      Zoom(1:0.05:1.2) |>
      Resize(64, 64)
 
-img_new = augment(img, pl)
+# modified from operations/assets/gif.jl
+function make_gif(img, pl, num_sample; post_op=identity, random_seed=1337)
+    Random.seed!(random_seed)
 
-using Plots
-pyplot(reuse = true)
-default(bg_outside=colorant"#F3F6F6")
-srand(123)
-
-# Create image that shows the input
-plot(img, size=(256,169), xlim=(1,255), ylim=(1,168), grid=false, ticks=true)
-Plots.png(joinpath("assets","isic_in.png"))
-
-# create animate gif that shows 10 outputs
-anim = @animate for i=1:10
-    plot(augment(img, pl), size=(169,169), xlim=(1,63), ylim=(1,63), grid=false, ticks=true)
+    fillvalue = oneunit(eltype(img))
+    frames = sym_paddedviews(
+        fillvalue,
+        post_op(img),
+        [post_op(augment(img, pl)) for _ in 1:num_sample-1]...
+    )
+    cat(frames..., dims=3)
 end
-Plots.gif(anim, joinpath("assets","isic_out.gif"), fps = 2)
+
+ImageMagick.save(joinpath("assets","isic_in.png"), img)
+preview = make_gif(img, pl, 10)[:, :, 2:end]
+ImageMagick.save(joinpath("assets", "isic_out.gif"), preview; fps=2)
 
 nothing
 ```
 
 The function `augment` will generate a single augmented image
 from the given input image and pipeline. To visualize the effect
-we compiled a few resulting output images into a GIF using the
-plotting library
-[Plots.jl](https://github.com/JuliaPlots/Plots.jl) with the
-[PyPlot.jl](https://github.com/JuliaPy/PyPlot.jl) back-end.
-You can inspect the full code by clicking on "Edit on Github" in
-the top right corner of this page.
+we compiled a few resulting output images into a GIF.
 
 Input (`img`)                |   | Output (`img_new`)
 :---------------------------:|:-:|:------------------------------:
