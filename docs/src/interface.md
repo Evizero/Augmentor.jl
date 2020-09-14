@@ -117,6 +117,54 @@ julia> pl = (1=>FlipX()) * (1=>FlipY()) * (2=>NoOp()) |> CropSize(100,100)
 Now that we know how to define a pipeline, let us think about how
 to apply it to an image or a set of images.
 
+## The design behind operation types
+
+
+The purpose of an operation is to simply serve as a "dumb
+placeholder" to specify the intent and parameters of the desired
+transformation. What that means is that a pipeline of operations
+can be thought of as a list of instructions (a cookbook of
+sorts), that Augmentor uses internally to construct the required
+code that implements the desired behaviour in the most efficient
+way it can.
+
+The way an operation is implemented depends on the rest of the
+specified pipeline. For example, Augmentor knows three different
+ways to implement the behaviour of the operation `Rotate90` and
+will choose the one that best coincides with the other operations
+of the pipeline and their concrete order.
+
+1. Call the function `rotl90` of Julia's base library, which
+   makes use of the fact that a 90 degree rotation can be
+   implemented very efficiently. While by itself this is the
+   fastest way to compute the result, this function is "eager"
+   and will allocate a new array. If `Rotate90` is followed by
+   another operation this may not be the best choice, since it
+   will cause a temporary image that is later discarded.
+
+2. Create a `SubArray` of a `PermutedDimsArray`. This is more or
+   less a lazy version of `rotl90` that makes use of the fact
+   that a 90 degree rotation can be described 1-to-1 using just
+   the original pixels. By itself this strategy is slower than
+   `rotl90`, but if it is followed by an operation such as `Crop`
+   or `CropSize` it can be significantly faster. The reason for
+   this is that it avoids the computation of unused pixels and
+   also any allocation of temporary memory. The computation
+   overhead per output pixel, while small, grows linearly with
+   the number of chained operations.
+
+3. Create an `AffineMap` using a rotation matrix that describes a
+   90 degree rotation around the center of the image. This will
+   result in a lazy transformation of the original image that is
+   further compose-able with other `AffineMap`. This is the
+   slowest available strategy, unless multiple affine operations
+   are chained together. If that is the case, then chaining the
+   operations can be reduced to composing the tiny affine maps
+   instead. This effectively fuses multiple operations into a
+   single operation for which the computation overhead per output
+   pixel remains approximately constant in respect to the number
+   of chained operations.
+
 ## Loading the Example Image
 
 Augmentor ships with a custom example image, which was
