@@ -1,7 +1,8 @@
 using ImageCore, ImageFiltering
 using ImageTransformations, CoordinateTransformations, Interpolations
 using MLDataPattern
-using OffsetArrays, StaticArrays, IdentityRanges, MappedArrays, ComputationalResources
+using OffsetArrays, StaticArrays, IdentityRanges, ComputationalResources
+using ImageCore.MappedArrays
 using ReferenceTests, Test, TestImages, ImageDistances, Statistics
 
 if isdefined(OffsetArrays, :IdOffsetRange)
