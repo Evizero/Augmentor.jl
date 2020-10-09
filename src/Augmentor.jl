@@ -1,7 +1,7 @@
 module Augmentor
 
-using MappedArrays
 using ImageCore
+using ImageCore.MappedArrays
 using ImageTransformations
 using ImageFiltering
 using CoordinateTransformations
