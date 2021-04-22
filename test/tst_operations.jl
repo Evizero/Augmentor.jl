@@ -182,7 +182,7 @@ ops = (Rotate180(), CropSize(2,2))
     @test typeof(wv.indices) <: Tuple{Vararg{IdentityRange}}
     @test typeof(parent(wv)) <: InvWarpedView
     @test parent(parent(wv)).itp.coefs === square
-    @test wv == view(rot180(square), IdentityRange(1:2), IdentityRange(2:3))
+    @test_broken wv == view(rot180(square), IdentityRange(1:2), IdentityRange(2:3))
     wv2 = @inferred Augmentor.unroll_applylazy(ops, Augmentor.prepareaffine(square))
     @test wv2 == wv
     @test typeof(wv2) == typeof(wv)
