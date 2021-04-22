@@ -131,12 +131,12 @@ end
 function applyeager(op::AggregateThenMapFun, img::AbstractArray, param)
     # promote the result to float type because `aggfun` might not widely support `Gray{N0f8}`/`N0f8` types well
     # e.g, type instability in https://github.com/JuliaGraphics/ColorVectorSpace.jl/issues/134
-    agg = op.aggfun(of_eltype(floattype(eltype(img)), img))
+    agg = convert(floattype(eltype(img)), op.aggfun(img))
     plain_array(map(x -> op.mapfun(x, agg), img))
 end
 
 function applylazy(op::AggregateThenMapFun, img::AbstractArray, param)
-    agg = op.aggfun(of_eltype(floattype(eltype(img)), img))
+    agg = convert(floattype(eltype(img)), op.aggfun(img))
     mappedarray(x -> op.mapfun(x, agg), img)
 end
 
