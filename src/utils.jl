@@ -35,7 +35,7 @@ end
 Return a memory contiguous array for better performance.
 
 Data copy only happens when necessary. For example, views returned by `view`,
-`permuteddimsview` are such cases.
+`PermutedDimsArray` are such cases.
 
 See also: [`plain_array`](@ref), [`plain_axes`](@ref)
 """
@@ -63,7 +63,7 @@ Return a memory contiguous plain array for better performance.
 A plain array is either an `Array` or a `StaticArray`.
 
 Data copy only happens when necessary. For example, views returned by `view`,
-`permuteddimsview` are such cases.
+`PermutedDimsArray` are such cases.
 
 See also: [`contiguous`](@ref), [`plain_axes`](@ref)
 """

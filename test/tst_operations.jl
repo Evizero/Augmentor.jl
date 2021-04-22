@@ -131,7 +131,7 @@ ops = (Rotate180(), Either((Rotate90(), Rotate270()), (1,0)))
     wv2 = @inferred Augmentor.unroll_applylazy(ops, Augmentor.prepareaffine(square))
     @test wv2 == wv
     v = @inferred Augmentor.unroll_applylazy(ops, rect)
-    @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
+    @test v === view(PermutedDimsArray(rect, (2,1)), 1:1:3, 2:-1:1)
     @test v == rotl90(rot180(rect))
 end
 
@@ -147,7 +147,7 @@ ops = (Crop(1:2,2:3), Either((Rotate90(), Rotate270()), (1,0)))
     @test wv2 == wv
     @test typeof(wv2) == typeof(wv)
     v = @inferred Augmentor.unroll_applylazy(ops, square)
-    @test v === view(permuteddimsview(square,(2,1)), 3:-1:2, 1:1:2)
+    @test v === view(PermutedDimsArray(square,(2,1)), 3:-1:2, 1:1:2)
     @test v == rotl90(view(square, 1:2, 2:3))
 end
 

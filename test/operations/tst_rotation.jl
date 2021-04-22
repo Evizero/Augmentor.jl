@@ -53,11 +53,11 @@
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Rotate90) === true
         v = @inferred Augmentor.applylazy(Rotate90(), rect)
-        @test v === view(permuteddimsview(rect, (2,1)), 3:-1:1, 1:1:2)
+        @test v === view(PermutedDimsArray(rect, (2,1)), 3:-1:1, 1:1:2)
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
         v = @inferred Augmentor.applylazy(Rotate90(), view(square,1:2,1:3))
-        @test v === view(permuteddimsview(square, (2,1)), 3:-1:1, 1:1:2)
+        @test v === view(PermutedDimsArray(square, (2,1)), 3:-1:1, 1:1:2)
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
         wv = @inferred Augmentor.applylazy(Rotate90(), Augmentor.prepareaffine(square))
@@ -77,7 +77,7 @@
     @testset "permute" begin
         @test Augmentor.supports_permute(Rotate90) === true
         v = @inferred Augmentor.applypermute(Rotate90(), rect)
-        @test v === view(permuteddimsview(rect, (2,1)), 3:-1:1, 1:1:2)
+        @test v === view(PermutedDimsArray(rect, (2,1)), 3:-1:1, 1:1:2)
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
         v2 = @inferred Augmentor.applypermute(Rotate90(), v)
@@ -212,11 +212,11 @@ end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Rotate270) === true
         v = @inferred Augmentor.applylazy(Rotate270(), rect)
-        @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
+        @test v === view(PermutedDimsArray(rect, (2,1)), 1:1:3, 2:-1:1)
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
         v = @inferred Augmentor.applylazy(Rotate270(), view(square,1:2,1:3))
-        @test v === view(permuteddimsview(square, (2,1)), 1:1:3, 2:-1:1)
+        @test v === view(PermutedDimsArray(square, (2,1)), 1:1:3, 2:-1:1)
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
         wv = @inferred Augmentor.applylazy(Rotate270(), Augmentor.prepareaffine(square))
@@ -233,7 +233,7 @@ end
     @testset "permute" begin
         @test Augmentor.supports_permute(Rotate270) === true
         v = @inferred Augmentor.applypermute(Rotate270(), rect)
-        @test v === view(permuteddimsview(rect, (2,1)), 1:1:3, 2:-1:1)
+        @test v === view(PermutedDimsArray(rect, (2,1)), 1:1:3, 2:-1:1)
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
         v2 = @inferred Augmentor.applypermute(Rotate270(), v)
