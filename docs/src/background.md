@@ -14,19 +14,20 @@ Depending on the structure and semantics of the data, coming up
 with such transformations can be a challenge by itself.
 
 Images are a special class of data that exhibit some interesting
-properties in respect to their structure. For example do the
+properties in respect to their structure. For example the
 dimensions of an image (i.e. the pixel) exhibit a spatial
 relationship to each other. As such, a lot of commonly used
 augmentation strategies for image data revolve around affine
 transformations, such as translations or rotations. Because
-images are such a popular and special case of data, they deserve
+images are so popular and special case of data, they deserve
 their own sub-category of data augmentation, which we will
 unsurprisingly refer to as **image augmentation**.
 
 The general idea is the following: if we want our model to
 generalize well, then we should design the learning process in
 such a way as to bias the model into learning such
-transformation-equivariant properties. One way to do this is via
+transformation-[equivariant](https://en.wikipedia.org/wiki/Equivariant_map)
+properties. One way to do this is via
 the design of the model itself, which for example was idea behind
 convolutional neural networks. An orthogonal approach to bias the
 model to learn about this equivariance - and the focus of this
