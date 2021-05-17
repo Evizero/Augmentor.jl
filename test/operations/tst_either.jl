@@ -595,7 +595,7 @@ end
         @test_throws MethodError Augmentor.applypermute(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
         @test v === @inferred(Augmentor.applypermute(op, rect))
-        @test v === view(permuteddimsview(rect,(2,1)),3:-1:1,1:1:2)
+        @test v === view(PermutedDimsArray(rect,(2,1)),3:-1:1,1:1:2)
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
         res1, res2 = @inferred Augmentor.applylazy(op, (square2, rect))
@@ -613,7 +613,7 @@ end
         @test_throws MethodError Augmentor.applypermute(op, nothing)
         v = @inferred Augmentor.applylazy(op, rect)
         @test v === @inferred(Augmentor.applypermute(op, rect))
-        @test v === view(permuteddimsview(rect,(2,1)),1:1:3,2:-1:1)
+        @test v === view(PermutedDimsArray(rect,(2,1)),1:1:3,2:-1:1)
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
     end

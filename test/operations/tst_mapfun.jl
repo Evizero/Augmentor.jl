@@ -32,7 +32,7 @@
             end
             img = OffsetArray(rgb_rect, -2, -1)
             res = @inferred(Augmentor.applyeager(MapFun(x -> x - RGB(.1,.1,.1)), img))
-            @test res ≈ collect(img .- RGB(.1,.1,.1))
+            @test collect(res) ≈ OffsetArrays.no_offset_view(img .- RGB(.1,.1,.1))
             @test typeof(res) <: Array{RGB{Float64}}
         end
     end
@@ -106,7 +106,7 @@ end
             end
             img = OffsetArray(rgb_rect, -2, -1)
             res = @inferred(Augmentor.applyeager(AggregateThenMapFun(mean, (x,a)->x-a), img))
-            @test res ≈ collect(img .- mean(rgb_rect))
+            @test res ≈ OffsetArrays.no_offset_view(img .- mean(rgb_rect))
             @test typeof(res) <: Array
             @test eltype(res) <: RGB{<:AbstractFloat} # could be either Float32 / Float64
         end
@@ -124,13 +124,13 @@ end
         @test parent(res) === rect
         @test res isa ReadonlyMappedArray
         res = @inferred(Augmentor.applylazy(AggregateThenMapFun(mean, (x,a)->x-a), rgb_rect))
-        @test res ≈ mappedarray(x->x-mean(rgb_rect), rgb_rect)
+        @test res ≈ collect(eltype(res), mappedarray(x->x-mean(rgb_rect), rgb_rect))
         @test parent(res) === rgb_rect
         @test typeof(res) <: MappedArrays.ReadonlyMappedArray
         @test eltype(res) <: RGB{<:AbstractFloat} # could be either Float32 / Float64
         img = OffsetArray(rgb_rect, -2, -1)
         res = @inferred(Augmentor.applylazy(AggregateThenMapFun(mean, (x,a)->x-a), img))
-        @test res ≈ mappedarray(x->x-mean(rgb_rect), img)
+        @test res ≈ collect(eltype(res), mappedarray(x->x-mean(rgb_rect), img))
         @test parent(res) === img
         @test typeof(res) <: MappedArrays.ReadonlyMappedArray
         @test eltype(res) <: RGB{<:AbstractFloat} # could be either Float32 / Float64

@@ -31,15 +31,15 @@ end
         @test @inferred(Augmentor.contiguous(v)) == channelview(rect)
         @test typeof(Augmentor.contiguous(v)) <: Array
     end
-    let p = permuteddimsview(A, (2,1))
+    let p = PermutedDimsArray(A, (2,1))
         @test @inferred(Augmentor.contiguous(p)) == A'
         @test typeof(Augmentor.contiguous(p)) <: Array
     end
-    let p = permuteddimsview(Ao, (2,1))
+    let p = PermutedDimsArray(Ao, (2,1))
         @test @inferred(Augmentor.contiguous(p)) == Ao'
         @test typeof(Augmentor.contiguous(p)) <: OffsetArray
     end
-    let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
+    let p = view(PermutedDimsArray(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
         @test @inferred(Augmentor.contiguous(p)) == OffsetArray(A'[2:3, 1:2],1,0)
         @test typeof(Augmentor.contiguous(p)) <: OffsetArray
     end
@@ -89,11 +89,11 @@ end
         @test @inferred(Augmentor.plain_array(v)) == channelview(rect)
         @test typeof(Augmentor.plain_array(v)) <: Array
     end
-    let p = permuteddimsview(A, (2,1))
+    let p = PermutedDimsArray(A, (2,1))
         @test @inferred(Augmentor.plain_array(p)) == A'
         @test typeof(Augmentor.plain_array(p)) <: Array
     end
-    let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
+    let p = view(PermutedDimsArray(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
         @test @inferred(Augmentor.plain_array(p)) == A'[2:3, 1:2]
         @test typeof(Augmentor.plain_array(p)) <: Array
     end
@@ -127,10 +127,10 @@ end
     let v = channelview(rect)
         @test @inferred(Augmentor.plain_axes(v)) === v
     end
-    let p = permuteddimsview(A, (2,1))
+    let p = PermutedDimsArray(A, (2,1))
         @test @inferred(Augmentor.plain_axes(p)) === p
     end
-    let p = view(permuteddimsview(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
+    let p = view(PermutedDimsArray(A, (2,1)), IdentityRange(2:3), IdentityRange(1:2))
         @test @inferred(Augmentor.plain_axes(p)) === view(parent(p), 2:3, 1:2)
     end
     let Aa = Augmentor.prepareaffine(A)

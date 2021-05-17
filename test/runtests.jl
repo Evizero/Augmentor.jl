@@ -1,4 +1,5 @@
 using ImageCore, ImageFiltering
+using Random
 using ImageTransformations, CoordinateTransformations, Interpolations
 using MLDataPattern
 using OffsetArrays, StaticArrays, IdentityRanges, ComputationalResources

@@ -107,6 +107,9 @@
             @test wv == imresize(square, 2, 3)
         end
         @testset "multiple images" begin
+            Random.seed!(0) # otherwise, it would introduce numerical instability after interpolation
+            square = Gray{N0f8}[0.1 0.2 0.3; 0.4 0.5 0.6; 0.7 0.6 0.9]
+            square2 = rand(Gray{N0f8}, 4, 4)
             wv1, wv2 = @inferred Augmentor.applylazy(Resize(2,3), (square, square2))
             @test typeof(wv1) <: SubArray
             @test typeof(wv1.indices) <: Tuple{Vararg{IdentityRange}}
@@ -119,6 +122,7 @@
             @test typeof(parent(wv2)) <: InvWarpedView
             @test typeof(parent(parent(wv2))) <: Interpolations.Extrapolation
             @test parent(parent(wv2)).itp.coefs === square2
+            # Interpolation might introduce numerical instability
             @test wv2 == imresize(square2, 2, 3)
         end
     end

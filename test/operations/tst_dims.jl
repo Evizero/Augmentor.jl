@@ -61,7 +61,7 @@
     @testset "lazy" begin
         @test Augmentor.supports_lazy(PermuteDims) === true
         @test @inferred(Augmentor.supports_lazy(typeof(PermuteDims(2,1)))) === true
-        f = (img) -> permuteddimsview(img, (2,1))
+        f = (img) -> PermutedDimsArray(img, (2,1))
         imgs = [
             (rect),
             (Augmentor.prepareaffine(rect)),
