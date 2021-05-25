@@ -96,7 +96,7 @@ example we can think of this as a 3D array as well.
 
 ```jldoctest 1
 julia> reshape(memory, (3, 1, 2))
-3×1×2 Array{UInt8,3}:
+3×1×2 Array{UInt8, 3}:
 [:, :, 1] =
  0x01
  0x02
@@ -116,7 +116,7 @@ any number of practically empty dimensions, otherwise known as
 
 ```jldoctest 1
 julia> reshape(memory, (3,1,1,1,2))
-3×1×1×1×2 Array{UInt8,5}:
+3×1×1×1×2 Array{UInt8, 5}:
 [:, :, 1, 1, 1] =
  0x01
  0x02
