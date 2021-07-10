@@ -18,6 +18,7 @@ MLDataPattern = "9920b226-0b2a-5f5f-9153-9aa70a013f8b"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 ComputationalResources = "0.3"
