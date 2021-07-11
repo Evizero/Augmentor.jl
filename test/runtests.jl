@@ -52,6 +52,7 @@ tests = [
     "operations/tst_zoom.jl",
     "operations/tst_distortions.jl",
     "operations/tst_either.jl",
+    "operations/tst_blur.jl",
     "tst_operations.jl",
     "tst_pipeline.jl",
     "tst_augment.jl",
