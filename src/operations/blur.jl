@@ -1,5 +1,41 @@
 import ImageFiltering: imfilter, KernelFactors.gaussian
 
+"""
+    GaussianBlur <: ImageOperation
+
+Description
+--------------
+
+Blurs an image using a Gaussian filter.
+
+Usage
+--------------
+
+    GaussianBlur(k, [σ])
+
+Arguments
+--------------
+
+- **`k`** : `Integer` or `AbstractVector` of `Integer` that denote
+    the kernel size. It must be an odd positive number.
+- **`σ`** : Optional. `Real` or `AbstractVector` of `Real` that denote the
+    standard deviation. It must be a positive number.
+    Defaults to `0.3 * ((k - 1) / 2 - 1) + 0.8`.
+
+Examples
+--------------
+
+```
+using Augmentor
+img = testpattern()
+
+# use exactly k=3 and σ=1.0
+augment(img, GaussianBlur(3, 1.0))
+
+# pick k and σ randomly from the specified ranges
+augment(img, GaussianBlur(3:2:7, 1.0:0.1:2.0))
+```
+"""
 struct GaussianBlur{K <: AbstractVector, S <: AbstractVector} <: ImageOperation
     k::K
     σ::S
@@ -13,6 +49,7 @@ struct GaussianBlur{K <: AbstractVector, S <: AbstractVector} <: ImageOperation
 end
 
 GaussianBlur(k, σ) = GaussianBlur(vectorize(k), vectorize(σ))
+GaussianBlur(k) = GaussianBlur(k, 0.3 * ((k - 1) / 2 - 1) + 0.8)
 
 randparam(op::GaussianBlur, img) = (safe_rand(op.k), safe_rand(op.σ))
 

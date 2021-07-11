@@ -2,7 +2,7 @@ import ImageFiltering: imfilter, KernelFactors.gaussian
 
 @testset "GaussianBlur" begin
     @testset "constructor" begin
-        @test_throws ArgumentError GaussianBlur(0, 1)
+        @test_throws ArgumentError GaussianBlur(0)
         @test_throws ArgumentError GaussianBlur(3, 0)
         @test_throws ArgumentError GaussianBlur([1, 3], 0)
         @test_throws ArgumentError GaussianBlur([1, 0], 1)
