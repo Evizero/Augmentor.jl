@@ -56,7 +56,8 @@ randparam(op::GaussianBlur, img) = (safe_rand(op.k), safe_rand(op.σ))
 @inline supports_eager(::Type{<:GaussianBlur}) = true
 
 function applyeager(op::GaussianBlur, img::AbstractArray, (k, σ))
-    kernel = gaussian((σ, σ), (k, k))
+    n = ndims(img)
+    kernel = gaussian(ntuple(_->σ, n), ntuple(_->k, n))
     return imfilter(img, kernel)
 end
 
@@ -72,4 +73,3 @@ function Base.show(io::IO, op::GaussianBlur)
         showconstruction(io, op)
     end
 end
-
