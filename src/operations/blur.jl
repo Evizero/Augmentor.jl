@@ -53,7 +53,7 @@ GaussianBlur(k) = GaussianBlur(k, 0.3 * ((k - 1) / 2 - 1) + 0.8)
 
 randparam(op::GaussianBlur, img) = (safe_rand(op.k), safe_rand(op.σ))
 
-@inline supports_eager(::GaussianBlur) = true
+@inline supports_eager(::Type{<:GaussianBlur}) = true
 
 function applyeager(op::GaussianBlur, img::AbstractArray, (k, σ))
     kernel = gaussian((σ, σ), (k, k))

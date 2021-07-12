@@ -1,5 +1,3 @@
-import ImageFiltering: imfilter, KernelFactors.gaussian
-
 @testset "GaussianBlur" begin
     @testset "constructor" begin
         @test_throws ArgumentError GaussianBlur(0)
@@ -28,7 +26,7 @@ import ImageFiltering: imfilter, KernelFactors.gaussian
         imgs = [testpattern(), camera]
 
         for img in imgs
-            ref = imfilter(img, gaussian((σ, σ), (k, k)))
+            ref = imfilter(img, KernelFactors.gaussian((σ, σ), (k, k)))
             res = Augmentor.applyeager(GaussianBlur(k, σ), img)
             @test ref == res
         end
