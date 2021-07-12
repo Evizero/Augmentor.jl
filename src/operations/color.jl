@@ -55,6 +55,7 @@ struct ColorJitter{A<:AbstractVector, B<:AbstractVector} <: ImageOperation
     end
 end
 
+# The default values for α and β are taken from Albumentations
 ColorJitter() = ColorJitter(0.8:0.1:1.2, -0.2:0.1:0.2, true)
 ColorJitter(α, β; usemax=true) = ColorJitter(vectorize(α), vectorize(β), usemax)
 

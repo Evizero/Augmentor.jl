@@ -48,8 +48,9 @@ struct GaussianBlur{K <: AbstractVector, S <: AbstractVector} <: ImageOperation
     end
 end
 
-GaussianBlur(k, σ) = GaussianBlur(vectorize(k), vectorize(σ))
+# The default value for σ is taken from Albumentations
 GaussianBlur(k) = GaussianBlur(k, 0.3 * ((k - 1) / 2 - 1) + 0.8)
+GaussianBlur(k, σ) = GaussianBlur(vectorize(k), vectorize(σ))
 
 randparam(op::GaussianBlur, img) = (safe_rand(op.k), safe_rand(op.σ))
 
