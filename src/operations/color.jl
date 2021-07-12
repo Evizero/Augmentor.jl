@@ -111,4 +111,4 @@ end
 Base.parent(A::ColorJitterView) = A.parent
 Base.size(A::ColorJitterView) = size(A.orig)
 Base.axes(A::ColorJitterView) = axes(A.orig)
-Base.getindex(A::ColorJitterView, i, j) = _map_pix(A.α, A.β, A.M, A.orig[i, j])
+Base.@propagate_inbounds Base.getindex(A::ColorJitterView, i, j) = _map_pix(A.α, A.β, A.M, A.orig[i, j])
