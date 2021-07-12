@@ -4,7 +4,7 @@ using ImageTransformations, CoordinateTransformations, Interpolations
 using MLDataPattern
 using OffsetArrays, StaticArrays, IdentityRanges, ComputationalResources
 using ImageCore.MappedArrays
-using ReferenceTests, Test, TestImages, ImageDistances, Statistics
+using ReferenceTests, Test, TestImages, ImageDistances, ImageQualityIndexes, Statistics
 
 if isdefined(OffsetArrays, :IdOffsetRange)
     OffsetRange = OffsetArrays.IdOffsetRange

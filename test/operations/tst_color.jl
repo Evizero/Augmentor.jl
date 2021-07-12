@@ -32,7 +32,7 @@
         for img in imgs
             ref = clamp01.(α .* img .+ β * gamutmax(eltype(img)))
             res = Augmentor.applyeager(ColorJitter(α, β, usemax=true), img)
-            @test ref == res
+            @test assess_psnr(res, ref) > 25
         end
     end
     @testset "lazy" begin
@@ -53,7 +53,7 @@
         for img in imgs
             ref = clamp01.(α .* img .+ β * gamutmax(eltype(img)))
             res = Augmentor.applylazy(ColorJitter(α, β), img)
-            @test ref == res
+            @test assess_psnr(res, ref) > 25
         end
     end
 end

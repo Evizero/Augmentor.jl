@@ -26,9 +26,10 @@
         imgs = [testpattern(), camera]
 
         for img in imgs
+            img = convert.(RGB, img)
             ref = imfilter(img, KernelFactors.gaussian((σ, σ), (k, k)))
             res = Augmentor.applyeager(GaussianBlur(k, σ), img)
-            @test ref == res
+            @test assess_psnr(res, ref) > 25
         end
     end
 end
