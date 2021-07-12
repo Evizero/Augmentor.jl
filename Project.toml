@@ -18,6 +18,7 @@ MLDataPattern = "9920b226-0b2a-5f5f-9153-9aa70a013f8b"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 ComputationalResources = "0.3"
@@ -37,6 +38,7 @@ julia = "1"
 [extras]
 ImageDistances = "51556ac3-7006-55f5-8cb3-34580c88182d"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
+ImageQualityIndexes = "2996bd0c-7a13-11e9-2da2-2f5ce47296a9"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 ReferenceTests = "324d217c-45ce-50fc-942e-d289b448e8cf"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
@@ -44,4 +46,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestImages = "5e47fb64-e119-507b-a336-dd2b206d9990"
 
 [targets]
-test = ["ImageDistances", "ImageMagick", "Random", "ReferenceTests", "Statistics", "TestImages", "Test"]
+test = ["ImageDistances", "ImageMagick", "ImageQualityIndexes", "Random", "ReferenceTests", "Statistics", "TestImages", "Test"]

@@ -1,0 +1,6 @@
+{
+  "title": "Blurring",
+  "order": [
+    "gaussianblur.jl"
+  ]
+}

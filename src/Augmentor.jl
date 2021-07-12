@@ -69,6 +69,9 @@ export
 
     ElasticDistortion,
 
+    ColorJitter,
+    GaussianBlur,
+
     augment,
     augment!,
     augmentbatch!,
@@ -95,6 +98,8 @@ include("operations/resize.jl")
 include("operations/scale.jl")
 include("operations/zoom.jl")
 include("operations/either.jl")
+include("operations/color.jl")
+include("operations/blur.jl")
 
 include("distortionfields.jl")
 include("distortedview.jl")
