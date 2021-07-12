@@ -69,7 +69,7 @@ export
 
     ElasticDistortion,
 
-    AdjustContrastBrightness,
+    ColorJitter,
     GaussianBlur,
 
     augment,
@@ -98,7 +98,7 @@ include("operations/resize.jl")
 include("operations/scale.jl")
 include("operations/zoom.jl")
 include("operations/either.jl")
-include("operations/brightness.jl")
+include("operations/color.jl")
 include("operations/blur.jl")
 
 include("distortionfields.jl")
