@@ -14,15 +14,16 @@ intensity value.
 Usage
 --------------
 
+    ColorJitter()
     ColorJitter(α, β; [usemax])
 
 Arguments
 --------------
 
 - **`α`** : `Real` or `AbstractVector` of `Real` that denote the coefficient(s)
-    for contrast adjustment.
+    for contrast adjustment. Defaults to `0.8:0.1:1.2`.
 - **`β`** : `Real` or `AbstractVector` of `Real` that denote the coefficient(s)
-    for brightness adjustment.
+    for brightness adjustment. Defaults to `-0.2:0.1:0.2`.
 - **`usemax::Bool`**: Optional. If `true`, the brightness will be adjusted by
     the maximum intensity value; otherwise, the image mean will be used.
     Defaults to `true`.
@@ -54,6 +55,7 @@ struct ColorJitter{A<:AbstractVector, B<:AbstractVector} <: ImageOperation
     end
 end
 
+ColorJitter() = ColorJitter(0.8:0.1:1.2, -0.2:0.1:0.2, true)
 ColorJitter(α, β; usemax=true) = ColorJitter(vectorize(α), vectorize(β), usemax)
 
 randparam(op::ColorJitter, img) = (safe_rand(op.α), safe_rand(op.β))
@@ -86,7 +88,14 @@ function Base.show(io::IO, op::ColorJitter)
 end
 
 _map_pix(α, β, M, pix) = clamp01(α * pix + β * M)
-_get_M(op::ColorJitter, img) = op.usemax ? gamutmax(eltype(img)) : mean(img)
+function _get_M(op::ColorJitter, img)
+    if op.usemax
+        T = eltype(img)
+        return T(gamutmax(eltype(img))...)
+    else
+        return mean(img)
+    end
+end
 
 # This wraps an image so that its pixels appear as after the contrast and
 # brightness adjustment. This is done in the `getindex` method.

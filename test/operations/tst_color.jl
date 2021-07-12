@@ -31,7 +31,7 @@
         # M = maximum value
         for img in imgs
             ref = clamp01.(α .* img .+ β * gamutmax(eltype(img)))
-            res = Augmentor.applyeager(ColorJitter(α, β), img)
+            res = Augmentor.applyeager(ColorJitter(α, β, usemax=true), img)
             @test ref == res
         end
     end
