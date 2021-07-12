@@ -88,10 +88,14 @@ function Base.show(io::IO, op::ColorJitter)
 end
 
 _map_pix(α, β, M, pix) = clamp01(α * pix + β * M)
+
 function _get_M(op::ColorJitter, img)
-    M = op.usemax ? gamutmax(eltype(img)) : mean(img)
     T = eltype(img)
-    return T(M...)
+    if op.usemax
+        return T(gamutmax(T)...)
+    else
+        return convert(T, mean(img))
+    end
 end
 
 # This wraps an image so that its pixels appear as after the contrast and
