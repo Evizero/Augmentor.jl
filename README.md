@@ -58,7 +58,7 @@ Augmentor.jl provides:
 * `|>` operator to compose operations into a pipeline
 * higher-lvel functions (`augment`, `augment!` and `augmentbatch!`) that works on a pipeline and image(s).
 
-Check the [documentation](https://evizero.github.io/Augmentor.jl/stable/democards/operations/) for a full list of operations.
+Check the [documentation](https://evizero.github.io/Augmentor.jl/stable/operations/) for a full list of operations.
 
 ## Citing Augmentor
 
