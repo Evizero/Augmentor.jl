@@ -2,7 +2,7 @@ import ImageCore: clamp01, gamutmax
 import Statistics: mean
 
 """
-    ColorJitter <: ImageOperation
+    ColorJitter <: ColorOperation
 
 Description
 --------------
@@ -42,7 +42,7 @@ augment(img, ColorJitter(1.2, [0.5, 0.8]))
 augment(img, ColorJitter(0.8:0.1:2.0, 0.5:0.1:1.1))
 ```
 """
-struct ColorJitter{A<:AbstractVector, B<:AbstractVector} <: ImageOperation
+struct ColorJitter{A<:AbstractVector, B<:AbstractVector} <: ColorOperation
     α::A
     β::B
     usemax::Bool
