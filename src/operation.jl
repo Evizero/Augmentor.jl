@@ -17,6 +17,20 @@
 @inline supports_stepview(A)   = supports_stepview(typeof(A))
 @inline supports_lazy(A)       = supports_lazy(typeof(A))
 
+"""
+    shouldapply(op, what)
+    shouldapply(typeof(op), typeof(what))
+
+Determines if operation `op` should be applied to `what`, which can be either
+an image or a semantic wrapper.
+"""
+shouldapply(op, what) = shouldapply(typeof(op), typeof(what))
+shouldapply(::Type{<:ImageOperation}, ::Type{<:AbstractArray})   = true
+shouldapply(::Type{<:ImageOperation}, ::Type{<:SemanticWrapper}) = true
+shouldapply(::Type{<:ColorOperation}, ::Type{Mask})              = false
+# By default any operation is applicable to any image and any semantic wrapper.
+# Add new methods to this function to define exceptions.
+
 # --------------------------------------------------------------------
 
 """
