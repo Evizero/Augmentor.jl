@@ -23,10 +23,10 @@
         notapplicable = []
         for op in ops
             for what in applicable
-                @test Augmentor.shouldapply(op, what)
+                @test Augmentor.shouldapply(op, what) == Val(true)
             end
             for what in notapplicable
-                @test !Augmentor.shouldapply(op, what)
+                @test Augmentor.shouldapply(op, what) == Val(false)
             end
         end
     end
@@ -37,10 +37,10 @@
         notapplicable = [Augmentor.Mask]
         for op in ops
             for what in applicable
-                @test Augmentor.shouldapply(op, what)
+                @test Augmentor.shouldapply(op, what) == Val(true)
             end
             for what in notapplicable
-                @test !Augmentor.shouldapply(op, what)
+                @test Augmentor.shouldapply(op, what) == Val(false)
             end
         end
     end

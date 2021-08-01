@@ -17,3 +17,4 @@ struct Mask{T<:AbstractArray} <: SemanticWrapper
 end
 
 unwrap(m::Mask) = m.img
+plain_array(m::Mask) = Mask(plain_array(unwrap(m)))
