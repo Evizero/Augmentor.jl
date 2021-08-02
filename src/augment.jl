@@ -3,7 +3,8 @@
     augment(img=>mask, pipeline) -> out
 
 Apply the operations of the given `pipeline` sequentially to the
-given image `img` and return the resulting image `out`.
+given image `img` and return the resulting image `out`. For the
+second method, see Semantic wrappers below.
 
 ```julia-repl
 julia> img = testpattern();
@@ -47,11 +48,18 @@ augment(FlipX())
 
 ## Semantic wrappers
 
-One can wrap the input image semantically to allow more flexible
-augmentation pipeline build. Currently implemented semantic wrappers are:
+It is possible to define more flexible augmentation pipelines by wrapping the
+input into a semantic wrapper. Semantic wrappers determine meaning of an input,
+and ensure that only appropriate operations are applied on that input.
 
-- [`Augmentor.Mask`](@ref): only apply spatial transformations.
+Currently implemented semantic wrappers are:
+
+- [`Augmentor.Mask`](@ref): Wraps a segmentation mask. Allows only spatial
+  transformations.
+
   The convenient usage for this is `augment(img => mask, pipeline)`.
+
+### Example
 
 ```jldoctest
 using Augmentor: unwrap, Mask
@@ -63,7 +71,7 @@ aug_img, aug_mask = unwrap.(augment((img, Mask(mask)), pl))
 # Equivalent usage
 aug_img, aug_mask = augment(img => mask, pl)
 
-# GaussianBlur will be skiped for our `mask`
+# GaussianBlur will be skipped for our `mask`
 aug_mask == augment(mask, Rotate90())
 
 # output
