@@ -77,7 +77,7 @@ function augment((img, mask)::Pair{<:AbstractArray, <:AbstractArray}, pipeline)
     img_out, mask_out = augment((img, Mask(mask)), pipeline)
     return img_out => unwrap(mask_out)
 end
-augment(pipeline) = augment(use_testpattern, pipeline) # TODO: deprecate this?
+augment(pipeline) = augment(use_testpattern(), pipeline) # TODO: deprecate this?
 
 # plain augment that faithfully operates on the objects without convenient interpretation
 function _plain_augment(img, pipeline::AbstractPipeline)
