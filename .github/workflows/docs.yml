@@ -13,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PYTHON: ""
     steps:
       - uses: actions/checkout@v2
       - name: Cache artifacts

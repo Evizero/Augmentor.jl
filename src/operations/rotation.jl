@@ -44,12 +44,12 @@ Examples
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
-2×2 Array{Int64,2}:
+2×2 Matrix{Int64}:
  200  150
   50    1
 
 julia> img_new = augment(img, Rotate90())
-2×2 Array{Int64,2}:
+2×2 Matrix{Int64}:
  150   1
  200  50
 ```
@@ -127,12 +127,12 @@ Examples
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
-2×2 Array{Int64,2}:
+2×2 Matrix{Int64}:
  200  150
   50    1
 
 julia> img_new = augment(img, Rotate180())
-2×2 Array{Int64,2}:
+2×2 Matrix{Int64}:
    1   50
  150  200
 ```
@@ -198,12 +198,12 @@ Examples
 julia> using Augmentor
 
 julia> img = [200 150; 50 1]
-2×2 Array{Int64,2}:
+2×2 Matrix{Int64}:
  200  150
   50    1
 
 julia> img_new = augment(img, Rotate270())
-2×2 Array{Int64,2}:
+2×2 Matrix{Int64}:
  50  200
   1  150
 ```

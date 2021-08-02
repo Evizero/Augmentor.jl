@@ -48,7 +48,8 @@ makedocs(
         "Tutorials" => examples,
         hide("Indices" => "indices.md"),
         "LICENSE.md",
-    ]
+    ],
+    # doctest=:fix, # used to fix outdated doctest
 )
 
 operations_cb()
