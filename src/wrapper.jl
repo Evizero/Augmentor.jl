@@ -17,4 +17,18 @@ struct Mask{T<:AbstractArray} <: SemanticWrapper
 end
 
 unwrap(m::Mask) = m.img
-plain_array(m::Mask) = Mask(plain_array(unwrap(m)))
+
+"""
+    shouldapply(op, wrapper)
+    shouldapply(typeof(op), typeof(wrapper))
+
+Determines if operation `op` should be applied to semantic wrapper `wrapper`.
+"""
+shouldapply(op::Operation, what::SemanticWrapper) = shouldapply(typeof(op), typeof(what))
+shouldapply(::Type{<:ImageOperation}, ::Type{<:SemanticWrapper}) = Val(true)
+shouldapply(::Type{<:ColorOperation}, ::Type{<:Mask})            = Val(false)
+# By default any operation is applicable to any semantic wrapper. Add new
+# methods to this function to define exceptions.
+
+# Allows doing `unwrap.(augment(img, Mask(img2), pl))`
+unwrap(A::AbstractArray) = A

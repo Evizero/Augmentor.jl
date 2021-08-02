@@ -17,20 +17,6 @@
 @inline supports_stepview(A)   = supports_stepview(typeof(A))
 @inline supports_lazy(A)       = supports_lazy(typeof(A))
 
-"""
-    shouldapply(op, what)
-    shouldapply(typeof(op), typeof(what))
-
-Determines if operation `op` should be applied to `what`, which can be either
-an image or a semantic wrapper.
-"""
-shouldapply(op, what) = shouldapply(typeof(op), typeof(what))
-shouldapply(::Type{<:ImageOperation}, ::Type{<:AbstractArray})   = Val(true)
-shouldapply(::Type{<:ImageOperation}, ::Type{<:SemanticWrapper}) = Val(true)
-shouldapply(::Type{<:ColorOperation}, ::Type{Mask})              = Val(false)
-# By default any operation is applicable to any image and any semantic wrapper.
-# Add new methods to this function to define exceptions.
-
 # --------------------------------------------------------------------
 
 """
@@ -74,12 +60,10 @@ for FUN in (:applyeager, :applylazy, :applypermute,
             ($FUN)(op, img, randparam(op, img))
         end
 
-        # Mask support
-        @inline $FUN(op::Operation, img::Mask) = $FUN(op, img, shouldapply(op, img))
-        @inline $FUN(op::Operation, img::Mask, ::Val{false}) = img
-        @inline function $FUN(op::Operation, img::Mask, ::Val{true})
-            Mask(($FUN)(op, unwrap(img)))
-        end
+        # Semantic wrapper support
+        @inline $FUN(op::Operation, img::SemanticWrapper, param) = $FUN(op, img, param, shouldapply(op, img))
+        @inline $FUN(op::Operation, img::SemanticWrapper, param, ::Val{false}) = img
+        @inline $FUN(op::Operation, img::Mask, param, ::Val{true}) = Mask(($FUN)(op, unwrap(img), param))
     end
 end
 

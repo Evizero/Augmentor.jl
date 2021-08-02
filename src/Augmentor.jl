@@ -79,9 +79,9 @@ export
     testpattern
 
 include("compat.jl")
-include("utils.jl")
 include("types.jl")
 include("wrapper.jl")
+include("utils.jl")
 include("operation.jl")
 
 include("operations/channels.jl")
