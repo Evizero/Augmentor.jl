@@ -44,6 +44,7 @@ See also: [`plain_array`](@ref), [`plain_axes`](@ref)
 @inline contiguous(A::SArray) = A
 @inline contiguous(A::MArray) = A
 @inline contiguous(A::AbstractArray) = match_idx(collect(A), axes(A))
+@inline contiguous(A::Mask) = Mask(contiguous(unwrap(A)))
 @inline contiguous(A::Tuple) = map(contiguous, A)
 
 # --------------------------------------------------------------------
@@ -53,6 +54,7 @@ See also: [`plain_array`](@ref), [`plain_axes`](@ref)
 @inline _plain_array(A::SArray) = A
 @inline _plain_array(A::MArray) = A
 @inline _plain_array(A::AbstractArray) = collect(A)
+@inline _plain_array(A::Mask) = Mask(_plain_array(unwrap(A)))
 @inline _plain_array(A::Tuple) = map(_plain_array, A)
 
 """
