@@ -1,7 +1,7 @@
 import ImageFiltering: imfilter, KernelFactors.gaussian
 
 """
-    GaussianBlur <: ImageOperation
+    GaussianBlur <: ColorOperation
 
 Description
 --------------
@@ -36,7 +36,7 @@ augment(img, GaussianBlur(3, 1.0))
 augment(img, GaussianBlur(3:2:7, 1.0:0.1:2.0))
 ```
 """
-struct GaussianBlur{K <: AbstractVector, S <: AbstractVector} <: ImageOperation
+struct GaussianBlur{K <: AbstractVector, S <: AbstractVector} <: ColorOperation
     k::K
     σ::S
 
