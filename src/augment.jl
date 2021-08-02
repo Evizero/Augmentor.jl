@@ -1,3 +1,4 @@
+const ImageOrTuple = Union{AbstractArray, Tuple}
 """
     augment([img], pipeline) -> out
 
@@ -44,20 +45,31 @@ image.
 augment(FlipX())
 ```
 """
-function augment(img, pipeline::AbstractPipeline)
+function augment(img::ImageOrTuple, pipeline::AbstractPipeline)
     plain_array(_augment(img, pipeline))
 end
 
-function augment(img, pipeline::Union{ImmutablePipeline{1},NTuple{1,Operation}})
+function augment(img::ImageOrTuple, pipeline::Union{ImmutablePipeline{1},NTuple{1,Operation}})
     augment(img, first(operations(pipeline)))
 end
 
-function augment(img, op::Operation)
+function augment(img::ImageOrTuple, op::Operation)
     plain_array(applyeager(op, img))
 end
 
 function augment(op::Union{AbstractPipeline,Operation})
     augment(use_testpattern(), op)
+end
+
+"""
+    augment(img => mask, pipeline)
+
+Convenience function for segmentation tasks. It is equivalent to
+`unwrap.(augment((img, Mask(mask)), pipeline))`.
+"""
+function augment(p::Pair{<:AbstractArray, <:AbstractArray}, pl::Union{AbstractPipeline, Operation})
+    img, mask = augment((p.first, Mask(p.second)), pl)
+    return img => unwrap(mask)
 end
 
 @inline function _augment(img, pipeline::AbstractPipeline)
