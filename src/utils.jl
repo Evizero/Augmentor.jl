@@ -204,3 +204,8 @@ function _2dborder!(A::AbstractArray{T,3}, val::T) where T
     end
     A
 end
+
+# This is expected to be added to Julia (maybe under a different name)
+# Follow https://github.com/JuliaLang/julia/issues/35543 for progress
+basetype(T::Type) = Base.typename(T).wrapper
+basetype(T) = basetype(typeof(T))
