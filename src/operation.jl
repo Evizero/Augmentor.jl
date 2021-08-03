@@ -63,7 +63,10 @@ for FUN in (:applyeager, :applylazy, :applypermute,
         # Semantic wrapper support
         @inline $FUN(op::Operation, img::SemanticWrapper, param) = $FUN(op, img, param, shouldapply(op, img))
         @inline $FUN(op::Operation, img::SemanticWrapper, param, ::Val{false}) = img
-        @inline $FUN(op::Operation, img::Mask, param, ::Val{true}) = Mask(($FUN)(op, unwrap(img), param))
+        function $FUN(op::Operation, sw::SemanticWrapper, param, ::Val{true})
+            T = basetype(sw)
+            return T(($FUN)(op, unwrap(sw), param))
+        end
     end
 end
 

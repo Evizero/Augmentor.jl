@@ -8,12 +8,8 @@ abstract type SemanticWrapper end
 """
 Mask wraps a segmentation mask.
 """
-struct Mask{T<:AbstractArray} <: SemanticWrapper
-    img::T
-
-    function Mask(img::T) where {T<:AbstractArray}
-        new{T}(img)
-    end
+struct Mask{AT<:AbstractArray} <: SemanticWrapper
+    img::AT
 end
 
 unwrap(m::Mask) = m.img
