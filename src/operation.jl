@@ -36,6 +36,10 @@ prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffinemap(NoOp(
 @inline prepareaffine(img::SubArray{T,N,<:InvWarpedView}) where {T,N} = img
 @inline prepareaffine(img::InvWarpedView) = img
 prepareaffine(imgs::Tuple) = map(prepareaffine, imgs)
+function prepareaffine(sw::SemanticWrapper)
+    T = basetype(sw)
+    return T(prepareaffine(unwrap(sw)))
+end
 
 # currently unused
 @inline preparelazy(img) = img
@@ -56,13 +60,14 @@ for FUN in (:applyeager, :applylazy, :applypermute,
             param = randparam(op, imgs)
             map(img -> ($FUN)(op, img, param), imgs)
         end
-        @inline function ($FUN)(op::Operation, img::AbstractArray)
+        function ($FUN)(op::Operation, img::Union{AbstractArray,
+                                                  SemanticWrapper})
             ($FUN)(op, img, randparam(op, img))
         end
 
         # Semantic wrapper support
-        @inline $FUN(op::Operation, img::SemanticWrapper, param) = $FUN(op, img, param, shouldapply(op, img))
-        @inline $FUN(op::Operation, img::SemanticWrapper, param, ::Val{false}) = img
+        @inline $FUN(op::Operation, sw::SemanticWrapper, param) = $FUN(op, sw, param, shouldapply(op, sw))
+        @inline $FUN(op::Operation, sw::SemanticWrapper, param, ::Val{false}) = sw
         function $FUN(op::Operation, sw::SemanticWrapper, param, ::Val{true})
             T = basetype(sw)
             return T(($FUN)(op, unwrap(sw), param))

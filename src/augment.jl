@@ -62,6 +62,7 @@ Currently implemented semantic wrappers are:
 ### Example
 
 ```jldoctest
+using Augmentor
 using Augmentor: unwrap, Mask
 
 img, mask = testpattern(), testpattern()

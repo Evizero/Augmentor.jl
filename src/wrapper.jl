@@ -12,6 +12,11 @@ struct Mask{AT<:AbstractArray} <: SemanticWrapper
     img::AT
 end
 
+"""
+    unwrap(sw::SemanticWrapper)
+
+Returns the original object.
+"""
 unwrap(m::Mask) = m.img
 
 """
