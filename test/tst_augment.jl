@@ -408,4 +408,13 @@ end
             @test aug_mask1 == aug_mask2
         end
     end
+
+    @testset "affine operations do not fail" begin
+        ops = [FlipX(), NoOp(), Rotate(15), Rotate180(), Scale(1.2), ShearX(5)]
+        img = camera
+        sws = [Augmentor.Mask(img .> 0.5)]
+        for op in ops, sw in sws
+            @test_nowarn augment((img, sw), op)
+        end
+    end
 end
