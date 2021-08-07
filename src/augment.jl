@@ -1,8 +1,10 @@
 """
     augment([img], pipeline) -> out
+    augment(img=>mask, pipeline) -> out
 
 Apply the operations of the given `pipeline` sequentially to the
-given image `img` and return the resulting image `out`.
+given image `img` and return the resulting image `out`. For the
+second method, see Semantic wrappers below.
 
 ```julia-repl
 julia> img = testpattern();
@@ -43,22 +45,62 @@ image.
 ```julia
 augment(FlipX())
 ```
+
+## Semantic wrappers
+
+It is possible to define more flexible augmentation pipelines by wrapping the
+input into a semantic wrapper. Semantic wrappers determine meaning of an input,
+and ensure that only appropriate operations are applied on that input.
+
+Currently implemented semantic wrappers are:
+
+- [`Augmentor.Mask`](@ref): Wraps a segmentation mask. Allows only spatial
+  transformations.
+
+  The convenient usage for this is `augment(img => mask, pipeline)`.
+
+### Example
+
+```jldoctest
+using Augmentor
+using Augmentor: unwrap, Mask
+
+img, mask = testpattern(), testpattern()
+pl = Rotate90() |> GaussianBlur(3)
+
+aug_img, aug_mask = unwrap.(augment((img, Mask(mask)), pl))
+# Equivalent usage
+aug_img, aug_mask = augment(img => mask, pl)
+
+# GaussianBlur will be skipped for our `mask`
+aug_mask == augment(mask, Rotate90())
+
+# output
+
+true
+```
 """
-function augment(img, pipeline::AbstractPipeline)
+augment(img, pipeline) = _plain_augment(img, pipeline)
+# convenient interpretation for certain use cases
+function augment((img, mask)::Pair{<:AbstractArray, <:AbstractArray}, pipeline)
+    img_out, mask_out = augment((img, Mask(mask)), pipeline)
+    return img_out => unwrap(mask_out)
+end
+augment(pipeline) = augment(use_testpattern(), pipeline) # TODO: deprecate this?
+
+# plain augment that faithfully operates on the objects without convenient interpretation
+function _plain_augment(img, pipeline::AbstractPipeline)
     plain_array(_augment(img, pipeline))
 end
 
-function augment(img, pipeline::Union{ImmutablePipeline{1},NTuple{1,Operation}})
+function _plain_augment(img, pipeline::Union{ImmutablePipeline{1},NTuple{1,Operation}})
     augment(img, first(operations(pipeline)))
 end
 
-function augment(img, op::Operation)
+function _plain_augment(img, op::Operation)
     plain_array(applyeager(op, img))
 end
 
-function augment(op::Union{AbstractPipeline,Operation})
-    augment(use_testpattern(), op)
-end
 
 @inline function _augment(img, pipeline::AbstractPipeline)
     _augment(img, operations(pipeline)...)

@@ -5,6 +5,7 @@
 
 @test Augmentor.ImageOperation <: Augmentor.Operation
 @test Augmentor.AffineOperation <: Augmentor.ImageOperation
+@test Augmentor.ColorOperation <: Augmentor.ImageOperation
 
 @testset "prepare" begin
     @test @inferred(Augmentor.preparelazy(rect)) === rect

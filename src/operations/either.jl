@@ -189,6 +189,10 @@ end
     applyview(op, img, randparam(op, img))
 end
 
+# Semantic wrapper support
+applyeager(op::Either, sw::SemanticWrapper, idx) = applyeager(op.operations[idx], sw)
+applyview(op::Either, sw::SemanticWrapper, idx) = applyview(op.operations[idx], sw)
+
 # Sample a random operation and pass the function call along.
 # Note: "applyaffine" needs to map to "applyaffine_common" for
 #   type stability, because otherwise the concrete type of the

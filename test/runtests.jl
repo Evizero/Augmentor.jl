@@ -37,6 +37,7 @@ rgb_rect = rand(RGB{N0f8}, 2, 3)
 tests = [
     "tst_compat.jl",
     "tst_utils.jl",
+    "tst_wrapper.jl",
     "operations/tst_channels.jl",
     "operations/tst_dims.jl",
     "operations/tst_convert.jl",

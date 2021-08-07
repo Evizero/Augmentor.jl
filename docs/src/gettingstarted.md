@@ -103,6 +103,61 @@ Input (`img`)                |   | Output (`img_new`)
 :---------------------------:|:-:|:------------------------------:
 ![input](assets/isic_in.png) | → | ![output](assets/isic_out.gif)
 
+## Segmentation example
+
+Augmentor also provides a convenient interface for applying a stochastic
+augmentation for images and their masks, which is useful for tasks of semantic
+segmentation. The following snippet demonstrates how to use the interface. The
+used image is derived from the [ISIC archive](https://isic-archive.com/).
+
+```julia
+julia> using Augmentor
+
+julia> img, mask = # load image and its mask
+
+julia> pl = Either(Rotate90(), FlipX(), FlipY()) |>
+            Either(ColorJitter(), GaussianBlur(3))
+
+julia> img_new, mask_new = augment(img => mask, pl)
+```
+
+```@eval
+using Augmentor
+using FileIO, ImageMagick, ImageCore
+using Random
+
+imgpath = joinpath("assets","segm_img.png")
+maskpath = joinpath("assets","segm_mask.png")
+
+img = load(imgpath)
+mask = load(maskpath)
+
+pl = Either(Rotate90(), FlipX(), FlipY()) |>
+     Either(ColorJitter(), GaussianBlur(3))
+
+# modified from operations/assets/gif.jl
+function make_gif(img, mask, pl, num_sample; random_seed=1337)
+    Random.seed!(random_seed)
+
+    fillvalue = oneunit(eltype(img))
+    frames = sym_paddedviews(
+        fillvalue,
+        hcat(img, mask),
+        [hcat(augment(img => mask, pl)...) for _ in 1:num_sample-1]...
+    )
+    cat(frames..., dims=3)
+end
+
+preview = make_gif(img, mask, pl, 16)[:, :, 2:end]
+ImageMagick.save(joinpath("assets", "segm_test.gif"), preview; fps=2)
+
+nothing
+```
+
+The augmented images and masks are displayed in the following animation:
+
+![output](assets/segm_test.gif)
+
 ## Getting Help
 
 To get help on specific functionality you can either look up the

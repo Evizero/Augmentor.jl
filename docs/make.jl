@@ -43,7 +43,10 @@ makedocs(
         ],
         "User's Guide" => [
             "interface.md",
-            operations,
+            operations
+        ],
+        "Developer's Guide" => [
+            "wrappers.md"
         ],
         "Tutorials" => examples,
         hide("Indices" => "indices.md"),

@@ -346,3 +346,75 @@ end
 
 # just for code coverage
 @test typeof(@inferred(Augmentor.augment_impl(Rotate90()))) <: Expr
+
+@testset "Semantic wrappers" begin
+    @testset "Apply operations on images but not on masks" begin
+        img = camera
+        mask = camera .> 0.5
+        pl = Rotate90() |> GaussianBlur(3)
+
+        aug_img, aug_mask = augment((img, Augmentor.Mask(mask)), pl)
+
+        @test typeof(aug_mask) <: Augmentor.Mask
+
+        @test aug_img == augment(img, pl)
+        @test Augmentor.unwrap(aug_mask) == augment(mask, Rotate90())
+
+        @testset "Either" begin
+            pl = Either(ColorJitter(), GaussianBlur(3))
+            aug_mask = augment(Augmentor.Mask(mask), pl)
+            @test Augmentor.unwrap(aug_mask) == mask
+
+            pl = Either(Rotate90(), FlipX())
+            aug_mask, aug_mask2 = augment((mask, Augmentor.Mask(mask)), pl)
+            @test Augmentor.unwrap(aug_mask2) == aug_mask
+        end
+    end
+
+    @testset "Same parameters are used for images and masks" begin
+        img = camera
+        pl = Crop(1:100, 1:100)
+
+        aug_img, aug_mask = augment((img, Augmentor.Mask(img)), pl)
+
+        @test Augmentor.unwrap(aug_mask) == aug_img
+    end
+
+    @testset "Manual API" begin
+        mask = camera .> 0.5
+        pl = Rotate90()
+        @test augment(mask, pl) == Augmentor.unwrap(augment(Augmentor.Mask(mask), pl))
+    end
+
+    @testset "Pair notation API" begin
+        img = camera
+        mask = camera .> 0.5
+        @testset "Pipeline" begin
+            pl = Rotate90() |> GaussianBlur(3)
+
+            aug_img1, aug_mask1 = augment(img => mask, pl)
+            aug_img2, aug_mask2 = Augmentor.unwrap.(augment((img, Augmentor.Mask(mask)), pl))
+
+            @test aug_img1 == aug_img2
+            @test aug_mask1 == aug_mask2
+        end
+        @testset "Single operation" begin
+            pl = Rotate90()
+
+            aug_img1, aug_mask1 = augment(img => mask, pl)
+            aug_img2, aug_mask2 = Augmentor.unwrap.(augment((img, Augmentor.Mask(mask)), pl))
+
+            @test aug_img1 == aug_img2
+            @test aug_mask1 == aug_mask2
+        end
+    end
+
+    @testset "affine operations do not fail" begin
+        ops = [FlipX(), NoOp(), Rotate(15), Rotate180(), Scale(1.2), ShearX(5)]
+        img = camera
+        sws = [Augmentor.Mask(img .> 0.5)]
+        for op in ops, sw in sws
+            @test_nowarn augment((img, sw), op)
+        end
+    end
+end

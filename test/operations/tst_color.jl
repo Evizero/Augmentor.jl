@@ -1,4 +1,6 @@
 @testset "ColorJitter" begin
+    @test ColorJitter <: Augmentor.ImageOperation
+
     @testset "constructor" begin
         @test_throws ArgumentError ColorJitter(1., 3.0:2.0)
         @test_throws ArgumentError ColorJitter(5.0:3.0, 1.)
