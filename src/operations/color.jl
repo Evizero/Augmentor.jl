@@ -71,7 +71,7 @@ end
 
 function applylazy(op::ColorJitter, img::AbstractArray, (α, β))
     M = _get_M(op, img)
-    return ColorJitterView(img, α, β, M)
+    return mappedarray(pix -> _map_pix(α, β, M, pix), img)
 end
 
 function showconstruction(io::IO, op::ColorJitter)
@@ -99,21 +99,3 @@ function _get_M(op::ColorJitter, img)
     end
 end
 
-# This wraps an image so that its pixels appear as after the contrast and
-# brightness adjustment. This is done in the `getindex` method.
-struct ColorJitterView{T, P<:AbstractMatrix{T}, R} <: AbstractArray{T, 2}
-    orig::P
-    α::R
-    β::R
-    M::T
-
-    function ColorJitterView(img::P, α::R, β::R, M) where {P <: AbstractMatrix,
-                                                        R <: Real}
-        new{eltype(P), P, R}(img, α, β, M)
-    end
-end
-
-Base.parent(A::ColorJitterView) = A.parent
-Base.size(A::ColorJitterView) = size(A.orig)
-Base.axes(A::ColorJitterView) = axes(A.orig)
-Base.@propagate_inbounds Base.getindex(A::ColorJitterView, i, j) = _map_pix(A.α, A.β, A.M, A.orig[i, j])
