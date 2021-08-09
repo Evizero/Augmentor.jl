@@ -108,4 +108,19 @@
     @testset "permute" begin
         @test Augmentor.supports_permute(ConvertEltype) === false
     end
+    @testset "inference" begin
+        img = testpattern()
+        let pl = ConvertEltype(Gray)
+            aug_img = @inferred(augment(img, pl))
+            @test eltype(aug_img) <: Gray
+        end
+        let pl = SplitChannels() |> ConvertEltype(Gray)
+            aug_img = @inferred(augment(img, pl))
+            @test eltype(aug_img) <: Gray{N0f8}
+        end
+        let pl = ConvertEltype(Gray) |> SplitChannels()
+            aug_img = @inferred(augment(img, pl))
+            @test eltype(aug_img) <: N0f8
+        end
+    end
 end
