@@ -56,7 +56,7 @@ function applyeager(op::ConvertEltype{T}, img::AbstractArray, param) where T
 end
 
 function applylazy(op::ConvertEltype{T}, img::AbstractArray, param) where T
-    mappedarray(c->convert(T,c), img)
+    of_eltype(T, img)
 end
 
 function showconstruction(io::IO, op::ConvertEltype)
