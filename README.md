@@ -13,23 +13,22 @@ It offers a simple way to build flexible **augmentation pipelines**. For our
 purposes, an augmentation pipeline can be understood as a sequence of
 operations for which the parameters can (but need not) be random variables.
 
-When augmenting, Augmentor.jl makes use of multiple heuristics to generate
-efficient tailor-made code for the concrete user-specified augmentation
-pipeline. In particular, Augmentor tries to avoid the need for any intermediate
-images, and aims to compute the output image directly from the input in one
-single pass.
+When augmenting, Augmentor.jl uses multiple heuristics to generate efficient
+tailor-made code for the concrete user-specified augmentation pipeline. In
+particular, Augmentor tries to avoid the need for any intermediate images and
+aims to compute the output image directly from the input in one single pass.
 
 ## Overview
 
 Augmentor.jl provides many augmentation operations such as rotations, flipping,
 blurring, and more. See the
 [documentation](https://evizero.github.io/Augmentor.jl/stable/operations/) for
-the full list of available operations.
+the complete list of available operations.
 
-The package exports the `|>` operator which **composes** operations, forming a
+The package exports the `|>` operator, which **composes** operations, forming a
 pipeline.
 
-Prepared pipelines are applied on images by calling one of the higher-level
+Prepared pipelines are applied to images by calling one of the higher-level
 functions: `augment`, `augment!`, or `augmentbatch!`.
 
 The full documentation is available at
@@ -57,7 +56,7 @@ julia> augment(img, pl)
 
 ![](https://evizero.github.io/Augmentor.jl/dev/mnist_preview.gif)
 
-For more examples see [the documentation](TODO).
+For more examples, see [the documentation](TODO).
 
 ## Contributing
 
@@ -89,8 +88,6 @@ packages. To name a few:
 - [JuliaImages/ImageTransformations.jl](https://github.com/JuliaImages/ImageTransformations.jl)
 - [JuliaMath/Interpolations.jl](https://github.com/JuliaMath/Interpolations.jl)
 - [JuliaArrays/IdentityRanges.jl](https://github.com/JuliaArrays/IdentityRanges.jl)
-
-Refer to [Project.toml](Project.toml) for the full list.
 
 
 [license-img]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
