@@ -59,6 +59,15 @@ julia> augment(img, pl)
 
 For more examples see [the documentation](TODO).
 
+## Contributing
+
+Contributions are greatly appreciated!
+
+To report a potential **bug** or propose a **new feature**, please file a *new
+issue*. *Pull requests* are always welcome. However, to make sure the PR gets
+accepted, it is generally preferred when it follows a particular issue to which
+it refers.
+
 ## Citing Augmentor
 
 If you use Augmentor for academic research and wish to cite it, please use the
