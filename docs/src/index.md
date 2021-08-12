@@ -3,7 +3,7 @@
 A **fast** library for increasing the number of training images
 by applying various transformations.
 
-# Augmentor.jl's documentation
+# Introduction
 
 Augmentor is a real-time image augmentation library designed to
 render the process of artificial dataset enlargement more
@@ -71,112 +71,90 @@ input in one single pass.
 
 For the Python version of Augmentor, you can find it [here](https://github.com/mdbloice/Augmentor)
 
-## Where to begin?
+## What is Image Augmentation?
 
-If this is the first time you consider using Augmentor.jl for
-your machine learning related experiments or packages, make sure
-to check out the "Getting Started" section. There we list the
-installation instructions and some simple hello world examples.
+The term *data augmentation* is commonly used to describe the
+process of repeatedly applying various transformations to some
+dataset, with the hope that the output (i.e. the newly generated
+observations) bias the model towards learning better features.
+Depending on the structure and semantics of the data, coming up
+with such transformations can be a challenge by itself.
 
-```@contents
-Pages = ["gettingstarted.md"]
-Depth = 2
-```
+Images are a special class of data that exhibit some interesting
+properties in respect to their structure. For example the
+dimensions of an image (i.e. the pixel) exhibit a spatial
+relationship to each other. As such, a lot of commonly used
+augmentation strategies for image data revolve around affine
+transformations, such as translations or rotations. Because
+images are so popular and special case of data, they deserve
+their own sub-category of data augmentation, which we will
+unsurprisingly refer to as **image augmentation**.
 
-## Introduction and Motivation
+The general idea is the following: if we want our model to
+generalize well, then we should design the learning process in
+such a way as to bias the model into learning such
+transformation-[equivariant](https://en.wikipedia.org/wiki/Equivariant_map)
+properties. One way to do this is via
+the design of the model itself, which for example was idea behind
+convolutional neural networks. An orthogonal approach to bias the
+model to learn about this equivariance - and the focus of this
+package - is by using label-preserving transformations.
 
-If you are new to image augmentation in general, or are simply
-interested in some background information, feel free to take a
-look at the following sections. There we discuss the concepts
-involved and outline the most important terms and definitions.
+## [Label-preserving Transformations](@id labelpreserving)
 
-```@contents
-Pages = ["background.md"]
-Depth = 2
-```
+Before attempting to train a model using some augmentation
+pipeline, it's a good idea to invest some time in deciding on an
+appropriate set of transformations to choose from. Some of these
+transformations also have parameters to tune, and we should also
+make sure that we settle on a decent set of values for those.
 
-In case you have not worked with image data in Julia before, feel
-free to browse the following documents for a crash course on how
-image data is represented in the Julia language, as well as how
-to visualize it. For more information on image processing in
-Julia, take a look at the documentation for the vast
-[`JuliaImages`](https://juliaimages.github.io/stable/) ecosystem.
+What constitutes as "decent" depends on the dataset. In general
+we want the augmented images to be fairly dissimilar to the
+originals. However, we need to be careful that the augmented
+images still visually represent the same concept (and thus
+label). If a pipeline only produces output images that have this
+property we call this pipeline **label-preserving**.
 
-```@contents
-Pages = ["images.md"]
-Depth = 2
-```
-
-## User's Guide
-
-As the name suggests, Augmentor was designed with image
-augmentation for machine learning in mind. That said, the way the
-library is implemented allows it to also be used for efficient
-image processing outside the machine learning domain.
-
-The following section describes the high-level user interface in
-detail. In particular it focuses on how a (stochastic)
-image-processing pipeline can be defined and then be applied to
-an image (or a set of images). It also discusses how batch
-processing of multiple images can be performed in parallel using
-multi-threading.
-
-```@contents
-Pages = ["interface.md"]
-Depth = 2
-```
-
-We mentioned before that an augmentation pipeline is just a
-sequence of image operations. Augmentor ships with a number of
-predefined operations, which should be sufficient to describe the
-most commonly utilized augmentation strategies. Each operation is
-represented as its own unique type. The following section
-provides a complete list of all the exported operations and their
-documentation.
-
-```@contents
-Pages = ["operations.md"]
-Depth = 2
-```
-
-## Tutorials
-
-Just like an image can say more than a thousand words, a simple
-hands-on tutorial showing actual code can say more than many
-pages of formal documentation.
-
-The first step of devising a successful augmentation strategy is
-to identify an appropriate set of operations and parameters. What
-that means can vary widely, because the utility of each operation
-depends on the dataset at hand (see [label-preserving
-transformations](@ref labelpreserving) for an example). To that
-end, we will spend the first tutorial discussing a simple but
-useful approach to interactively explore and visualize the space
-of possible parameters.
-
-```@contents
-Pages = [joinpath("generated", "mnist_elastic.md")]
-Depth = 2
-```
-
-In the next tutorials we will take a close look at how we can
-actually use Augmentor in combination with popular deep learning
-frameworks. The first framework we will discuss will be
-[Knet](https://github.com/denizyuret/Knet.jl). In particular we
-will focus on adapting an already existing example to make use of
-a (quite complicated) augmentation pipeline. Furthermore, this
-tutorial will also serve to showcase the various ways that
-augmentation can influence the performance of your network.
-
-```@contents
-Pages = [joinpath("generated", "mnist_knet.md")]
-Depth = 2
-```
+Consider the following example from the [MNIST database of
+handwritten digits](http://yann.lecun.com/exdb/mnist/). Our input image clearly
+represents its associated label "6". If we were to use the
+transformation [`Rotate180`](@ref) in our augmentation pipeline
+for this type of images, we could end up with the situation
+depicted by the image on the right side.
 
 ```@eval
-# Pages = [joinpath("generated", fname) for fname in readdir("generated") if splitext(fname)[2] == ".md"]
-# Depth = 2
+using Augmentor, MLDatasets
+input_img  = MNIST.convert2image(MNIST.traintensor(19))
+output_img = augment(input_img, Rotate180())
+using Images, FileIO; # hide
+upsize(A) = repeat(A, inner=(4,4)); # hide
+save(joinpath("assets","bg_mnist_in.png"), upsize(input_img)); # hide
+save(joinpath("assets","bg_mnist_out.png"), upsize(output_img)); # hide
+nothing # hide
 ```
+
+Input (`input_img`)              | Output (`output_img`)
+---------------------------------|------------------------------------
+![input](assets/bg_mnist_in.png) | ![output](assets/bg_mnist_out.png)
+
+To a human, this newly transformed image clearly represents the
+label "9", and not "6" like the original image did. In image
+augmentation, however, the assumption is that the output of the
+pipeline has the same label as the input. That means that in this
+example we would tell our model that the correct answer for the
+image on the right side is "6", which is clearly undesirable for
+obvious reasons.
+
+Thus, for the MNIST dataset, the transformation
+[`Rotate180`](@ref) is **not** label-preserving and should not be
+used for augmentation.
+
+## Working with images in Julia
+
+Augmentor exists along other packages in the
+[JuliaImages](https://juliaimages.org/) ecosystem. To learn how images are
+treated in Julia, how pixels are represented, and more, read [the
+documentation](https://juliaimages.org/stable/tutorials/quickstart/).
 
 ## Citing Augmentor
 
@@ -187,9 +165,3 @@ Marcus D. Bloice, Christof Stocker, and Andreas Holzinger,
 *Augmentor: An Image Augmentation Library for Machine Learning*,
 arXiv preprint **arXiv:1708.04680**,
 <https://arxiv.org/abs/1708.04680>, 2017.
-
-## Indices
-
-```@contents
-Pages = ["indices.md"]
-```

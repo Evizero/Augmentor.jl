@@ -1,7 +1,7 @@
 # ---
 # title: Composition utilities
 # cover: utilities.gif
-# description: a set of helper opeartions that may be useful when compositing more complex augmentation workflow
+# description: a set of helper operations that may be useful when compositing more complex augmentation workflow
 # ---
 
 # Aside from "true" operations that specify some kind of transformation, there are also a couple of

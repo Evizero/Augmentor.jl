@@ -36,8 +36,6 @@ The full documentation is available at
 
 ## Example
 
-TODO
-
 ```julia
 julia> pl = ElasticDistortion(6, scale=0.3, border=true) |>
             Rotate([10, -5, -3, 0, 3, 5, 10]) |>
@@ -56,7 +54,7 @@ julia> augment(img, pl)
 
 ![](https://evizero.github.io/Augmentor.jl/dev/mnist_preview.gif)
 
-For more examples, see [the documentation](TODO).
+For more examples, see [the documentation](https://evizero.github.io/Augmentor.jl/).
 
 ## Contributing
 
