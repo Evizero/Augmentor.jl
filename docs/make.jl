@@ -3,6 +3,14 @@ using Augmentor
 using Random
 using MLDatasets
 
+try
+    using ISICArchive
+catch
+    using Pkg
+    Pkg.add(url="https://github.com/Evizero/ISICArchive.jl.git", rev="master")
+    using ISICArchive
+end
+
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true # MLDatasets
 
 op_templates, op_theme = cardtheme("grid")
