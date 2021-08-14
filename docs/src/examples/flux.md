@@ -58,8 +58,18 @@ nothing # hide
 
 ## Adding augmentation
 
-First of all, we remove `Flux.unsqueeze` from the image tensor. This is
-required for Augmentor to correctly process the batches.
+Augmentor aims to provide generic image augmentation support for any machine
+learning framework and not just deep learning. Except for the grayscale images,
+Augmentor assumes every image is an array of `Colorant`. Without loss of generality,
+we use `Gray` image here so that the same pipeline also applies to `RGB` image.
+
+!!! warning "Use colorant array whenever you can"
+    If you pass a 3d numerical array, e.g., of size `(28, 28, 3)` and interpret it as an RGB
+    array, you'll almost definitely get an incorrect result from Augmentor. This is because
+    Augmentor and the entire JuliaImages ecosystem uses `Array{RGB{Float32}, 2}` to
+    represent an `RGB` array. Without any explicit note, `Array{Float32, 3}` will be
+    interpreted as a 3d gray image instead of any colorful image. Just think of the color
+    specifications like `Lab`, `HSV` and you'll notice the ambiguity here.
 
 ```@example flux
 X = MNIST.traintensor(Float32, 1:n_instances)
