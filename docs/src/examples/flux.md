@@ -26,6 +26,8 @@ n_instances = 32
 batch_size = 32
 n_epochs = 16
 
+# Flux requires a 4D numerical array in WHCN (width, height, channel, batch)
+# format thus we need to insert a dummy dimension to indicate `C=1`(gray image).
 X = Flux.unsqueeze(MNIST.traintensor(Float32, 1:n_instances), 3)
 y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 
