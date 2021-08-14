@@ -5,7 +5,7 @@ This example shows a way to use Augmentor to provide images for training
 [MNIST database of handwritten digits](http://yann.lecun.com/exdb/mnist/) as
 our input data.
 
-To skip all the talking and see the code, go ahead to [Complete example](@ref).
+To skip all the talking and see the code, go ahead to [Complete example](@ref flux_mnist_complete_example).
 
 ## Ordinary training
 
