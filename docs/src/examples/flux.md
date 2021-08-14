@@ -123,7 +123,17 @@ each batch only when it's required.
 ```@example flux
 using MappedArrays
 
-batches = mappedarray(augmentbatch, batchview((X, y), maxsize=batch_size))
+batches = batchview((X, y), maxsize=batch_size)
+# lazy evaluation: the augmentation applies lazily until you indexing into `batches`
+batches = mappedarray(augmentbatch, batches)
+# eager evaluation: the augmentation applies when this line gets executed.
+# batches = augmentbatch.(batches)
+
+# The output is already the expected WHCN format
+# size(batches[1][1]) == (28, 28, 1, 32)
+# size(batches[1][2]) == (10, 32)
+@assert size(batches[1][1]) == (28, 28, 1, 32) # hide
+@assert size(batches[1][2]) == (10, 32) # hide
 
 nothing # hide
 ```
