@@ -7,18 +7,33 @@
 [![unittest][action-img]][action-url]
 [![codecov][codecov-img]][codecov-url]
 
-A **fast** Julia library for increasing the number of training
-images by applying various transformations.
+**Augmentor.jl** is a *fast* Julia library designed to make the process of
+image augmentation more convenient, less error-prone, and easier to reproduce.
+It offers a simple way to build flexible **augmentation pipelines**. For our
+purposes, an augmentation pipeline can be understood as a sequence of
+operations for which the parameters can (but need not) be random variables.
 
-Augmentor is a real-time image augmentation library designed to
-render the process of artificial dataset enlargement more
-convenient, less error prone, and easier to reproduce. It offers
-the user the ability to build a *stochastic image-processing
-pipeline* -- which we will also refer to as *augmentation
-pipeline* -- using image operations as building blocks. For our
-purposes, an augmentation pipeline can be understood as a
-sequence of operations for which the parameters can (but need
-not) be random variables.
+When augmenting, Augmentor.jl uses multiple heuristics to generate efficient
+tailor-made code for the concrete user-specified augmentation pipeline. In
+particular, Augmentor tries to avoid the need for any intermediate images and
+aims to compute the output image directly from the input in one single pass.
+
+## Overview
+
+Augmentor.jl provides many augmentation operations such as rotations, flipping,
+blurring, and more. See the
+[documentation](https://evizero.github.io/Augmentor.jl/stable/operations/) for
+the complete list of available operations.
+
+The package uses the `|>` operator to **compose** operations into a pipeline.
+
+Prepared pipelines are applied to images by calling one of the higher-level
+functions: `augment`, `augment!`, or `augmentbatch!`.
+
+The full documentation is available at
+[evizero.github.io/Augmentor.jl/](https://evizero.github.io/Augmentor.jl/).
+
+## Example
 
 ```julia
 julia> pl = ElasticDistortion(6, scale=0.3, border=true) |>
@@ -38,44 +53,33 @@ julia> augment(img, pl)
 
 ![](https://evizero.github.io/Augmentor.jl/dev/mnist_preview.gif)
 
-The Julia version of Augmentor is engineered specifically for
-high performance applications. It makes use of multiple
-heuristics to generate efficient tailor-made code for the
-concrete user-specified augmentation pipeline. In particular
-Augmentor tries to avoid the need for any intermediate images,
-but instead aims to compute the output image directly from the
-input in one single pass.
+For more examples, see [the documentation](https://evizero.github.io/Augmentor.jl/).
 
-**Augmentor.jl** is the [Julia](http://julialang.org)
-implementation for Augmentor. The Python version of the same name
-is available [here](https://github.com/mdbloice/Augmentor).
+## Contributing
 
-## Package Overview
+Contributions are greatly appreciated!
 
-Augmentor.jl provides:
-
-* predefined augmentation operations, e.g., `FlipX`
-* `|>` operator to compose operations into a pipeline
-* higher-lvel functions (`augment`, `augment!` and `augmentbatch!`) that works on a pipeline and image(s).
-
-Check the [documentation](https://evizero.github.io/Augmentor.jl/stable/operations/) for a full list of operations.
+To report a potential **bug** or propose a **new feature**, please file a *new
+issue*. *Pull requests* are always welcome. However, to make sure the PR gets
+accepted, it is generally preferred when it follows a particular issue to which
+it refers.
 
 ## Citing Augmentor
 
-If you use Augmentor for academic research and wish to cite it,
-please use the following paper.
+If you use Augmentor for academic research and wish to cite it, please use the
+following paper.
 
-Marcus D. Bloice, Christof Stocker, and Andreas Holzinger,
-*Augmentor: An Image Augmentation Library for Machine Learning*,
-arXiv preprint **arXiv:1708.04680**,
+Marcus D. Bloice, Christof Stocker, and Andreas Holzinger, *Augmentor: An Image
+Augmentation Library for Machine Learning*, arXiv preprint **arXiv:1708.04680**,
 <https://arxiv.org/abs/1708.04680>, 2017.
 
 ## Acknowledgments
 
-This package makes heavy use of the following packages in order
-to provide it's main functionality. To see at full list of
-utilized packages, please take a look at the [REQUIRE](./REQUIRE)
-file.
+This package is inspired by a Python library of the same name available at
+[github.com/mdbloice/Augmentor](https://github.com/mdbloice/Augmentor).
+
+To provide most of the operations, Augmentor.jl makes heavy use of many
+packages. To name a few:
 
 - [FugroRoames/CoordinateTransformations.jl](https://github.com/FugroRoames/CoordinateTransformations.jl)
 - [JuliaImages/ImageTransformations.jl](https://github.com/JuliaImages/ImageTransformations.jl)

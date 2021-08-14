@@ -1,6 +1,7 @@
 {
     "order":[
         "layout.jl",
-        "utilities.jl"
+        "utilities.jl",
+        "higherorder.jl"
     ]
 }
