@@ -33,6 +33,8 @@ y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 
 # size(X) == (28, 28, 1, 32)
 # size(y) == (10, 32)
+@assert size(X) == (28, 28, 1, 32) # hide
+@assert size(y) == (10, 32) # hide
 
 # `data = batches[1]` means the first batch input:
 #     - `data[1]` is a batch extracted from `X`
