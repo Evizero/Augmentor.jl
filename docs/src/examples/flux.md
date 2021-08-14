@@ -110,7 +110,7 @@ nothing # hide
 Iterating over batches will now produce augmented images. No other changes are
 required.
 
-## Complete example
+## [Complete example](@id flux_mnist_complete_example)
 
 ```@example
 using Augmentor, Flux, MappedArrays, MLDatasets, MLDataUtils
