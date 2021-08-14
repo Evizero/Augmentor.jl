@@ -1,5 +1,5 @@
 # ---
-# title: General functions
+# title: Higher-order functions
 # description: a set of helper opeartions that allow applying any function
 # ---
 

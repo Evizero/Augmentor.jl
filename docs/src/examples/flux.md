@@ -38,7 +38,7 @@ y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 
 # `data = batches[1]` means the first batch input:
 #     - `data[1]` is a batch extracted from `X`
-#     - `data[2]` is a batch extracted from `Y`
+#     - `data[2]` is a batch extracted from `y`
 # We also apply `shuffleobs` to get a random batch view.
 batches = batchview(shuffleobs((X, y)), maxsize=batch_size)
 
@@ -78,6 +78,8 @@ we use `Gray` image here so that the same pipeline also applies to `RGB` image.
     specifications like `Lab`, `HSV` and you'll notice the ambiguity here.
 
 ```@example flux
+using ImageCore
+
 X = Gray.(MNIST.traintensor(Float32, 1:n_instances))
 y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 
@@ -87,9 +89,9 @@ nothing # hide
 Augmentation is given by an augmentation pipeline. Our pipeline is a
 composition of three operations:
 
-  1. [`ElasticDistortion`](@ref) is the only image operation in this pipeline,
-  2. [`Reshape`](@ref) adds the singleton dimension that is required by Flux.
-  3. [`SplitChannels`](@ref) split the colorant array into the plain numerical array so that deep learning frameworks are happy with the layout.
+  1. [`ElasticDistortion`](@ref) is the only image operation in this pipeline.
+  2. [`SplitChannels`](@ref) split the colorant array into the plain numerical array so that deep learning frameworks are happy with the layout.
+  2. [`PermuteDims`](@ref) permutes the dimension of each image to match WHC.
 
 The operations are composed by the `|>` operator.
 
@@ -101,7 +103,8 @@ pl = ElasticDistortion(6, 6,
                        scale=0.3,
                        iter=3,
                        border=true) |>
-     Reshape(28, 28, 1)
+     SplitChannels() |>
+     PermuteDims((3, 1, 2))
 ```
 
 Next, we define two helper functions.
@@ -134,13 +137,13 @@ required.
 ## [Complete example](@id flux_mnist_complete_example)
 
 ```@example
-using Augmentor, Flux, MappedArrays, MLDatasets, MLDataUtils
+using Augmentor, Flux, ImageCore, MappedArrays, MLDatasets, MLDataUtils
 
 n_instances = 32
 batch_size = 32
 n_epochs = 16
 
-X = MNIST.traintensor(Float32, 1:n_instances)
+X = Gray.(MNIST.traintensor(Float32, 1:n_instances))
 y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 
 pl = ElasticDistortion(6, 6,
@@ -148,7 +151,8 @@ pl = ElasticDistortion(6, 6,
                        scale=0.3,
                        iter=3,
                        border=true) |>
-     Reshape(28, 28, 1)
+     SplitChannels() |>
+     PermuteDims((2, 3, 1))
 
 outbatch(X) = Array{Float32}(undef, (28, 28, 1, nobs(X)))
 augmentbatch((X, y)) = (augmentbatch!(outbatch(X), X, pl), y)
