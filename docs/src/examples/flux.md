@@ -34,7 +34,11 @@ y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 # size(X) == (28, 28, 1, 32)
 # size(y) == (10, 32)
 
-batches = batchview((X, y), maxsize=batch_size)
+# `data = batches[1]` means the first batch input:
+#     - `data[1]` is a batch extracted from `X`
+#     - `data[2]` is a batch extracted from `Y`
+# We also apply `shuffleobs` to get a random batch view.
+batches = batchview(shuffleobs((X, y)), maxsize=batch_size)
 
 predict = Chain(Conv((3, 3), 1=>16, pad=(1, 1), relu),
                 MaxPool((2,2)),
