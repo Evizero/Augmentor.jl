@@ -25,8 +25,7 @@ blurring, and more. See the
 [documentation](https://evizero.github.io/Augmentor.jl/stable/operations/) for
 the complete list of available operations.
 
-The package exports the `|>` operator, which **composes** operations, forming a
-pipeline.
+The package uses the `|>` operator to **compose** operations into a pipeline.
 
 Prepared pipelines are applied to images by calling one of the higher-level
 functions: `augment`, `augment!`, or `augmentbatch!`.
