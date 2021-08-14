@@ -83,10 +83,11 @@ nothing # hide
 ```
 
 Augmentation is given by an augmentation pipeline. Our pipeline is a
-composition of two operations:
+composition of three operations:
 
   1. [`ElasticDistortion`](@ref) is the only image operation in this pipeline,
   2. [`Reshape`](@ref) adds the singleton dimension that is required by Flux.
+  3. [`SplitChannels`](@ref) split the colorant array into the plain numerical array so that deep learning frameworks are happy with the layout.
 
 The operations are composed by the `|>` operator.
 
