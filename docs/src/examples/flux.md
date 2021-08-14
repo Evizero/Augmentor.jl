@@ -5,7 +5,8 @@ This example shows a way to use Augmentor to provide images for training
 [MNIST database of handwritten digits](http://yann.lecun.com/exdb/mnist/) as
 our input data.
 
-To skip all the talking and see the code, go ahead to [Complete example](@ref flux_mnist_complete_example).
+To skip all the talking and see the code, go ahead to [Complete example](@ref
+flux_mnist_complete_example).
 
 ## Ordinary training
 
@@ -66,16 +67,18 @@ nothing # hide
 
 Augmentor aims to provide generic image augmentation support for any machine
 learning framework and not just deep learning. Except for the grayscale images,
-Augmentor assumes every image is an array of `Colorant`. Without loss of generality,
-we use `Gray` image here so that the same pipeline also applies to `RGB` image.
+Augmentor assumes every image is an array of `Colorant`. Without loss of
+generality, we use `Gray` image here so that the same pipeline also applies to
+`RGB` image.
 
 !!! warning "Use colorant array whenever you can"
-    If you pass a 3d numerical array, e.g., of size `(28, 28, 3)` and interpret it as an RGB
-    array, you'll almost definitely get an incorrect result from Augmentor. This is because
-    Augmentor and the entire JuliaImages ecosystem uses `Array{RGB{Float32}, 2}` to
-    represent an `RGB` array. Without any explicit note, `Array{Float32, 3}` will be
-    interpreted as a 3d gray image instead of any colorful image. Just think of the color
-    specifications like `Lab`, `HSV` and you'll notice the ambiguity here.
+    If you pass a 3d numerical array, e.g., of size `(28, 28, 3)` and interpret
+    it as an RGB array, you'll almost definitely get an incorrect result from
+    Augmentor. This is because Augmentor and the entire JuliaImages ecosystem
+    uses `Array{RGB{Float32}, 2}` to represent an `RGB` array. Without any
+    explicit note, `Array{Float32, 3}` will be interpreted as a 3d gray image
+    instead of any colorful image. Just think of the color specifications like
+    `Lab`, `HSV` and you'll notice the ambiguity here.
 
 ```@example flux
 using ImageCore
@@ -90,7 +93,8 @@ Augmentation is given by an augmentation pipeline. Our pipeline is a
 composition of three operations:
 
   1. [`ElasticDistortion`](@ref) is the only image operation in this pipeline.
-  2. [`SplitChannels`](@ref) split the colorant array into the plain numerical array so that deep learning frameworks are happy with the layout.
+  2. [`SplitChannels`](@ref) split the colorant array into the plain numerical
+     array so that deep learning frameworks are happy with the layout.
   2. [`PermuteDims`](@ref) permutes the dimension of each image to match WHC.
 
 The operations are composed by the `|>` operator.
@@ -104,7 +108,7 @@ pl = ElasticDistortion(6, 6,
                        iter=3,
                        border=true) |>
      SplitChannels() |>
-     PermuteDims((3, 1, 2))
+     PermuteDims((2, 3, 1))
 ```
 
 Next, we define two helper functions.
@@ -118,21 +122,20 @@ augmentbatch((X, y)) = (augmentbatch!(outbatch(X), X, pl), y)
 nothing # hide
 ```
 
-In many deep learning tasks, the augmentation is applied lazily during the data iteration.
-For this purpose, we wrap the batches with a [mapped
+In many deep learning tasks, the augmentation is applied lazily during the data
+iteration. For this purpose, we wrap the batches with a [mapped
 array](https://github.com/JuliaArrays/MappedArrays.jl/) in order to augment
-each batch only when it's required.
+each batch right before feeding it to the network.
 
 ```@example flux
 using MappedArrays
 
 batches = batchview((X, y), maxsize=batch_size)
-# lazy evaluation: the augmentation applies lazily until you indexing into `batches`
 batches = mappedarray(augmentbatch, batches)
-# eager evaluation: the augmentation applies when this line gets executed.
+# eager alternative: augmentation happens when this line gets executed
 # batches = augmentbatch.(batches)
 
-# The output is already the expected WHCN format
+# The output is already in the expected WHCN format
 # size(batches[1][1]) == (28, 28, 1, 32)
 # size(batches[1][2]) == (10, 32)
 @assert size(batches[1][1]) == (28, 28, 1, 32) # hide
