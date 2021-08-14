@@ -112,9 +112,10 @@ augmentbatch((X, y)) = (augmentbatch!(outbatch(X), X, pl), y)
 nothing # hide
 ```
 
-Finally, we wrap the batches with a [mapped
+In many deep learning tasks, the augmentation is applied lazily during the data iteration.
+For this purpose, we wrap the batches with a [mapped
 array](https://github.com/JuliaArrays/MappedArrays.jl/) in order to augment
-each batch.
+each batch only when it's required.
 
 ```@example flux
 using MappedArrays
