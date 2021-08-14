@@ -76,7 +76,8 @@ we use `Gray` image here so that the same pipeline also applies to `RGB` image.
     specifications like `Lab`, `HSV` and you'll notice the ambiguity here.
 
 ```@example flux
-X = MNIST.traintensor(Float32, 1:n_instances)
+X = Gray.(MNIST.traintensor(Float32, 1:n_instances))
+y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
 
 nothing # hide
 ```
