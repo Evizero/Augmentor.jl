@@ -24,15 +24,16 @@
 
 Make sure `img` is either a `InvWarpedView` or a `SubArray` of
 one. If that is already the case, `img` will be returned as is.
-Otherwise `invwarpedview` will be called using a `Flat()`
+Otherwise `InvWarpedView` will be called using a `Flat()`
 extrapolation scheme.
 
 Doing this will tell subsequent operations that they should also
 participate as affine operations (i.e. use `AffineMap` if they
 can).
 """
-prepareaffine(img) = invwarpedview(img, toaffinemap(NoOp(), img), Flat())
-prepareaffine(img::AbstractExtrapolation) = invwarpedview(img, toaffinemap(NoOp(), img))
+prepareaffine(img) = InvWarpedView(img, toaffinemap(NoOp(), img),
+                                   fillvalue=Flat())
+prepareaffine(img::AbstractExtrapolation) = InvWarpedView(img, toaffinemap(NoOp(), img))
 @inline prepareaffine(img::SubArray{T,N,<:InvWarpedView}) where {T,N} = img
 @inline prepareaffine(img::InvWarpedView) = img
 prepareaffine(imgs::Tuple) = map(prepareaffine, imgs)
@@ -87,7 +88,8 @@ function applyaffineview(op::Operation, img::AbstractArray, param)
 end
 
 function applyaffine(op::AffineOperation, img::AbstractArray, param)
-    invwarpedview(img, toaffinemap(op, img, param))
+    InvWarpedView(img, toaffinemap(op, img, param),
+                  fillvalue=ImageTransformations.Reflect())
 end
 
 # Allow affine operations to omit specifying a custom
@@ -136,7 +138,7 @@ end
 end
 
 function applyaffine_common(op::AffineOperation, img::AbstractArray, param)
-    invwarpedview(img, toaffinemap_common(op, img, param))
+    InvWarpedView(img, toaffinemap_common(op, img, param))
 end
 
 function applyaffineview_common(op::AffineOperation, img::AbstractArray, param)
