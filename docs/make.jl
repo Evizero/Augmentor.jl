@@ -35,7 +35,9 @@ UserGuide = "User's guide" => [
     ]
 
 DevGuide = "Developer's guide" => [
-        "wrappers.md"
+        "devguide/wrappers.md",
+        "devguide/pipeline.md",
+        "devguide/operations.md"
     ]
 
 Examples = "Examples" => [
