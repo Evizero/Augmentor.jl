@@ -75,8 +75,8 @@ Augmentation Library for Machine Learning*, arXiv preprint **arXiv:1708.04680**,
 
 ## Acknowledgments
 
-This package is inspired by a Python library of the same name available at
-[github.com/mdbloice/Augmentor](https://github.com/mdbloice/Augmentor).
+A Python version of the package is also being developed as a sister project
+and is available at [mdbloice/Augmentor](https://github.com/mdbloice/Augmentor)
 
 To provide most of the operations, Augmentor.jl makes heavy use of many
 packages. To name a few:
