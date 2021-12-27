@@ -33,7 +33,6 @@
         @test @inferred(Augmentor.toaffinemap(Rotate90(), rect)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         @test @inferred(Augmentor.toaffinemap(Rotate90(), rect, 90)) ≈ AffineMap([6.12323e-17 -1.0; 1.0 6.12323e-17], [3.5,0.5])
         wv = @inferred Augmentor.applyaffine(Rotate90(), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
         # check that the affine map is computed for each image
@@ -47,7 +46,6 @@
         wv = @inferred Augmentor.applyaffineview(Rotate90(), Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
-        @test parent(parent(wv)).itp.coefs === square
         @test wv == rotl90(square)
     end
     @testset "lazy" begin
@@ -61,7 +59,6 @@
         @test v == rotl90(rect)
         @test typeof(v) <: SubArray
         wv = @inferred Augmentor.applylazy(Rotate90(), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
         res1, res2 = @inferred(Augmentor.applylazy(Rotate90(), (square, square2)))
@@ -119,7 +116,6 @@ end
         @test_throws MethodError Augmentor.applyaffine(Rotate180(), nothing)
         @test @inferred(Augmentor.toaffinemap(Rotate180(), rect)) ≈ AffineMap([-1.0 -1.22465e-16; 1.22465e-16 -1.0], [3.0,4.0])
         wv = @inferred Augmentor.applyaffine(Rotate180(), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv[1:3,1:3] == rot180(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
@@ -129,7 +125,6 @@ end
         wv = @inferred Augmentor.applyaffineview(Rotate180(), Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
-        @test parent(parent(wv)).itp.coefs === square
         @test wv[1:3,1:3] == rot180(square)
     end
     @testset "lazy" begin
@@ -139,7 +134,6 @@ end
         @test v == rot180(rect)
         @test typeof(v) <: SubArray
         wv = @inferred Augmentor.applylazy(Rotate180(), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv[1:3,1:3] == rot180(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
@@ -196,7 +190,6 @@ end
         @test_throws MethodError Augmentor.applyaffine(Rotate270(), nothing)
         @test @inferred(Augmentor.toaffinemap(Rotate270(), rect)) ≈ AffineMap([6.12323e-17 1.0; -1.0 6.12323e-17], [-0.5,3.5])
         wv = @inferred Augmentor.applyaffine(Rotate270(), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
@@ -206,7 +199,6 @@ end
         wv = @inferred Augmentor.applyaffineview(Rotate270(), Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
-        @test parent(parent(wv)).itp.coefs === square
         @test wv == rotr90(square)
     end
     @testset "lazy" begin
@@ -220,7 +212,6 @@ end
         @test v == rotr90(rect)
         @test typeof(v) <: SubArray
         wv = @inferred Augmentor.applylazy(Rotate270(), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
@@ -330,11 +321,9 @@ end
         @test Augmentor.supports_affine(Rotate) === true
         @test_throws MethodError Augmentor.applyaffine(Rotate(90), nothing)
         wv = @inferred Augmentor.applyaffine(Rotate(90), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
         wv = @inferred Augmentor.applyaffine(Rotate(-90), Augmentor.prepareaffine(square))
-        @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end
@@ -344,22 +333,18 @@ end
         wv = @inferred Augmentor.applyaffineview(Rotate(90), Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
-        @test parent(parent(wv)).itp.coefs === square
         @test wv == rotl90(square)
         wv = @inferred Augmentor.applyaffineview(Rotate(-90), Augmentor.prepareaffine(square))
         @test typeof(wv) <: SubArray{eltype(square),2}
         @test typeof(parent(wv)) <: InvWarpedView
-        @test parent(parent(wv)).itp.coefs === square
         @test wv == rotr90(square)
     end
     @testset "lazy" begin
         @test Augmentor.supports_lazy(Rotate(90)) === true
         wv = @inferred Augmentor.applylazy(Rotate(90), square)
-        @test parent(wv).itp.coefs === square
         @test wv == rotl90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
         wv = @inferred Augmentor.applylazy(Rotate(-90), square)
-        @test parent(wv).itp.coefs === square
         @test wv == rotr90(square)
         @test typeof(wv) <: InvWarpedView{eltype(square),2}
     end

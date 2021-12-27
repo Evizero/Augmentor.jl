@@ -86,7 +86,7 @@ function applyaffineview(op::Resize{N}, img::AbstractArray{T,N}, param) where {T
     tinv = toaffinemap(op, img, param)
     inds = ImageTransformations.autorange(img, tinv)
     pad_inds = map((s,r)-> s>=1 ? padrange(r,ceil(Int,s/2)) : r, sf, inds)
-    wv = invwarpedview(img, tinv, pad_inds)
+    wv = InvWarpedView(img, tinv, pad_inds, fillvalue=Flat())
     # expanding will cause an additional pixel that has to be skipped
     indirect_view(wv, map(s->2:s+1, op.size))
 end
