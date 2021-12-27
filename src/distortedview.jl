@@ -8,8 +8,8 @@ struct DistortedView{T,P<:AbstractMatrix,E<:AbstractExtrapolation,G,D} <: Abstra
         @assert size(grid,1) == 2
         # to compare two DistortedViews, their `axes` should be the same
         parent = plain_axes(parent)
-        etp = ImageTransformations.box_extrapolation(parent, Flat())
-        field = ImageTransformations.box_extrapolation(grid, 0.0)
+        etp = ImageTransformations.box_extrapolation(parent, fillvalue=Flat())
+        field = ImageTransformations.box_extrapolation(grid, fillvalue=0.0)
         new{T,typeof(parent),typeof(etp),typeof(grid),typeof(field)}(parent, etp, grid, field)
     end
 end
