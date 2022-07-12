@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Integration with Flux.jl · Augmentor.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/><link href="../../assets/style.css" rel="stylesheet" type="text/css"/><link href="../../democards/gridtheme.css" rel="stylesheet" type="text/css"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="Augmentor.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Augmentor.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Introduction</a></li><li><a class="tocitem" href="../../gettingstarted/">Getting Started</a></li><li><span class="tocitem">User&#39;s guide</span><ul><li><a class="tocitem" href="../../interface/">High-level Interface</a></li><li><a class="tocitem" href="../../operations/">Supported Operations</a></li></ul></li><li><span class="tocitem">Developer&#39;s guide</span><ul><li><a class="tocitem" href="../../wrappers/">Semantic Wrappers</a></li></ul></li><li><span class="tocitem">Examples</span><ul><li class="is-active"><a class="tocitem" href>Integration with Flux.jl</a><ul class="internal"><li><a class="tocitem" href="#Ordinary-training"><span>Ordinary training</span></a></li><li><a class="tocitem" href="#Adding-augmentation"><span>Adding augmentation</span></a></li><li><a class="tocitem" href="#flux_mnist_complete_example"><span>Complete example</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../license/">License</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Integration with Flux.jl</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Integration with Flux.jl</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Evizero/Augmentor.jl/blob/master/docs/src/examples/flux.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Integration-with-Flux.jl"><a class="docs-heading-anchor" href="#Integration-with-Flux.jl">Integration with Flux.jl</a><a id="Integration-with-Flux.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Integration-with-Flux.jl" title="Permalink"></a></h1><p>This example shows a way to use Augmentor to provide images for training <a href="https://github.com/FluxML/Flux.jl/">Flux.jl</a> models. We will be using the <a href="http://yann.lecun.com/exdb/mnist/">MNIST database of handwritten digits</a> as our input data.</p><p>To skip all the talking and see the code, go ahead to <a href="#flux_mnist_complete_example">Complete example</a>.</p><h2 id="Ordinary-training"><a class="docs-heading-anchor" href="#Ordinary-training">Ordinary training</a><a id="Ordinary-training-1"></a><a class="docs-heading-anchor-permalink" href="#Ordinary-training" title="Permalink"></a></h2><p>Let&#39;s first show how training looks without any augmentation.</p><p>We are using the <a href="https://github.com/JuliaML/MLDataSets.jl">MLDataSets.jl</a> package to coveniently access the MNIST dataset. To reduce the training time, we are working only with a subset of the data.</p><p>After collecting the data, we divide them into batches using <code>batchview</code> from <a href="https://github.com/JuliaML/MLDataUtils.jl">MLDataUtils.jl</a>. We then create a model, pick a loss function and an optimizer, and start the training.</p><pre><code class="language-">using Flux, MLDatasets, MLDataUtils
+
+n_instances = 32
+batch_size = 32
+n_epochs = 16
+
+# Flux requires a 4D numerical array in WHCN (width, height, channel, batch)
+# format thus we need to insert a dummy dimension to indicate `C=1`(gray image).
+X = Flux.unsqueeze(MNIST.traintensor(Float32, 1:n_instances), 3)
+y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
+
+# size(X) == (28, 28, 1, 32)
+# size(y) == (10, 32)
+@assert size(X) == (28, 28, 1, 32) # hide
+@assert size(y) == (10, 32) # hide
+
+# `data = batches[1]` means the first batch input:
+#     - `data[1]` is a batch extracted from `X`
+#     - `data[2]` is a batch extracted from `y`
+# We also apply `shuffleobs` to get a random batch view.
+batches = batchview(shuffleobs((X, y)), maxsize=batch_size)
+
+predict = Chain(Conv((3, 3), 1=&gt;16, pad=(1, 1), relu),
+                MaxPool((2,2)),
+                Conv((3, 3), 16=&gt;32, pad=(1, 1), relu),
+                MaxPool((2,2)),
+                Conv((3, 3), 32=&gt;32, pad=(1, 1), relu),
+                MaxPool((2, 2)),
+                flatten,
+                Dense(288, 10))
+
+loss(X, y) = Flux.Losses.logitcrossentropy(predict(X), y)
+
+opt = Flux.Optimise.ADAM(0.001)
+
+for epoch in 1:n_epochs
+    Flux.train!(loss, params(predict), batches, opt)
+end
+
+nothing # hide</code></pre><h2 id="Adding-augmentation"><a class="docs-heading-anchor" href="#Adding-augmentation">Adding augmentation</a><a id="Adding-augmentation-1"></a><a class="docs-heading-anchor-permalink" href="#Adding-augmentation" title="Permalink"></a></h2><p>Augmentor aims to provide generic image augmentation support for any machine learning framework and not just deep learning. Except for the grayscale images, Augmentor assumes every image is an array of <code>Colorant</code>. Without loss of generality, we use <code>Gray</code> image here so that the same pipeline also applies to <code>RGB</code> image.</p><div class="admonition is-warning"><header class="admonition-header">Use colorant array whenever you can</header><div class="admonition-body"><p>If you pass a 3d numerical array, e.g., of size <code>(28, 28, 3)</code> and interpret it as an RGB array, you&#39;ll almost definitely get an incorrect result from Augmentor. This is because Augmentor and the entire JuliaImages ecosystem uses <code>Array{RGB{Float32}, 2}</code> to represent an <code>RGB</code> array. Without any explicit note, <code>Array{Float32, 3}</code> will be interpreted as a 3d gray image instead of any colorful image. Just think of the color specifications like <code>Lab</code>, <code>HSV</code> and you&#39;ll notice the ambiguity here.</p></div></div><pre><code class="language-julia">using ImageCore
+
+X = Gray.(MNIST.traintensor(Float32, 1:n_instances))
+y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)</code></pre><pre class="documenter-example-output">┌ Warning: MNIST.traintensor() is deprecated, use `MNIST(split=:train).features` instead.
+└ @ MLDatasets ~/.julia/packages/MLDatasets/eZ0Va/src/datasets/vision/mnist.jl:157
+┌ Warning: MNIST.trainlabels() is deprecated, use `MNIST(split=:train).targets` instead.
+└ @ MLDatasets ~/.julia/packages/MLDatasets/eZ0Va/src/datasets/vision/mnist.jl:173</pre><p>Augmentation is given by an augmentation pipeline. Our pipeline is a composition of three operations:</p><ol><li><a href="../../operations/distortions/elasticdistortion/#Augmentor.ElasticDistortion"><code>ElasticDistortion</code></a> is the only image operation in this pipeline.</li><li><a href="../../operations/misc/layout/#Augmentor.SplitChannels"><code>SplitChannels</code></a> split the colorant array into the plain numerical array so that deep learning frameworks are happy with the layout.</li><li><a href="../../operations/misc/layout/#Augmentor.PermuteDims"><code>PermuteDims</code></a> permutes the dimension of each image to match WHC.</li></ol><p>The operations are composed by the <code>|&gt;</code> operator.</p><pre><code class="language-julia">using Augmentor
+
+pl = ElasticDistortion(6, 6,
+                       sigma=4,
+                       scale=0.3,
+                       iter=3,
+                       border=true) |&gt;
+     SplitChannels() |&gt;
+     PermuteDims((2, 3, 1))</code></pre><pre class="documenter-example-output">3-step Augmentor.ImmutablePipeline:
+ 1.) Distort using a 3-times smoothed and normalized 6×6 grid
+ 2.) Split colorant into its color channels
+ 3.) Permute dimension order to (2, 3, 1)</pre><p>Next, we define two helper functions.</p><pre><code class="language-julia"># Creates an output array for augmented images
+outbatch(X) = Array{Float32}(undef, (28, 28, 1, nobs(X)))
+# Takes a batch (images and targets) and augments the images
+augmentbatch((X, y)) = (augmentbatch!(outbatch(X), X, pl), y)</code></pre><p>In many deep learning tasks, the augmentation is applied lazily during the data iteration. For this purpose, we wrap the batches with a <a href="https://github.com/JuliaArrays/MappedArrays.jl/">mapped array</a> in order to augment each batch right before feeding it to the network.</p><pre><code class="language-julia">using MappedArrays
+
+batches = batchview((X, y), maxsize=batch_size)
+batches = mappedarray(augmentbatch, batches)
+# eager alternative: augmentation happens when this line gets executed
+# batches = augmentbatch.(batches)
+
+# The output is already in the expected WHCN format
+# size(batches[1][1]) == (28, 28, 1, 32)
+# size(batches[1][2]) == (10, 32)</code></pre><p>Iterating over batches will now produce augmented images. No other changes are required.</p><h2 id="flux_mnist_complete_example"><a class="docs-heading-anchor" href="#flux_mnist_complete_example">Complete example</a><a id="flux_mnist_complete_example-1"></a><a class="docs-heading-anchor-permalink" href="#flux_mnist_complete_example" title="Permalink"></a></h2><pre><code class="language-">using Augmentor, Flux, ImageCore, MappedArrays, MLDatasets, MLDataUtils
+
+n_instances = 32
+batch_size = 32
+n_epochs = 16
+
+X = Gray.(MNIST.traintensor(Float32, 1:n_instances))
+y = Flux.onehotbatch(MNIST.trainlabels(1:n_instances), 0:9)
+
+pl = ElasticDistortion(6, 6,
+                       sigma=4,
+                       scale=0.3,
+                       iter=3,
+                       border=true) |&gt;
+     SplitChannels() |&gt;
+     PermuteDims((2, 3, 1))
+
+outbatch(X) = Array{Float32}(undef, (28, 28, 1, nobs(X)))
+augmentbatch((X, y)) = (augmentbatch!(outbatch(X), X, pl), y)
+
+batches = mappedarray(augmentbatch, batchview((X, y), maxsize=batch_size))
+
+predict = Chain(Conv((3, 3), 1=&gt;16, pad=(1, 1), relu),
+                MaxPool((2,2)),
+                Conv((3, 3), 16=&gt;32, pad=(1, 1), relu),
+                MaxPool((2,2)),
+                Conv((3, 3), 32=&gt;32, pad=(1, 1), relu),
+                MaxPool((2, 2)),
+                flatten,
+                Dense(288, 10))
+
+loss(X, y) = Flux.Losses.logitcrossentropy(predict(X), y)
+
+opt = Flux.Optimise.ADAM(0.001)
+
+for epoch in 1:n_epochs
+    Flux.train!(loss, params(predict), batches, opt)
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../wrappers/">« Semantic Wrappers</a><a class="docs-footer-nextpage" href="../../license/">License »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 12 July 2022 16:03">Tuesday 12 July 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
